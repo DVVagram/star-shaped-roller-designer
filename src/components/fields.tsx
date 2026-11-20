@@ -157,6 +157,41 @@ export function OptionCards<T extends string>({
   );
 }
 
+export function PresetButtons<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: T | null;
+  options: { value: T; label: string }[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div role="group" aria-label={label} className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+      {options.map((option) => {
+        const active = option.value === value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(option.value)}
+            className={
+              active
+                ? "rounded-lg border border-accent/60 bg-accent-soft/70 px-2 py-1.5 text-[11px] font-semibold text-accent-strong transition"
+                : "rounded-lg border border-line bg-white px-2 py-1.5 text-[11px] font-medium text-muted transition hover:bg-paper-deep/40 hover:text-ink"
+            }
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function Toggle({
   id,
   label,

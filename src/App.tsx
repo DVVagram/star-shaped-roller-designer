@@ -1,4 +1,12 @@
+import { useEffect, useState, type ReactNode } from "react";
+
+import DesignerPage, { type DesignerPageProps } from "@/components/DesignerPage";
+import FanBuilder from "@/components/FanBuilder";
+import PropellerBuilder from "@/components/PropellerBuilder";
+import SprocketBuilder from "@/components/SprocketBuilder";
 import StarBuilder from "@/components/StarBuilder";
+
+/* ------------------------------------------------------------------- marks */
 
 const STAR_PATH = (() => {
   const tips = 8;
@@ -23,174 +31,359 @@ function StarMark({ className = "" }: { className?: string }) {
   );
 }
 
-const specChips = [
-  ["Spikes", "3 – 96"],
-  ["Wheel Ø", "20 – 180 mm"],
-  ["Spike depth", "0.5 – 80 mm"],
-] as const;
+function SprocketMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className}>
+      <circle
+        cx="16"
+        cy="16"
+        r="10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeDasharray="3.2 3.4"
+      />
+      <circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" strokeWidth="3" />
+    </svg>
+  );
+}
 
-const steps = [
-  {
-    number: "01",
-    title: "Set the wheel",
-    body: "Enter the wheel diameter, thickness and how deep the spikes bite. Leave auto-fit on and the spike count follows the dimensions you choose.",
-  },
-  {
-    number: "02",
-    title: "Shape the points",
-    body: "Pick rounded, truncated, sharp or swept claws, then tune tip width, valley width and a taper that narrows every point towards the top face.",
-  },
-  {
-    number: "03",
-    title: "Export the STL",
-    body: "The 3D view renders the same mesh the volume readout measures, so the file you download is the solid you have been looking at.",
-  },
+function ImpellerMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className}>
+      {[0, 60, 120, 180, 240, 300].map((angle) => (
+        <ellipse
+          key={angle}
+          cx="16"
+          cy="9"
+          rx="3.4"
+          ry="7"
+          fill="currentColor"
+          transform={`rotate(${angle} 16 16)`}
+        />
+      ))}
+      <circle cx="16" cy="16" r="3.4" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PropellerMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className}>
+      {[0, 120, 240].map((angle) => (
+        <path
+          key={angle}
+          d="M16 16 C 20 10, 21 4, 16 2.2 C 12 4, 12.6 10, 16 16 Z"
+          fill="currentColor"
+          transform={`rotate(${angle} 16 16)`}
+        />
+      ))}
+      <circle cx="16" cy="16" r="2.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+/* ---------------------------------------------------------------- routing */
+
+const ROUTE_IDS = ["star", "sprocket", "impeller", "propeller"] as const;
+type RouteId = (typeof ROUTE_IDS)[number];
+
+const NAV: { id: RouteId; label: string; href: string }[] = [
+  { id: "star", label: "Star roller", href: "#/" },
+  { id: "sprocket", label: "Sprocket", href: "#/sprocket" },
+  { id: "impeller", label: "Impeller", href: "#/impeller" },
+  { id: "propeller", label: "Propeller", href: "#/propeller" },
 ];
 
+function routeFromHash(): RouteId | null {
+  if (typeof window === "undefined") return "star";
+  const raw = window.location.hash.replace(/^#\/?/, "").toLowerCase();
+  if (raw === "") return "star";
+  return (ROUTE_IDS as readonly string[]).includes(raw) ? (raw as RouteId) : null;
+}
+
+/** Hash routing, so the whole suite stays a static site. */
+function useRoute(): RouteId {
+  const [route, setRoute] = useState<RouteId>(() => routeFromHash() ?? "star");
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const next = routeFromHash();
+      if (!next) return;
+      setRoute(next);
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  return route;
+}
+
+function NavLinks({ route }: { route: RouteId }) {
+  return (
+    <>
+      {NAV.map((item) => {
+        const active = item.id === route;
+        return (
+          <a
+            key={item.id}
+            href={item.href}
+            aria-current={active ? "page" : undefined}
+            className={
+              active
+                ? "shrink-0 rounded-md bg-card px-2.5 py-1 text-[11px] font-semibold text-ink ring-1 ring-line"
+                : "shrink-0 rounded-md px-2.5 py-1 text-[11px] font-medium text-muted transition hover:bg-card hover:text-ink"
+            }
+          >
+            {item.label}
+          </a>
+        );
+      })}
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ pages */
+
+type PageConfig = Omit<DesignerPageProps, "children"> & { builder: ReactNode };
+
+const PAGES: Record<RouteId, PageConfig> = {
+  star: {
+    mark: <StarMark className="size-3.5" />,
+    eyebrow: "Fully parametric",
+    title: (
+      <>
+        Star rollers,
+        <br />
+        made to spec.
+      </>
+    ),
+    lede: "Design a 3D-printable star-spiked wheel by diameter, spike shape and centre hole. The point count fits itself to the room you give it, the solid updates as you type, and the STL comes out watertight.",
+    chips: [
+      { label: "Spikes", value: "3 – 96" },
+      { label: "Wheel Ø", value: "20 – 180 mm" },
+      { label: "Spike depth", value: "0.5 – 80 mm" },
+    ],
+    builderTitle: "Build your roller",
+    builderLede: "Millimetres or inches — every field is live.",
+    builderNote:
+      "Printable range: 3–96 spikes inside a 180 × 180 × 180 mm build volume. Anything outside is blocked before export.",
+    steps: [
+      {
+        number: "01",
+        title: "Set the wheel",
+        body: "Enter the wheel diameter, thickness and how deep the spikes bite. Leave auto-fit on and the spike count follows the dimensions you choose.",
+      },
+      {
+        number: "02",
+        title: "Shape the points",
+        body: "Pick rounded, truncated, sharp or swept claws, then tune tip width, valley width and a taper that narrows every point towards the top face.",
+      },
+      {
+        number: "03",
+        title: "Export the STL",
+        body: "The 3D view renders the same mesh the volume readout measures, so the file you download is the solid you have been looking at.",
+      },
+    ],
+    checklist: [
+      "A closed indexed mesh: every edge is shared by exactly two consistently wound triangles, so the exported STL is watertight by construction rather than by repair.",
+      "A binary STL in millimetres with the real spike profile, valley, centre hole and hub — not a bounding box or an approximation.",
+      "A measured solid volume, so you can size the part before you slice.",
+    ],
+    notesTitle: "How the points fit",
+    notes: [
+      "Each spike owns one pitch of 2π / N. Inside that pitch it spends angular room on its tip land, its valley land and a printable flank. Auto-fit takes the largest count whose lands and flanks still fit at your diameter and depth — so widening the wheel adds points and deepening the spikes takes them away.",
+      "Print spikes with at least three perimeters and a small layer height; tall thin points are the first thing to snap on a printed roller.",
+    ],
+    builder: <StarBuilder />,
+  },
+
+  sprocket: {
+    mark: <SprocketMark className="size-3.5" />,
+    eyebrow: "Chain driven",
+    title: (
+      <>
+        Sprockets,
+        <br />
+        cut for the chain.
+      </>
+    ),
+    lede: "Pick a roller chain, set the tooth count and the bore. The seats are cut to the real chain pitch and roller, so the wheel you print actually engages the links — and the pitch circle is reported before you slice.",
+    chips: [
+      { label: "Teeth", value: "6 – 72" },
+      { label: "Chain", value: "#25 – #50" },
+      { label: "Seat", value: "roller + gap" },
+    ],
+    builderTitle: "Build your sprocket",
+    builderLede: "The preset sets pitch and roller; every field stays live.",
+    builderNote:
+      "Printable range: 6–72 teeth inside a 180 × 180 × 180 mm build volume. Teeth that collide with the seats are blocked before export.",
+    steps: [
+      {
+        number: "01",
+        title: "Pick the chain",
+        body: "The #25 to #50 presets set the pitch and the roller diameter. Override either one when you are matching a measured chain.",
+      },
+      {
+        number: "02",
+        title: "Set the teeth",
+        body: "The pitch circle follows p / sin(π / N), the seats are cut to the roller plus your clearance, and the flanks carry the tooth height you choose.",
+      },
+      {
+        number: "03",
+        title: "Export the STL",
+        body: "One closed shell with the bore and the optional hub. The file is the same solid the preview draws and the volume readout measures.",
+      },
+    ],
+    checklist: [
+      "A closed indexed mesh with one shell and one through-hole, verified before the download button unlocks.",
+      "Roller seats cut to the real roller diameter plus the clearance you set, on the true pitch circle for your tooth count.",
+      "A measured solid volume and tooth depth, so you can check the part against the chain before printing.",
+    ],
+    notesTitle: "How the seat is cut",
+    notes: [
+      "A chain roller sits in a circular seat whose centre is on the pitch circle. The profile follows the part of that circle facing the axis, so the seat floor is the root radius and the seat edges meet the flanks tangentially. Because the pitch circle grows as the tooth count rises, a given roller takes up less of each pitch — which is why small sprockets need more clearance.",
+      "Too tight and the chain binds; too loose and it skips a tooth. Start with 0.15 mm of clearance per side, print one link pair to test, then adjust.",
+    ],
+    builder: <SprocketBuilder />,
+  },
+
+  impeller: {
+    mark: <ImpellerMark className="size-3.5" />,
+    eyebrow: "Air moving",
+    title: (
+      <>
+        Impellers,
+        <br />
+        twisted to move air.
+      </>
+    ),
+    lede: "An axial impeller rotor: blades swept around a solid hub, leaned to the blade angle you choose. Diameter, blade count, chord, height and lean are all live, and the passage between blades is checked as you type.",
+    chips: [
+      { label: "Blades", value: "2 – 24" },
+      { label: "Tip Ø", value: "20 – 180 mm" },
+      { label: "Blade angle", value: "0 – 70°" },
+    ],
+    builderTitle: "Build your impeller",
+    builderLede: "Chords, sweep and lean are measured in millimetres and degrees.",
+    builderNote:
+      "Printable range: 2–24 blades inside a 180 × 180 × 180 mm build volume. Blades that overlap or lean into a neighbour are blocked before export.",
+    steps: [
+      {
+        number: "01",
+        title: "Size the rotor",
+        body: "Set the tip diameter and the hub. The blades span whatever radial length is left between them.",
+      },
+      {
+        number: "02",
+        title: "Set the blades",
+        body: "Blade count, chord at the root and at the tip, sweep and lean. The designer measures the narrowest passage between neighbouring blades.",
+      },
+      {
+        number: "03",
+        title: "Export the STL",
+        body: "The leaned walls are one closed shell, so the rotor slices without repair — and the hub bore is part of the same solid.",
+      },
+    ],
+    checklist: [
+      "One watertight shell: hub, blades and bore are built together, with no booleans or mesh repair.",
+      "The blades are a leaned extrusion of the plan — the top face is sheared by the blade angle, so the wall twists from root to tip.",
+      "A measured solid volume and the narrowest passage, so you know the part can be printed before you commit.",
+    ],
+    notesTitle: "How the blades are made",
+    notes: [
+      "Each blade is a band of constant chord wrapped along a swept centre line, so the passages between blades stay open all the way to the rim. The top face is displaced tangentially in proportion to the radius, which tilts each blade without moving the hub — the twist you see is that displacement, not a texture.",
+      "Lean is limited by the gap between blades: lean far enough and the top of a blade would run into its neighbour. The designer blocks that rather than export a self-intersecting solid.",
+    ],
+    builder: <FanBuilder />,
+  },
+
+  propeller: {
+    mark: <PropellerMark className="size-3.5" />,
+    eyebrow: "Pitch and thrust",
+    title: (
+      <>
+        Propellers,
+        <br />
+        pitched to bite.
+      </>
+    ),
+    lede: "Set the advance you want per revolution and the blade angle follows at 70 % of the tip radius, tapering from the root chord to the tip. Three blades by default, two to eight if you want them.",
+    chips: [
+      { label: "Blades", value: "2 – 8" },
+      { label: "Pitch", value: "mm / rev" },
+      { label: "Tip Ø", value: "20 – 180 mm" },
+    ],
+    builderTitle: "Build your propeller",
+    builderLede: "Pitch is the input; the blade angle is derived from it.",
+    builderNote:
+      "Printable range: 2–8 blades inside a 180 × 180 × 180 mm build volume. A pitch that would lean a blade into its neighbour is blocked before export.",
+    steps: [
+      {
+        number: "01",
+        title: "Set the disc",
+        body: "Tip diameter, hub diameter and the blade drop. The hub carries the shaft bore and the blades grow out of it.",
+      },
+      {
+        number: "02",
+        title: "Set the pitch",
+        body: "Pitch is the distance the prop would advance in one turn. The blade angle at 70 % radius follows from it, and the chords taper to the tip.",
+      },
+      {
+        number: "03",
+        title: "Export the STL",
+        body: "The blades, hub and bore come out as one closed shell, ready to slice and balance.",
+      },
+    ],
+    checklist: [
+      "One closed shell built from two corresponding outlines, so there is nothing to stitch or repair before slicing.",
+      "A real pitch: the blade angle is derived from the advance per revolution at 70 % radius, not typed in twice.",
+      "A measured volume, blade area and narrowest passage — enough to compare two props before printing either.",
+    ],
+    notesTitle: "How the pitch works",
+    notes: [
+      "Pitch is the distance a prop would travel forward in one revolution if nothing slipped. At any radius r the blade sits at an angle of atan(pitch / 2πr) to the disc, so the same pitch means a steeper angle near the hub and a shallower one at the tip. The designer evaluates that angle at 70 % radius — the station that does most of the work.",
+      "Printed props need balancing: sand the leading blade until the tip rests level, and print in a material that survives the rpm you intend to run.",
+    ],
+    builder: <PropellerBuilder />,
+  },
+};
+
+/* -------------------------------------------------------------------- app */
+
 export default function App() {
+  const route = useRoute();
+  const page = PAGES[route];
+  const { builder, ...content } = page;
+
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-30 border-b border-line/80 bg-paper/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <a href="/" className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight whitespace-nowrap">
-            <StarMark className="size-5 shrink-0 text-accent sm:size-6" />
-            <span className="truncate">
-              <span className="hidden sm:inline">Star Shaped </span>Roller Designer
-            </span>
-          </a>
-          <nav aria-label="Main" className="flex shrink-0 items-center gap-4 text-xs font-medium">
-            <a href="#builder" className="hidden text-muted transition hover:text-ink sm:inline">
-              Builder
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="flex h-14 items-center justify-between gap-4">
+            <a
+              href="#/"
+              className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight whitespace-nowrap"
+            >
+              <StarMark className="size-5 shrink-0 text-accent sm:size-6" />
+              <span className="truncate">Parametric Wheel Works</span>
             </a>
-            <a href="#how" className="hidden text-muted transition hover:text-ink sm:inline">
-              How it works
-            </a>
+            <nav aria-label="Designers" className="hidden items-center gap-1 sm:flex">
+              <NavLinks route={route} />
+            </nav>
+          </div>
+          <nav
+            aria-label="Designers"
+            className="-mx-1 flex items-center gap-1 overflow-x-auto px-1 pb-2 sm:hidden"
+          >
+            <NavLinks route={route} />
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
-        <section className="mx-auto max-w-6xl px-4 pb-10 pt-10 sm:px-6 sm:pt-16">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end">
-            <div>
-              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
-                <span aria-hidden="true" className="h-px w-8 bg-accent" />
-                Fully parametric
-              </p>
-              <h1 className="mt-4 max-w-2xl text-[2.6rem] font-semibold leading-[1.03] tracking-tight sm:text-6xl">
-                Star rollers,
-                <br />
-                made to spec.
-              </h1>
-              <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted">
-                Design a 3D-printable star-spiked wheel by diameter, spike shape and
-                centre hole. The point count fits itself to the room you give it, the
-                solid updates as you type, and the STL comes out watertight.
-              </p>
-            </div>
-
-            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line text-xs">
-              {specChips.map(([label, value]) => (
-                <div key={label} className="bg-card px-4 py-3.5">
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
-                    {label}
-                  </dt>
-                  <dd className="mt-0.5 font-mono text-[13px] text-ink numeric whitespace-nowrap">
-                    {value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </section>
-
-        <section
-          id="builder"
-          aria-labelledby="builder-heading"
-          className="mx-auto max-w-6xl px-4 pb-16 sm:px-6"
-        >
-          <div className="mb-5 flex flex-col gap-2 border-t border-line pt-8 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 id="builder-heading" className="text-xl font-semibold tracking-tight sm:text-2xl">
-                Build your roller
-              </h2>
-              <p className="mt-1 text-sm text-muted">
-                Millimetres or inches — every field is live.
-              </p>
-            </div>
-            <p className="max-w-sm text-xs leading-relaxed text-muted">
-              Printable range: 3–96 spikes inside a 180 × 180 × 180 mm build volume.
-              Anything outside is blocked before export.
-            </p>
-          </div>
-
-          <StarBuilder />
-        </section>
-
-        <section id="how" aria-labelledby="how-heading" className="border-y border-line bg-paper-deep/50">
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <h2 id="how-heading" className="text-xl font-semibold tracking-tight sm:text-2xl">
-                How it works
-              </h2>
-              <p className="text-xs text-muted">
-                One geometry engine for the preview, the measurements and the STL.
-              </p>
-            </div>
-            <ol className="mt-8 grid gap-6 sm:grid-cols-3">
-              {steps.map((step) => (
-                <li key={step.number} className="border-t border-line pt-4">
-                  <p className="font-mono text-xs text-accent">{step.number}</p>
-                  <h3 className="mt-2 text-sm font-semibold">{step.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{step.body}</p>
-                </li>
-              ))}
-            </ol>
-
-            <div className="mt-12 grid gap-6 rounded-2xl border border-line bg-card p-6 sm:grid-cols-2 sm:p-8">
-              <div>
-                <h3 className="text-sm font-semibold">What you get</h3>
-                <ul className="mt-3 space-y-2 text-sm text-muted">
-                  <li className="flex gap-2">
-                    <span aria-hidden="true" className="text-accent">
-                      ✓
-                    </span>
-                    A closed indexed mesh: every edge is shared by exactly two
-                    consistently wound triangles, so the exported STL is watertight by
-                    construction rather than by repair.
-                  </li>
-                  <li className="flex gap-2">
-                    <span aria-hidden="true" className="text-accent">
-                      ✓
-                    </span>
-                    A binary STL in millimetres with the real spike profile, valley,
-                    centre hole and hub — not a bounding box or an approximation.
-                  </li>
-                  <li className="flex gap-2">
-                    <span aria-hidden="true" className="text-accent">
-                      ✓
-                    </span>
-                    A measured solid volume, so you can size the part before you slice.
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold">How the points fit</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  Each spike owns one pitch of 2π / N. Inside that pitch it spends
-                  angular room on its tip land, its valley land and a printable flank.
-                  Auto-fit takes the largest count whose lands and flanks still fit at
-                  your diameter and depth — so widening the wheel adds points and
-                  deepening the spikes takes them away.
-                </p>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  Print spikes with at least three perimeters and a small layer height;
-                  tall thin points are the first thing to snap on a printed roller.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <DesignerPage {...content}>{builder}</DesignerPage>
       </main>
 
       <footer className="bg-paper">
@@ -199,21 +392,21 @@ export default function App() {
             <div className="flex items-center gap-2">
               <StarMark className="size-5 text-accent" />
               <span className="text-sm font-semibold tracking-tight">
-                Star Shaped Roller Designer
+                Parametric Wheel Works
               </span>
             </div>
             <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted">
-              Parametric star-spiked rollers with a live 3D preview and binary STL
-              export. Runs entirely in the browser — no accounts, no uploads, no CAD
-              kernel.
+              Four parametric designers in one static site: star rollers, roller-chain
+              sprockets, axial impellers and propellers. Everything is generated locally
+              in the browser — no accounts, no uploads, no CAD kernel.
             </p>
           </div>
           <div className="text-xs leading-relaxed text-muted sm:text-right">
             <p>
-              Every model is generated locally from the fields you enter. Geometry is a
-              prismatic star with a through-hole and an optional hub.
+              Every model is generated from the fields you enter, then verified as a single
+              closed shell before an STL is offered.
             </p>
-            <p className="mt-2">© {new Date().getFullYear()} Star Shaped Roller Designer</p>
+            <p className="mt-2">© {new Date().getFullYear()} Parametric Wheel Works</p>
           </div>
         </div>
       </footer>

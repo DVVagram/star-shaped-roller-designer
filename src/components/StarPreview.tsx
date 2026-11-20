@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+import { buildSmoothGeometry } from "@/lib/kit/solid";
 import type { StarSpec } from "@/lib/star/geometry";
 import { buildStarMesh } from "@/lib/star/mesh";
 
@@ -102,7 +103,7 @@ export default function StarPreview({ spec }: StarPreviewProps) {
       color: 0xe4e1da,
       metalness: 0.55,
       roughness: 0.38,
-      flatShading: true,
+      flatShading: false,
     });
 
     const mesh = new THREE.Mesh(new THREE.BufferGeometry(), material);
@@ -174,25 +175,27 @@ export default function StarPreview({ spec }: StarPreviewProps) {
 
     let geometry: THREE.BufferGeometry;
     try {
-      const { positions, indices } = buildStarMesh({
-        outerDiameterMm,
-        thicknessMm,
-        spikeCount,
-        spikeDepthMm,
-        spikeShape,
-        tipWidthMm,
-        valleyWidthMm,
-        taperMm,
-        boreMm,
-        boreShape,
-        hubEnabled,
-        hubDiameterMm,
-        hubHeightMm,
-      });
+      const smooth = buildSmoothGeometry(
+        buildStarMesh({
+          outerDiameterMm,
+          thicknessMm,
+          spikeCount,
+          spikeDepthMm,
+          spikeShape,
+          tipWidthMm,
+          valleyWidthMm,
+          taperMm,
+          boreMm,
+          boreShape,
+          hubEnabled,
+          hubDiameterMm,
+          hubHeightMm,
+        }),
+      );
       geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-      geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-      geometry.computeVertexNormals();
+      geometry.setAttribute("position", new THREE.BufferAttribute(smooth.positions, 3));
+      geometry.setAttribute("normal", new THREE.BufferAttribute(smooth.normals, 3));
+      geometry.setIndex(new THREE.BufferAttribute(smooth.indices, 1));
       geometry.computeBoundingSphere();
     } catch {
       return;
