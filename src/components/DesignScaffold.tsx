@@ -70,8 +70,8 @@ export default function DesignScaffold({
           ))}
           {errorCount > 0 && (
             <p className="rounded-lg border border-red-300/70 bg-red-50 px-3 py-2 text-xs text-red-800">
-              {errorCount} field{errorCount === 1 ? "" : "s"} need attention before the STL
-              can be exported.
+              {errorCount} field{errorCount === 1 ? " needs" : "s need"} attention before
+              the STL can be exported.
             </p>
           )}
           {warnings.map((message) => (

@@ -128,6 +128,89 @@ function place(angle: number, t: number, valleyRadius: number, tipRadius: number
 }
 
 /**
+ * Round core plus rectangular flaps: the outline for the rectangle spike shape.
+ *
+ * One flap is a true rectangle in plan — two sides parallel to its radius at
+ * ±half the tip width, closed by a flat chord where the corners touch the tip
+ * circle — and the valley between flaps is the valley circle. Only the valley is
+ * sampled: the straight runs carry their corners alone, because earcut drops
+ * collinear points from a cap and a dropped point would leave the shell open.
+ *
+ * Both faces come from one pass, so the vertex order matches and the wall
+ * between them stays closed. A taper shortens the flaps without narrowing them,
+ * since their sides stay square to the radius at every height.
+ */
+function rectangleRings(
+  spec: StarSpec,
+  layout: SpikeLayout,
+): { points: Point2D[]; topPoints: Point2D[] } {
+  const count = Math.max(3, Math.round(spec.spikeCount));
+  const pitch = TWO_PI / count;
+  const half = pitch / 2;
+  const tipRadius = spec.outerDiameterMm / 2;
+  const valleyRadius = tipRadius - spec.spikeDepthMm;
+  const topTipRadius = tipRadius - Math.max(0, spec.taperMm);
+  const halfWidth = layout.flapHalfWidthMm;
+
+  if (!(halfWidth > 0)) {
+    throw new StarGeometryError("A rectangular flap needs a tip width.");
+  }
+  if (!(halfWidth < valleyRadius)) {
+    throw new StarGeometryError(
+      "The flap is wider than the valley circle — reduce the tip width or the spike depth.",
+    );
+  }
+  if (!(halfWidth < topTipRadius)) {
+    throw new StarGeometryError("The taper narrows the tip circle past the flap width.");
+  }
+
+  const baseX = Math.sqrt(valleyRadius * valleyRadius - halfWidth * halfWidth);
+  const tipX = Math.sqrt(tipRadius * tipRadius - halfWidth * halfWidth);
+  const topX = Math.sqrt(topTipRadius * topTipRadius - halfWidth * halfWidth);
+  const baseHalfAngle = Math.asin(Math.min(1, halfWidth / valleyRadius));
+  const valleyArcMm = valleyRadius * (pitch - 2 * baseHalfAngle);
+  const arcSteps = Math.max(4, Math.min(64, Math.ceil(valleyArcMm / 1.2)));
+
+  const points: Point2D[] = [];
+  const topPoints: Point2D[] = [];
+
+  const pushLocal = (x: number, y: number, top: number, cos: number, sin: number) => {
+    points.push({ x: x * cos - y * sin, y: x * sin + y * cos });
+    topPoints.push({ x: top * cos - y * sin, y: top * sin + y * cos });
+  };
+  const pushPolar = (radius: number, angle: number) => {
+    const point = { x: radius * Math.cos(angle), y: radius * Math.sin(angle) };
+    points.push(point);
+    topPoints.push({ ...point });
+  };
+
+  for (let i = 0; i < count; i += 1) {
+    const tipAngle = i * pitch + half;
+    const cos = Math.cos(tipAngle);
+    const sin = Math.sin(tipAngle);
+
+    // The outbound base is already placed as the last point of the previous
+    // valley arc, except at the start of the loop.
+    if (i === 0) pushLocal(baseX, -halfWidth, baseX, cos, sin);
+    pushLocal(tipX, -halfWidth, topX, cos, sin); // outbound tip corner
+    pushLocal(tipX, halfWidth, topX, cos, sin); // tip chord, corner to corner
+    pushLocal(baseX, halfWidth, baseX, cos, sin); // returning base
+
+    // Valley: the core circle, from this flap round to the next one. The last
+    // arc stops a vertex short, because the loop's first vertex is the next
+    // flap's base.
+    const from = tipAngle + baseHalfAngle;
+    const to = tipAngle + pitch - baseHalfAngle;
+    const steps = i === count - 1 ? arcSteps - 1 : arcSteps;
+    for (let j = 1; j <= steps; j += 1) {
+      pushPolar(valleyRadius, from + ((to - from) * j) / arcSteps);
+    }
+  }
+
+  return { points, topPoints };
+}
+
+/**
  * Builds the closed star outline.
  *
  * `t` interpolates between the valley radius and the tip radius, so the tapered
@@ -156,6 +239,21 @@ export function createStarProfile(spec: StarSpec): StarProfile {
   }
 
   const samples = sampleCounts(spec.spikeCount);
+  const preset = SPIKE_SHAPES[spec.spikeShape] ?? SPIKE_SHAPES.rounded;
+
+  if (preset.straightSides) {
+    const flaps = rectangleRings(spec, layout);
+    return {
+      points: flaps.points,
+      topPoints: flaps.topPoints,
+      baseAreaMm2: polygonArea(flaps.points),
+      topAreaMm2: polygonArea(flaps.topPoints),
+      samples,
+      tipLandMm: layout.tipLandMm,
+      valleyLandMm: layout.valleyLandMm,
+    };
+  }
+
   const schedule = starSchedule(spec, layout, samples);
 
   if (schedule.length < 6) {

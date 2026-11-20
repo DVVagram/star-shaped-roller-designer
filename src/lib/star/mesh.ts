@@ -1,5 +1,6 @@
 import { ShapeUtils, Vector2 } from "three";
 
+import { cleanRings } from "../kit/solid";
 import {
   boreOutline,
   circleOutline,
@@ -56,11 +57,15 @@ function capFaces(outer: Point2D[], holes: Point2D[][]): Face[] {
  */
 export function buildStarMesh(spec: StarSpec): StarMesh {
   const profile = createStarProfile(spec);
-  const flip = signedArea(profile.points) < 0;
-  const bottomOuter = flip ? [...profile.points].reverse() : profile.points;
-  const topOuter = flip ? [...profile.topPoints].reverse() : profile.topPoints;
+  // Outlines are cleaned as a set, so a profile that repeats a vertex (a flat
+  // clamped to zero width, say) cannot leave zero-length wall edges or facets
+  // with no normal behind in the exported file.
+  const [baseRing, topRing] = cleanRings([profile.points, profile.topPoints]);
+  const flip = signedArea(baseRing) < 0;
+  const bottomOuter = flip ? [...baseRing].reverse() : baseRing;
+  const topOuter = flip ? [...topRing].reverse() : topRing;
 
-  const bore = boreOutline(spec);
+  const bore = cleanRings([boreOutline(spec)])[0];
   const halfThickness = spec.thicknessMm / 2;
   const hubRadius = spec.hubEnabled ? Math.max(0, spec.hubDiameterMm / 2) : 0;
   const hubEnabled = hubRadius > 0 && spec.hubHeightMm > 0;
@@ -88,8 +93,13 @@ export function buildStarMesh(spec: StarSpec): StarMesh {
     positions[index * 3 + 2] = z;
   };
 
+  // The top ring is the tapered outline, not a copy of the base: writing the
+  // base points at both heights would export a straight prism and silently
+  // drop the tip taper from the mesh, the volume and the STL.
   bottomOuter.forEach((point, i) => {
     write(outerBottom + i, point, -halfThickness);
+  });
+  topOuter.forEach((point, i) => {
     write(outerTop + i, point, halfThickness);
   });
   bore.forEach((point, i) => {

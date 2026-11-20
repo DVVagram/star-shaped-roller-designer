@@ -11,6 +11,7 @@
  *   pitch angle  = 360° / N
  *   passage(r)   = pitch·r − blade width(r)
  *   lean         = blade height · tan(blade angle)
+ *   edge round    = quarter round on the top and bottom of each tip
  */
 
 import {
@@ -39,8 +40,10 @@ export interface RotorSpec {
   bladeCount: number;
   rootWidthMm: number;
   tipWidthMm: number;
-  /** Radius of the round on each outer blade end. 0 leaves a square tip. */
+  /** Radius of the round on each outer blade end in plan. 0 leaves a square tip. */
   tipRoundingMm: number;
+  /** Radius of the round on the top and bottom of the tip. 0 leaves a square edge. */
+  tipEdgeRoundingMm: number;
   bladeHeightMm: number;
   bladeAngleDeg: number;
   bladeSweepDeg: number;
@@ -55,6 +58,7 @@ export const ROTOR_LIMITS = {
   rootWidthMm: { min: 1, max: 80 },
   tipWidthMm: { min: 0.8, max: 80 },
   tipRoundingMm: { min: 0, max: 40 },
+  tipEdgeRoundingMm: { min: 0, max: 60 },
   bladeHeightMm: { min: 2, max: 120 },
   bladeAngleDeg: { min: 0, max: 70 },
   bladeSweepDeg: { min: -60, max: 60 },
@@ -106,6 +110,69 @@ export function effectiveTipRoundingMm(spec: RotorSpec): number {
   return Math.min(requested, Math.max(0, chordLimit), span * 0.9);
 }
 
+/**
+ * Tip edge rounding actually used, in millimetres.
+ *
+ * This one runs along the top and bottom of the blade tip, so it eats into the
+ * wall from each face and the two rounds meet at mid-height: half the blade
+ * height is the most it can be. It also stops short of the hub, or the bottom
+ * face would no longer sit flat.
+ */
+export function effectiveTipEdgeRoundingMm(spec: RotorSpec): number {
+  const requested = spec.tipEdgeRoundingMm;
+  if (typeof requested !== "number" || !Number.isFinite(requested) || requested <= 0) {
+    return 0;
+  }
+  const hubRadius = Math.max(0.5, spec.hubDiameterMm / 2);
+  const tipRadius = Math.max(hubRadius + 0.5, spec.tipDiameterMm / 2);
+  const span = tipRadius - hubRadius;
+  const planRounding = effectiveTipRoundingMm(spec);
+  const uTrim = planRounding > 1e-9 ? Math.max(0, 1 - planRounding / span) : 1;
+  const halfWidth = Math.min(
+    Math.PI * 0.48 * (tipRadius - planRounding),
+    bladeWidthAt(spec, uTrim) / 2,
+  );
+  const corner = Math.min(planRounding, Math.max(0, halfWidth));
+  // The runout down the flanks needs room, or it would reach the hub and tilt
+  // the face the part sits on.
+  const room = Math.max(0, span - corner);
+  return Math.min(requested, Math.max(0, spec.bladeHeightMm) / 2, room * 0.45);
+}
+
+/**
+ * How far the tip wall is pulled in at one height, for a quarter round.
+ *
+ * Seen end-on the round is a quarter circle of radius `rounding` tangent to the
+ * tip wall at mid-height and to the face at its widest pull-in.
+ */
+export function tipEdgeInsetMm(rounding: number, z: number, heightMm: number): number {
+  if (!(rounding > 1e-9)) return 0;
+  const toFace = Math.max(0, Math.min(z, heightMm - z));
+  if (toFace >= rounding) return 0;
+  return rounding - Math.sqrt(Math.max(0, toFace * (2 * rounding - toFace)));
+}
+
+/**
+ * Share of the edge pull-in a point takes, by how far inboard it sits.
+ *
+ * The tip land and its corner rounds take the full pull-in and so move inboard
+ * together, as a rigid offset of the plan profile. The flanks then run the round
+ * out linearly over twice the radius: a hard edge there would fold the corner
+ * rounds onto one circle, and a ramp slower than that keeps every vertex apart.
+ */
+function tipEdgeWeight(
+  radius: number,
+  tipRadius: number,
+  cornerMm: number,
+  rounding: number,
+): number {
+  if (!(rounding > 1e-9)) return 0;
+  const band = Math.max(0, tipRadius - cornerMm);
+  if (radius >= band) return 1;
+  const blend = 2 * rounding;
+  return clamp((radius - (band - blend)) / blend, 0, 1);
+}
+
 export interface RotorDerived {
   bladeCount: number;
   tipRadiusMm: number;
@@ -118,6 +185,8 @@ export interface RotorDerived {
   meanWidthMm: number;
   /** Rounding actually applied; capped by the tip chord. */
   tipRoundingMm: number;
+  /** Edge rounding actually applied; capped at half the blade height. */
+  tipEdgeRoundingMm: number;
   minPassageMm: number;
   leanMm: number;
   leanLimitMm: number;
@@ -143,6 +212,7 @@ export function deriveRotor(spec: RotorSpec): RotorDerived {
   const bladeAngle = clamp(spec.bladeAngleDeg, 0, 75);
   const lean = Math.max(0, spec.bladeHeightMm) * Math.tan((bladeAngle * Math.PI) / 180);
   const tipRounding = effectiveTipRoundingMm(spec);
+  const tipEdgeRounding = effectiveTipEdgeRoundingMm(spec);
 
   let minPassage = Infinity;
   for (let i = 0; i <= 24; i += 1) {
@@ -169,6 +239,7 @@ export function deriveRotor(spec: RotorSpec): RotorDerived {
     tipWidthMm: spec.tipWidthMm,
     meanWidthMm: (spec.rootWidthMm + spec.tipWidthMm) / 2,
     tipRoundingMm: tipRounding,
+    tipEdgeRoundingMm: tipEdgeRounding,
     minPassageMm: Number.isFinite(minPassage) ? minPassage : 0,
     leanMm: lean,
     leanLimitMm: leanLimit,
@@ -194,6 +265,8 @@ export function deriveRotor(spec: RotorSpec): RotorDerived {
 export interface RotorOutline {
   /** Cross-sections stacked from the bottom face up, sharing their vertices. */
   rings: Point2D[][];
+  /** Height of each cross-section, as a fraction of the blade height. */
+  fractions: number[];
   /** Plan view at the bottom face. */
   bottom: Point2D[];
   /** The same vertices after the full lean, at the top face. */
@@ -220,6 +293,44 @@ export function rotorRingCount(spec: RotorSpec): number {
   const step = 2 * Math.acos(clamp(1 - CURVE_TOLERANCE_MM / tipRadius, -1, 1));
   if (!(step > 1e-9)) return 48;
   return Math.min(48, Math.max(2, Math.ceil(turn / step) + 1));
+}
+
+/**
+ * Heights of the profile slices, from the bottom face (0) to the top face (1).
+ *
+ * The lean only asks for evenly spaced slices, but an edge round is a quarter
+ * circle seen from the side: it needs slices bunched into the millimetres next
+ * to each face or it comes out as a chamfer. The two sets are merged and the
+ * twist spacing is kept everywhere, so neither feature is under-sampled.
+ */
+export function rotorRingFractions(spec: RotorSpec): number[] {
+  const twistCount = rotorRingCount(spec);
+  const spacing = 1 / Math.max(1, twistCount - 1);
+  const height = Math.max(0, spec.bladeHeightMm);
+  const rounding = effectiveTipEdgeRoundingMm(spec);
+  const values: number[] = [];
+  const add = (t: number) => {
+    const value = clamp(t, 0, 1);
+    if (values.every((existing) => Math.abs(existing - value) > 1e-7)) values.push(value);
+  };
+
+  if (rounding > 1e-9 && height > 1e-9) {
+    const step = 2 * Math.acos(clamp(1 - CURVE_TOLERANCE_MM / rounding, -1, 1));
+    const segments = Math.max(1, Math.ceil(Math.PI / 2 / Math.max(step, 1e-6)));
+    for (let j = 0; j <= segments; j += 1) {
+      const theta = (Math.PI / 2) * (j / segments);
+      const z = rounding * (1 - Math.cos(theta));
+      add(z / height);
+      add(1 - z / height);
+    }
+  }
+
+  const slices = Math.max(1, Math.ceil(1 / spacing));
+  for (let k = 0; k <= slices; k += 1) add(k / slices);
+  // Mid-height is where two capped rounds meet, so it always needs a slice.
+  add(0.5);
+
+  return values.sort((a, b) => a - b);
 }
 
 export function rotorOutline(spec: RotorSpec): RotorOutline {
@@ -289,6 +400,12 @@ export function rotorOutline(spec: RotorSpec): RotorOutline {
   // exact instead of shrinking it, and the land length falls out of the trim.
   const rounding = effectiveTipRoundingMm(spec);
   const uTrim = rounding > 1e-9 ? Math.max(0, 1 - rounding / span) : 1;
+  // Where the plan round ends and the flanks begin: the edge round is full
+  // outside that radius and runs out down the flanks below it.
+  const trimRadius = tipRadius - rounding;
+  const halfWidthAtTrim = deltaAt(uTrim) * trimRadius;
+  const corner = rounding > 1e-9 ? Math.min(rounding, Math.max(0, halfWidthAtTrim)) : 0;
+  const land = Math.max(0, halfWidthAtTrim - corner);
 
   /** Maps a point from the blade tip frame (tangential a, inboard b) to polar. */
   const pushTipPoint = (centre: number, a: number, b: number) => {
@@ -324,11 +441,6 @@ export function rotorOutline(spec: RotorSpec): RotorOutline {
     );
 
     if (rounding > 1e-9) {
-      const trimRadius = tipRadius - rounding;
-      const halfWidth = deltaAt(uTrim) * trimRadius;
-      const corner = Math.min(rounding, Math.max(0, halfWidth));
-      const land = Math.max(0, halfWidth - corner);
-
       // Trailing corner: a quarter round from the side into the tip land.
       pushTipCurve(
         centre,
@@ -402,27 +514,32 @@ export function rotorOutline(spec: RotorSpec): RotorOutline {
     }
   }
 
-  const ringCount = rotorRingCount(spec);
-  const rings: Point2D[][] = [];
-  for (let k = 0; k < ringCount; k += 1) {
-    const t = ringCount === 1 ? 1 : k / (ringCount - 1);
-    rings.push(
-      bottom.map((_, index) => {
-        const radius = radii[index];
-        const u = clamp((radius - hubRadius) / span, 0, 1);
-        const shifted = angles[index] + (lean * u * t) / radius;
-        return { x: radius * Math.cos(shifted), y: radius * Math.sin(shifted) };
-      }),
-    );
-  }
+  // Each slice keeps the plan outline but pulls it in near the tip by an amount
+  // that grows towards the faces: that stack of slices is the quarter round
+  // along the tip edge, and the widest slice still sits on the entered tip
+  // circle because the pull-in is zero at mid-height.
+  const fractions = rotorRingFractions(spec);
+  const edgeRounding = effectiveTipEdgeRoundingMm(spec);
+  const height = Math.max(0, spec.bladeHeightMm);
+  const rings: Point2D[][] = fractions.map((t) => {
+    const inset = tipEdgeInsetMm(edgeRounding, height * t, height);
+    return bottom.map((_, index) => {
+      const radius = radii[index];
+      const u = clamp((radius - hubRadius) / span, 0, 1);
+      const shifted = angles[index] + (lean * u * t) / radius;
+      const drawn = radius - inset * tipEdgeWeight(radius, tipRadius, corner, edgeRounding);
+      return { x: drawn * Math.cos(shifted), y: drawn * Math.sin(shifted) };
+    });
+  });
 
-  return { rings, bottom: rings[0], top: rings[rings.length - 1] };
+  return { rings, fractions, bottom: rings[0], top: rings[rings.length - 1] };
 }
 
 export function buildRotorMesh(spec: RotorSpec): Mesh {
-  const { rings } = rotorOutline(spec);
+  const { rings, fractions } = rotorOutline(spec);
   return buildExtrusion({
     rings,
+    ringFractions: fractions,
     bore: boreOutline(spec),
     thicknessMm: spec.bladeHeightMm,
   });
@@ -451,6 +568,7 @@ export function validateRotor(
   const rootOk = pushRange(errors, unit, "rootWidth", "Root width", spec.rootWidthMm, ROTOR_LIMITS.rootWidthMm.min, ROTOR_LIMITS.rootWidthMm.max);
   const tipWidthOk = pushRange(errors, unit, "tipWidth", "Tip width", spec.tipWidthMm, ROTOR_LIMITS.tipWidthMm.min, ROTOR_LIMITS.tipWidthMm.max);
   const roundingOk = pushRange(errors, unit, "tipRounding", "Tip rounding", spec.tipRoundingMm ?? 0, ROTOR_LIMITS.tipRoundingMm.min, ROTOR_LIMITS.tipRoundingMm.max);
+  const edgeOk = pushRange(errors, unit, "tipEdgeRounding", "Edge rounding", spec.tipEdgeRoundingMm ?? 0, ROTOR_LIMITS.tipEdgeRoundingMm.min, ROTOR_LIMITS.tipEdgeRoundingMm.max);
   const heightOk = pushRange(errors, unit, "bladeHeight", "Blade height", spec.bladeHeightMm, ROTOR_LIMITS.bladeHeightMm.min, ROTOR_LIMITS.bladeHeightMm.max);
   const angleOk = pushRange(errors, unit, "bladeAngle", "Blade angle", spec.bladeAngleDeg, ROTOR_LIMITS.bladeAngleDeg.min, ROTOR_LIMITS.bladeAngleDeg.max);
   const sweepOk = pushRange(errors, unit, "bladeSweep", "Blade sweep", spec.bladeSweepDeg, ROTOR_LIMITS.bladeSweepDeg.min, ROTOR_LIMITS.bladeSweepDeg.max);
@@ -463,6 +581,7 @@ export function validateRotor(
     rootOk &&
     tipWidthOk &&
     roundingOk &&
+    edgeOk &&
     heightOk &&
     angleOk &&
     sweepOk &&
@@ -537,7 +656,8 @@ export function validateRotor(
       warnings.push({
         field: "bladeAngle",
         level: "warning",
-        message: "A pitch this coarse relative to the disc stalls; try a finer pitch.",
+        message:
+          "A blade angle this steep stalls the disc; reduce the angle or use a finer pitch.",
       });
     }
     if ((full.tipRoundingMm ?? 0) > derived.tipRoundingMm + 1e-6) {
@@ -545,6 +665,13 @@ export function validateRotor(
         field: "tipRounding",
         level: "warning",
         message: `The tip chord caps the end rounding at ${shown(derived.tipRoundingMm)}.`,
+      });
+    }
+    if ((full.tipEdgeRoundingMm ?? 0) > derived.tipEdgeRoundingMm + 1e-6) {
+      warnings.push({
+        field: "tipEdgeRounding",
+        level: "warning",
+        message: `Half the blade height caps the edge rounding at ${shown(derived.tipEdgeRoundingMm)}.`,
       });
     }
     if (derived.meanWidthMm < 2) {

@@ -68,6 +68,7 @@ export function lengthPrecisionMm(units: LengthUnit): number {
 export function fitInputOf(
   values: Record<NumericField, string>,
   spikeShape: SpikeShape,
+  units: LengthUnit = "mm",
 ): SpikeFitInput | null {
   const outer = parseInput(values.outerDiameter);
   const depth = parseInput(values.spikeDepth);
@@ -76,11 +77,14 @@ export function fitInputOf(
   if (outer === null || depth === null || tip === null || valley === null) {
     return null;
   }
+  // The stored strings are in the form's current unit, so they have to be read
+  // as millimetres here — otherwise switching to inches refits the spike count
+  // to a wheel a twenty-fifth of the real size.
   return {
-    outerDiameterMm: outer,
-    spikeDepthMm: depth,
-    tipWidthMm: tip,
-    valleyWidthMm: valley,
+    outerDiameterMm: unitToMm(outer, units),
+    spikeDepthMm: unitToMm(depth, units),
+    tipWidthMm: unitToMm(tip, units),
+    valleyWidthMm: unitToMm(valley, units),
     spikeShape,
   };
 }
@@ -187,7 +191,7 @@ function withLastValid(state: BuilderState): BuilderState {
  */
 function refit(state: BuilderState): BuilderState {
   if (!state.autoSpikes) return { ...state, notice: null };
-  const fit = fitInputOf(state.values, state.spikeShape);
+  const fit = fitInputOf(state.values, state.spikeShape, state.units);
   if (!fit) return state;
   const fitted = autoSpikeCount(fit);
   const value = String(fitted.count);
@@ -257,7 +261,7 @@ export function resetBuilder(): BuilderState {
 /** The spike-fit explanation shown under the count field, or null when manual. */
 export function fitNote(state: BuilderState): string | null {
   if (!state.autoSpikes) return null;
-  const fit = fitInputOf(state.values, state.spikeShape);
+  const fit = fitInputOf(state.values, state.spikeShape, state.units);
   if (!fit) return null;
   const fitted = autoSpikeCount(fit);
   if (!fitted.limitedBy) return "All available spikes fit.";

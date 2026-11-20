@@ -23,11 +23,17 @@ Everything runs in the browser: no CAD kernel, no server, no account, no uploads
 
 ### Star roller
 
-Wheel diameter, thickness, spike count, four spike shapes, spike depth, tip and
+Wheel diameter, thickness, spike count, five spike shapes, spike depth, tip and
 valley widths, a tip taper, the centre hole (round, hex or double-flat) and an
 optional hub boss. Auto-fit returns the largest count whose tip lands, valley
 lands and flanks still fit at the current diameter and depth, and says what
 stopped one more point.
+
+The **Rectangle** shape swaps the points for rectangular flaps: the core stays a
+circle and each spike is a true rectangle in plan, with sides parallel to its
+radius and a flat chord at the tip circle. Tip width is then the flap width, and
+flap height is the spike depth. The valley width still sets the gap the flaps
+have to leave, and the tip taper shortens the flaps instead of narrowing them.
 
 ### Sprocket
 
@@ -41,16 +47,17 @@ tangentially.
 ### Impeller
 
 An axial rotor: tip and hub diameter, blade count, chord at the root and at the
-tip, a tip rounding radius, axial height, blade angle and sweep. The passages
-between blades are measured at 25 radii and reported, and a blade that would lean
-into its neighbour is rejected before export.
+tip, a tip rounding radius (in plan) plus an edge rounding radius (on the top and
+bottom of the tip), axial height, blade angle and sweep. The passages between
+blades are measured at 25 radii and reported, and a blade that would lean into
+its neighbour is rejected before export.
 
 ### Propeller
 
 The same rotor core with pitch as the input: the blade angle at 70 % radius is
 `atan(pitch / 2πr)`, so the advance per revolution stays put when the diameter
-changes. Blade count, root and tip chord, tip rounding, blade drop, sweep and the
-shaft bore.
+changes. Blade count, root and tip chord, tip rounding and edge rounding, blade
+drop, sweep and the shaft bore.
 
 ---
 
@@ -67,6 +74,9 @@ and an optional hub boss.
   the two outlines always share their vertex order. When the top outline is
   rotated or sheared relative to the bottom one, that wall is a twisted ruled
   surface and the shell stays closed.
+- Slice heights are chosen per feature: spread evenly for the lean, bunched next
+  to each face for the tip edge round. That keeps a quarter round a round instead
+  of a chamfer without slicing the whole part finely.
 - `emitCap` fixes each cap triangle's winding from its 2D orientation, so caps and
   walls always agree.
 
@@ -95,7 +105,7 @@ divergence-theorem volume of that closed mesh.
 | 3D       | three.js + OrbitControls                                 |
 | Geometry | In-repo profiles + one deterministic indexed-mesh extruder |
 | Export   | Binary STL writer (no dependency)                        |
-| Tests    | Vitest — 38 geometry, solid and STL tests                |
+| Tests    | Vitest — 84 geometry, solid and STL tests                |
 
 No database, no API keys and no environment variables.
 
@@ -149,13 +159,16 @@ src/
 ## Limits
 
 - **Star roller** is prismatic apart from the tip taper: no helix or knurling.
+  Rectangle flaps keep their width up the taper, so their sides stay in one plane.
 - **Sprocket** seats are true circular roller cuts with straight or eased flanks;
   the ANSI tooth-flank radii are not modelled, so treat tooth strength as
   indicative.
 - **Impeller and propeller** blades are constant-chord bands leaned by a linear
   shear: no airfoil camber, no radial pitch distribution beyond that shear, and no
   twist beyond the root-to-tip lean. The tip rounding is a true round in plan,
-  capped by the tip chord; it is not a ball-end in three dimensions.
+  capped by the tip chord; the edge rounding is a quarter round in the radial–axial
+  plane on the top and bottom of the tip, capped at half the blade height. The two
+  are separate features, and neither is a ball-end on the corner.
 - Hubs are plain bosses; there are no spoke cut-outs, bolt circles or keyways.
 - Printability checks describe geometry only. Layer adhesion, wall count and
   material still decide whether a print survives.

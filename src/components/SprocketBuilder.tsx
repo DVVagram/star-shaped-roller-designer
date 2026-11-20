@@ -165,7 +165,7 @@ export default function SprocketBuilder() {
     try {
       const buffer = buildBinaryStl(
         buildSprocketMesh(current),
-        "Sprocket Designer — units: mm",
+        "Sprocket Designer - units: mm",
       );
       downloadStl(
         buffer,

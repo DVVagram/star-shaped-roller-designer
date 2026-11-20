@@ -4,8 +4,12 @@ import {
 } from "./geometry";
 import type { StarMesh } from "./mesh";
 
-/** ASCII name written into the 80-byte binary STL header. */
-export const STL_HEADER = "Star Shaped Roller Designer — units: mm";
+/**
+ * ASCII name written into the 80-byte binary STL header. The header is a byte
+ * block, so it stays plain ASCII — a typographic dash would be truncated into a
+ * control character by the writer.
+ */
+export const STL_HEADER = "Star Shaped Roller Designer - units: mm";
 
 export function stlByteLength(mesh: StarMesh): number {
   return 84 + mesh.triangleCount * 50;
@@ -24,7 +28,8 @@ export function buildBinaryStl(mesh: StarMesh): ArrayBuffer {
   const { positions, indices } = mesh;
 
   for (let i = 0; i < STL_HEADER.length && i < 80; i += 1) {
-    view.setUint8(i, STL_HEADER.charCodeAt(i) & 0xff);
+    const code = STL_HEADER.charCodeAt(i);
+    view.setUint8(i, code >= 32 && code < 127 ? code : 0x2d);
   }
   view.setUint32(80, mesh.triangleCount, true);
 

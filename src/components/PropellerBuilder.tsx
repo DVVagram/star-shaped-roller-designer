@@ -100,6 +100,11 @@ export default function PropellerBuilder() {
       source: "input",
     },
     {
+      label: "Edge rounding",
+      value: formatMeasure(derived.tipEdgeRoundingMm, units),
+      source: "input",
+    },
+    {
       label: "Blade area",
       value: `${formatNumber(derived.bladeAreaMm2 / 100, 1)} cm²`,
       source: "calc",
@@ -133,7 +138,7 @@ export default function PropellerBuilder() {
     try {
       const buffer = buildBinaryStl(
         buildRotorMesh(current),
-        "Propeller Designer — units: mm",
+        "Propeller Designer - units: mm",
       );
       downloadStl(
         buffer,
@@ -265,8 +270,17 @@ export default function PropellerBuilder() {
             value={values.tipRounding}
             unit={units}
             onChange={(value) => change("tipRounding", value)}
-            hint="Radius on the blade ends. 0 leaves them square."
+            hint="Radius on the blade ends in plan. 0 leaves them square."
             error={errors.get("tipRounding")}
+          />
+          <NumberField
+            id="tipEdgeRounding"
+            label="Edge rounding"
+            value={values.tipEdgeRounding}
+            unit={units}
+            onChange={(value) => change("tipEdgeRounding", value)}
+            hint="Radius on the top and bottom of the tip. 0 leaves the edge square."
+            error={errors.get("tipEdgeRounding")}
           />
           <NumberField
             id="bladeSweep"

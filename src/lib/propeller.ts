@@ -15,6 +15,7 @@ export type PropellerField =
   | "rootWidth"
   | "tipWidth"
   | "tipRounding"
+  | "tipEdgeRounding"
   | "bladeHeight"
   | "pitch"
   | "bladeSweep"
@@ -26,6 +27,7 @@ export const PROPELLER_LENGTH_FIELDS: PropellerField[] = [
   "rootWidth",
   "tipWidth",
   "tipRounding",
+  "tipEdgeRounding",
   "bladeHeight",
   "pitch",
   "bore",
@@ -39,6 +41,7 @@ export function propellerDefaultValues(): Record<PropellerField, string> {
     rootWidth: "16",
     tipWidth: "9",
     tipRounding: "4",
+    tipEdgeRounding: "6",
     bladeHeight: "34",
     pitch: "150",
     bladeSweep: "6",
@@ -75,6 +78,7 @@ export function buildPropellerSpec(
     rootWidthMm: length("rootWidth"),
     tipWidthMm: length("tipWidth"),
     tipRoundingMm: length("tipRounding"),
+    tipEdgeRoundingMm: length("tipEdgeRounding"),
     bladeHeightMm: length("bladeHeight"),
     bladeAngleDeg:
       pitch !== undefined && tipDiameter !== undefined
@@ -92,6 +96,7 @@ export function buildPropellerSpec(
     spec.rootWidthMm !== undefined &&
     spec.tipWidthMm !== undefined &&
     spec.tipRoundingMm !== undefined &&
+    spec.tipEdgeRoundingMm !== undefined &&
     spec.bladeHeightMm !== undefined &&
     spec.bladeAngleDeg !== undefined &&
     spec.bladeSweepDeg !== undefined &&

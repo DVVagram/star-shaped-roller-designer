@@ -47,7 +47,7 @@ export const LIMITS = {
 } as const;
 
 export type LengthUnit = "mm" | "in";
-export type SpikeShape = "rounded" | "truncated" | "sharp" | "claw";
+export type SpikeShape = "rounded" | "truncated" | "paddle" | "sharp" | "claw";
 export type BoreShape = "round" | "hex" | "doubleFlat";
 
 export interface Point2D {
@@ -64,6 +64,11 @@ export interface SpikeShapePreset {
   flankExponent: number;
   /** Smoothstep flanks meet the tip and the valley with zero slope. */
   smooth: boolean;
+  /**
+   * Flanks are straight lines in plan, square to the tip width, with a flat tip
+   * chord: the spike is a true rectangle instead of a polar profile.
+   */
+  straightSides?: boolean;
 }
 
 export const SPIKE_SHAPES: Record<SpikeShape, SpikeShapePreset> = {
@@ -80,6 +85,14 @@ export const SPIKE_SHAPES: Record<SpikeShape, SpikeShapePreset> = {
     tipWidthFactor: 1,
     flankExponent: 1,
     smooth: false,
+  },
+  paddle: {
+    label: "Rectangle",
+    description: "Round core with rectangular flaps instead of points.",
+    tipWidthFactor: 1,
+    flankExponent: 1,
+    smooth: false,
+    straightSides: true,
   },
   sharp: {
     label: "Sharp",
@@ -100,6 +113,7 @@ export const SPIKE_SHAPES: Record<SpikeShape, SpikeShapePreset> = {
 export const SPIKE_SHAPE_ORDER: SpikeShape[] = [
   "rounded",
   "truncated",
+  "paddle",
   "sharp",
   "claw",
 ];
@@ -223,13 +237,16 @@ export function boreOutline(spec: Pick<StarSpec, "boreMm" | "boreShape">): Point
     const y = Math.sqrt(Math.max(0, radius * radius - flatHalf * flatHalf));
     const a0 = Math.acos(Math.min(1, flatHalf / radius));
     const arcSteps = 24;
+    // Each arc stops one step short of the far flat: that corner is pushed
+    // explicitly, and repeating it would leave a zero-length wall edge and a
+    // facet with no normal in the STL.
     const points: Point2D[] = [{ x: flatHalf, y: -y }, { x: flatHalf, y }];
-    for (let i = 1; i <= arcSteps; i += 1) {
+    for (let i = 1; i < arcSteps; i += 1) {
       const angle = a0 + ((Math.PI - 2 * a0) * i) / arcSteps;
       points.push({ x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
     }
     points.push({ x: -flatHalf, y }, { x: -flatHalf, y: -y });
-    for (let i = 1; i <= arcSteps; i += 1) {
+    for (let i = 1; i < arcSteps; i += 1) {
       const angle = Math.PI + a0 + ((Math.PI - 2 * a0) * i) / arcSteps;
       points.push({ x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
     }
@@ -243,12 +260,19 @@ export function boreOutline(spec: Pick<StarSpec, "boreMm" | "boreShape">): Point
 export interface SpikeLayout {
   pitchRad: number;
   halfPitchRad: number;
+  /** Half-angle the tip land subtends at the tip radius. */
   tipHalfAngleRad: number;
+  /** Widest half-angle a flank occupies — at the valley for a rectangle. */
+  flankHalfAngleRad: number;
   valleyHalfAngleRad: number;
   /** Angular room left for one flank; negative means the features collide. */
   flankSpanRad: number;
   tipLandMm: number;
   valleyLandMm: number;
+  /** True when the spike is a rectangle in plan rather than a polar profile. */
+  straightSides: boolean;
+  /** Half-width of a rectangular flap, measured square to its radius. */
+  flapHalfWidthMm: number;
 }
 
 export function spikeLayout(
@@ -260,19 +284,34 @@ export function spikeLayout(
   const count = Math.max(1, spec.spikeCount);
   const pitch = TWO_PI / count;
   const half = pitch / 2;
+  const straight = preset.straightSides === true;
   const tipLand = Math.max(0, spec.tipWidthMm) * preset.tipWidthFactor;
+  const flapHalfWidth = tipLand / 2;
   const valleyLand = Math.max(0, spec.valleyWidthMm);
-  const tipHalf = tipRadius > 0 ? tipLand / (2 * tipRadius) : 0;
+  // A polar profile measures its tip land as an arc. A rectangular flap is
+  // measured square to its radius, so its sides leave the valley circle at the
+  // wider angle asin(halfWidth / r) — that is the angle the count has to fit.
+  const tipHalf = straight
+    ? Math.asin(Math.min(1, tipRadius > 0 ? flapHalfWidth / tipRadius : 1))
+    : tipRadius > 0
+      ? tipLand / (2 * tipRadius)
+      : 0;
+  const flankHalf = straight
+    ? Math.asin(Math.min(1, valleyRadius > 0 ? flapHalfWidth / valleyRadius : 1))
+    : tipHalf;
   const valleyHalf = valleyRadius > 0 ? valleyLand / (2 * valleyRadius) : 0;
 
   return {
     pitchRad: pitch,
     halfPitchRad: half,
     tipHalfAngleRad: tipHalf,
+    flankHalfAngleRad: flankHalf,
     valleyHalfAngleRad: valleyHalf,
-    flankSpanRad: half - tipHalf - valleyHalf,
-    tipLandMm: tipLand,
+    flankSpanRad: half - flankHalf - valleyHalf,
+    tipLandMm: straight ? 2 * flapHalfWidth : tipLand,
     valleyLandMm: valleyLand,
+    straightSides: straight,
+    flapHalfWidthMm: flapHalfWidth,
   };
 }
 
@@ -306,6 +345,31 @@ export function evaluateSpikeCount(
   }
 
   const layout = spikeLayout({ ...fit, spikeCount: count }, tipRadius, valleyRadius);
+
+  if (layout.straightSides) {
+    const halfWidth = layout.flapHalfWidthMm;
+    if (!(halfWidth > 0) || halfWidth >= valleyRadius) {
+      return { ok: false, limitedBy: "the flap width" };
+    }
+    if (layout.flankSpanRad <= 0.004) {
+      return { ok: false, limitedBy: "spike spacing" };
+    }
+    // A flap's sides are parallel, so what matters is how far it reaches out of
+    // the core and whether the flap itself is thick enough to print.
+    const baseX = Math.sqrt(valleyRadius * valleyRadius - halfWidth * halfWidth);
+    const tipX = Math.sqrt(tipRadius * tipRadius - halfWidth * halfWidth);
+    if (tipX - baseX < MIN_FLANK_MM) {
+      return { ok: false, limitedBy: "flank length" };
+    }
+    if (layout.tipLandMm < 2 * MIN_FEATURE_MM) {
+      return { ok: false, limitedBy: "the flap width" };
+    }
+    const flapTipLandArc = 2 * layout.tipHalfAngleRad * tipRadius;
+    if (layout.pitchRad * tipRadius - flapTipLandArc < MIN_FEATURE_MM) {
+      return { ok: false, limitedBy: "the gap between the tips" };
+    }
+    return { ok: true, limitedBy: null };
+  }
 
   if (layout.flankSpanRad <= 0.004) {
     return { ok: false, limitedBy: "spike spacing" };
@@ -427,8 +491,9 @@ export function deriveStar(spec: StarSpec): DerivedStar {
     pitchAngleDeg: (layout.pitchRad * 180) / Math.PI,
     tipLandMm: layout.tipLandMm,
     valleyLandMm: layout.valleyLandMm,
-    spikeBaseArcMm:
-      layout.pitchRad * valleyRadius - 2 * layout.valleyHalfAngleRad * valleyRadius,
+    spikeBaseArcMm: layout.straightSides
+      ? 2 * layout.flankHalfAngleRad * valleyRadius
+      : layout.pitchRad * valleyRadius - 2 * layout.valleyHalfAngleRad * valleyRadius,
     flankLengthMm: Math.max(0, layout.flankSpanRad) * midRadius,
     boreRadiusMm: boreRadius,
     boreInscribedRadiusMm: boreInscribedRadius,
@@ -599,6 +664,9 @@ export function validateStar(
     geometry = deriveStar(specFull);
     const derived = geometry;
     const unitShown = (valueMm: number) => shown(valueMm);
+    // A rectangular flap is exactly as wide as the entered tip width.
+    const paddle = specFull.spikeShape === "paddle";
+    const flapWidthMm = paddle ? derived.tipLandMm : 0;
 
     if (specFull.spikeDepthMm >= derived.tipRadiusMm - MIN_SPIKE_HEIGHT_MM) {
       errors.push({
@@ -618,7 +686,33 @@ export function validateStar(
       });
     }
 
-    if (!derived.feasible) {
+    if (paddle && !(flapWidthMm > 0)) {
+      errors.push({
+        field: "tipWidth",
+        level: "error",
+        message: "Rectangular flaps need a tip width — the flap is that wide.",
+      });
+    } else if (paddle && flapWidthMm >= derived.valleyRadiusMm * 2) {
+      errors.push({
+        field: "tipWidth",
+        level: "error",
+        message: `A ${unitShown(flapWidthMm)} flap is wider than the ${unitShown(
+          derived.valleyRadiusMm * 2,
+        )} valley circle. Keep the tip width under ${unitShown(
+          derived.valleyRadiusMm * 2,
+        )}.`,
+      });
+    } else if (paddle && flapWidthMm < 2 * MIN_FEATURE_MM) {
+      errors.push({
+        field: "tipWidth",
+        level: "error",
+        message: `Flaps narrower than ${unitShown(
+          2 * MIN_FEATURE_MM,
+        )} will not print; widen the tip width or pick another spike shape.`,
+      });
+    }
+
+    if (!derived.feasible && !(paddle && derived.limitingFactor === "the flap width")) {
       errors.push({
         field: "spikeCount",
         level: "error",
@@ -704,6 +798,16 @@ export function validateStar(
           )} ${unit} wide — thin tips chip off printed parts.`,
         });
       }
+    }
+
+    if (paddle && flapWidthMm > 0 && derived.spikeHeightMm > 4 * flapWidthMm) {
+      warnings.push({
+        field: "tipWidth",
+        level: "warning",
+        message: `Flaps ${unitShown(derived.spikeHeightMm)} tall on a ${unitShown(
+          flapWidthMm,
+        )} base are flexible; widen the tip width or reduce the spike depth.`,
+      });
     }
 
     if (specFull.valleyWidthMm > 0 && specFull.valleyWidthMm < 1) {

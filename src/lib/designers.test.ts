@@ -36,10 +36,13 @@ import {
   bladeWidthAt,
   buildRotorMesh,
   deriveRotor,
+  effectiveTipEdgeRoundingMm,
   effectiveTipRoundingMm,
   passageAt,
   rotorOutline,
   rotorRingCount,
+  rotorRingFractions,
+  tipEdgeInsetMm,
   validateRotor,
   type RotorSpec,
 } from "./rotor";
@@ -56,6 +59,11 @@ function maxRadius(points: Point2D[]): number {
 
 function minRadius(points: Point2D[]): number {
   return points.reduce((min, point) => Math.min(min, radiusOf(point)), Infinity);
+}
+
+/** The section that still reaches the entered tip circle. */
+function widestRing(rings: Point2D[][]): Point2D[] {
+  return rings.reduce((best, ring) => (maxRadius(ring) > maxRadius(best) ? ring : best));
 }
 
 /** Shortest edge of a closed outline, including the closing edge. */
@@ -286,24 +294,29 @@ describe("rounded blade tips", () => {
   it("keeps the entered tip diameter for every rounding radius", () => {
     for (const base of [FAN_DEFAULT_SPEC, PROPELLER_DEFAULT_SPEC]) {
       for (const tipRoundingMm of [0, 0.5, 2, 4, 6]) {
-        const spec: RotorSpec = { ...base, tipRoundingMm };
-        const { rings } = rotorOutline(spec);
-        expect(closed(rings[0])).toBe(true);
-        for (const ring of rings) {
-          expect(maxRadius(ring)).toBeCloseTo(spec.tipDiameterMm / 2, 6);
-          expect(minRadius(ring)).toBeCloseTo(spec.hubDiameterMm / 2, 6);
+        for (const tipEdgeRoundingMm of [0, 3, 8]) {
+          const spec: RotorSpec = { ...base, tipRoundingMm, tipEdgeRoundingMm };
+          const { rings } = rotorOutline(spec);
+          expect(closed(rings[0])).toBe(true);
+          for (const ring of rings) {
+            expect(maxRadius(ring)).toBeLessThanOrEqual(spec.tipDiameterMm / 2 + 1e-9);
+            expect(minRadius(ring)).toBeCloseTo(spec.hubDiameterMm / 2, 6);
+          }
+          // An edge round only narrows the sections near the faces; the middle
+          // still measures the entered tip circle.
+          expect(maxRadius(widestRing(rings))).toBeCloseTo(spec.tipDiameterMm / 2, 6);
+          expect(shortestEdge(rings[0])).toBeGreaterThan(1e-5);
         }
-        expect(shortestEdge(rings[0])).toBeGreaterThan(1e-5);
       }
     }
   });
 
   it("rounds the corners off instead of squaring the tip", () => {
     const square = polygonArea(
-      rotorOutline({ ...FAN_DEFAULT_SPEC, tipRoundingMm: 0 }).bottom,
+      rotorOutline({ ...FAN_DEFAULT_SPEC, tipRoundingMm: 0, tipEdgeRoundingMm: 0 }).bottom,
     );
     const rounded = polygonArea(
-      rotorOutline({ ...FAN_DEFAULT_SPEC, tipRoundingMm: 6 }).bottom,
+      rotorOutline({ ...FAN_DEFAULT_SPEC, tipRoundingMm: 6, tipEdgeRoundingMm: 0 }).bottom,
     );
     expect(rounded).toBeLessThan(square);
     expect(rounded).toBeGreaterThan(square * 0.85);
@@ -317,13 +330,13 @@ describe("rounded blade tips", () => {
     const halfWidth = bladeWidthAt(spec, uTrim) / 2;
     expect(halfWidth).toBeGreaterThanOrEqual(rounding - 1e-9);
 
-    const land = rimLength(rotorOutline(spec).bottom, tipRadius);
+    const land = rimLength(widestRing(rotorOutline(spec).rings), tipRadius);
     // The polyline is a chord approximation of that arc, so allow 0.01 mm.
     expect(land).toBeCloseTo(2 * (halfWidth - rounding), 2);
 
     // With the rounding off, the land spans the whole tip chord again.
     const plain = rimLength(
-      rotorOutline({ ...spec, tipRoundingMm: 0 }).bottom,
+      widestRing(rotorOutline({ ...spec, tipRoundingMm: 0 }).rings),
       tipRadius,
     );
     expect(plain).toBeCloseTo(spec.tipWidthMm, 1);
@@ -340,10 +353,10 @@ describe("rounded blade tips", () => {
       effectiveTipRoundingMm({ ...spec, tipRoundingMm: 120 }),
     ).toBeCloseTo(rounding, 9);
     // No straight land is left once the corner rounds meet.
-    expect(rimLength(rotorOutline(spec).bottom, tipRadius)).toBeCloseTo(0, 6);
+    expect(rimLength(widestRing(rotorOutline(spec).rings), tipRadius)).toBeCloseTo(0, 6);
     expect(
       rimLength(
-        rotorOutline({ ...spec, tipRoundingMm: rounding * 0.9 }).bottom,
+        widestRing(rotorOutline({ ...spec, tipRoundingMm: rounding * 0.9 }).rings),
         tipRadius,
       ),
     ).toBeGreaterThan(0.1);
@@ -355,7 +368,7 @@ describe("rounded blade tips", () => {
 
   it("leaves no step or sharp corner in the rounded tip", () => {
     const spec: RotorSpec = { ...PROPELLER_DEFAULT_SPEC, tipRoundingMm: 3 };
-    const outline = rotorOutline(spec).bottom;
+    const outline = widestRing(rotorOutline(spec).rings);
     const tipRadius = spec.tipDiameterMm / 2;
     const trimRadius = tipRadius - effectiveTipRoundingMm(spec);
     let tipPoints = 0;
@@ -444,6 +457,193 @@ describe("rounded blade tips", () => {
   });
 });
 
+/* -------------------------------------------------------- rounded tip edges */
+
+describe("rounded tip edges", () => {
+  it("caps the edge round at half the blade height and at the blade span", () => {
+    const spec: RotorSpec = { ...FAN_DEFAULT_SPEC, tipEdgeRoundingMm: 5 };
+    expect(effectiveTipEdgeRoundingMm(spec)).toBeCloseTo(5, 9);
+    expect(effectiveTipEdgeRoundingMm({ ...spec, tipEdgeRoundingMm: 0 })).toBe(0);
+    expect(effectiveTipEdgeRoundingMm({ ...spec, tipEdgeRoundingMm: -3 })).toBe(0);
+    expect(effectiveTipEdgeRoundingMm({ ...spec, tipEdgeRoundingMm: Number.NaN })).toBe(0);
+    // The two rounds meet at mid-height rather than passing through each other.
+    expect(effectiveTipEdgeRoundingMm({ ...spec, tipEdgeRoundingMm: 40 })).toBeCloseTo(13, 9);
+    // A blade with no room inboard of the tip round caps it below the request,
+    // so the runout cannot reach the hub.
+    const stubby: RotorSpec = {
+      ...spec,
+      tipDiameterMm: 70,
+      hubDiameterMm: 58,
+      tipRoundingMm: 1,
+      tipEdgeRoundingMm: 8,
+    };
+    const capped = effectiveTipEdgeRoundingMm(stubby);
+    expect(capped).toBeGreaterThan(0);
+    expect(capped).toBeLessThan(8);
+    expect(minRadius(rotorOutline({ ...stubby, tipEdgeRoundingMm: capped }).rings[0])).toBeCloseTo(
+      29,
+      9,
+    );
+  });
+
+  it("follows a quarter circle from each face to mid-height", () => {
+    const spec: RotorSpec = { ...PROPELLER_DEFAULT_SPEC, tipEdgeRoundingMm: 6 };
+    const rounding = effectiveTipEdgeRoundingMm(spec);
+    const tipRadius = spec.tipDiameterMm / 2;
+    const height = spec.bladeHeightMm;
+    const { rings, fractions } = rotorOutline(spec);
+
+    expect(rounding).toBeCloseTo(6, 9);
+    expect(fractions[0]).toBe(0);
+    expect(fractions[fractions.length - 1]).toBe(1);
+    expect(rings.length).toBe(fractions.length);
+    expect(rotorRingFractions(spec)).toEqual(fractions);
+
+    rings.forEach((ring, k) => {
+      const z = fractions[k] * height;
+      expect(maxRadius(ring)).toBeCloseTo(
+        tipRadius - tipEdgeInsetMm(rounding, z, height),
+        6,
+      );
+    });
+
+    // The faces are pulled back by the full radius, so this is a round and not
+    // a chamfer, and the widest slice is still the entered tip diameter.
+    expect(maxRadius(rings[0])).toBeCloseTo(tipRadius - rounding, 6);
+    expect(maxRadius(rings[rings.length - 1])).toBeCloseTo(tipRadius - rounding, 6);
+    expect(maxRadius(widestRing(rings))).toBeCloseTo(tipRadius, 6);
+  });
+
+  it("samples the edge round inside the curve tolerance", () => {
+    const spec: RotorSpec = { ...FAN_DEFAULT_SPEC, tipEdgeRoundingMm: 5 };
+    const rounding = effectiveTipEdgeRoundingMm(spec);
+    const height = spec.bladeHeightMm;
+    const { fractions } = rotorOutline(spec);
+    // The section through the edge round, in millimetres: height against pull-in.
+    const pointAt = (t: number) => ({
+      x: t * height,
+      y: -tipEdgeInsetMm(rounding, t * height, height),
+    });
+
+    for (let k = 0; k < fractions.length - 1; k += 1) {
+      const a = pointAt(fractions[k]);
+      const b = pointAt(fractions[k + 1]);
+      for (let s = 1; s < 8; s += 1) {
+        const t = fractions[k] + (fractions[k + 1] - fractions[k]) * (s / 8);
+        expect(pointToSegment(pointAt(t), a, b)).toBeLessThanOrEqual(
+          CURVE_TOLERANCE_MM * 1.05,
+        );
+      }
+    }
+  });
+
+  it("rounds the edge instead of chamfering it and keeps the bottom flat", () => {
+    const square: RotorSpec = {
+      ...FAN_DEFAULT_SPEC,
+      tipRoundingMm: 0,
+      tipEdgeRoundingMm: 0,
+    };
+    const rounded: RotorSpec = { ...square, tipEdgeRoundingMm: 4 };
+    const flat = inspectMesh(buildRotorMesh(square));
+    const round = inspectMesh(buildRotorMesh(rounded));
+    expect(round.ok).toBe(true);
+    expect(round.volumeMm3).toBeLessThan(flat.volumeMm3);
+
+    // A chamfer of the same depth joins its two ends with a straight line; the
+    // round stands outside that chord all the way between them.
+    const rounding = effectiveTipEdgeRoundingMm(rounded);
+    const tipRadius = rounded.tipDiameterMm / 2;
+    const chord = tipRadius - rounding / 2;
+    expect(
+      tipRadius - tipEdgeInsetMm(rounding, rounding / 2, rounded.bladeHeightMm),
+    ).toBeGreaterThan(chord + 0.2);
+
+    // The round stops short of the hub, so the bottom face still sits flat.
+    const { rings } = rotorOutline(rounded);
+    expect(minRadius(rings[0])).toBeCloseTo(rounded.hubDiameterMm / 2, 9);
+  });
+
+  it("stays watertight across blade counts and edge roundings", () => {
+    for (const bladeCount of [2, 3, 5, 8]) {
+      for (const tipEdgeRoundingMm of [0, 1, 4, 40]) {
+        const spec: RotorSpec = {
+          ...FAN_DEFAULT_SPEC,
+          bladeCount,
+          tipEdgeRoundingMm,
+          tipRoundingMm: 4,
+          bladeSweepDeg: 18,
+          bladeAngleDeg: 28,
+          bladeHeightMm: 18,
+          tipDiameterMm: 120,
+          hubDiameterMm: 40,
+          rootWidthMm: 9,
+          tipWidthMm: 6,
+          boreMm: 6,
+        };
+        expect(validateRotor(spec).ok).toBe(true);
+        const mesh = buildRotorMesh(spec);
+        const report = inspectMesh(mesh);
+        expect(report.watertight).toBe(true);
+        expect(report.manifold).toBe(true);
+        expect(report.components).toBe(1);
+        expect(minTriangleArea(mesh)).toBeGreaterThan(1e-9);
+
+        let rim = 0;
+        for (let i = 0; i < mesh.positions.length; i += 3) {
+          rim = Math.max(rim, Math.hypot(mesh.positions[i], mesh.positions[i + 1]));
+        }
+        expect(rim).toBeCloseTo(spec.tipDiameterMm / 2, 4);
+      }
+    }
+  });
+
+  it("warns when the blade height caps the edge round", () => {
+    const spec: RotorSpec = { ...FAN_DEFAULT_SPEC, tipEdgeRoundingMm: 40 };
+    expect(effectiveTipEdgeRoundingMm(spec)).toBeCloseTo(13, 9);
+    expect(
+      validateRotor(spec).warnings.some((issue) => issue.field === "tipEdgeRounding"),
+    ).toBe(true);
+    expect(inspectMesh(buildRotorMesh(spec)).ok).toBe(true);
+  });
+
+  it("carries the edge round through both forms in either unit", () => {
+    const fan = buildFanSpec(fanDefaultValues(), "mm", "round");
+    expect(fan.spec.tipEdgeRoundingMm).toBe(4);
+    const prop = buildPropellerSpec(
+      { ...propellerDefaultValues(), tipEdgeRounding: "0.25" },
+      "in",
+      "round",
+    );
+    expect(prop.spec.tipEdgeRoundingMm).toBeCloseTo(6.35, 6);
+  });
+
+  it("ships the edge-rounded mesh at the entered diameter and height", () => {
+    const spec: RotorSpec = { ...PROPELLER_DEFAULT_SPEC, tipEdgeRoundingMm: 7 };
+    const mesh = buildRotorMesh(spec);
+    const view = new DataView(
+      buildBinaryStl(mesh, "Propeller Designer — tip edge rounding"),
+    );
+    const count = view.getUint32(80, true);
+    expect(count).toBe(mesh.triangleCount);
+    let rim = 0;
+    let top = -Infinity;
+    let bottom = Infinity;
+    for (let t = 0; t < count; t += 1) {
+      const offset = 84 + t * 50 + 12;
+      for (let corner = 0; corner < 3; corner += 1) {
+        const x = view.getFloat32(offset + corner * 12, true);
+        const y = view.getFloat32(offset + corner * 12 + 4, true);
+        const z = view.getFloat32(offset + corner * 12 + 8, true);
+        rim = Math.max(rim, Math.hypot(x, y));
+        top = Math.max(top, z);
+        bottom = Math.min(bottom, z);
+      }
+    }
+    expect(rim).toBeCloseTo(spec.tipDiameterMm / 2, 4);
+    expect(top - bottom).toBeCloseTo(spec.bladeHeightMm, 4);
+  });
+});
+
 describe("shared extrusion", () => {
   it("refuses mismatched outlines", () => {
     const outer = circleOutline(20, 48);
@@ -474,6 +674,17 @@ describe("shared extrusion", () => {
     const buffer = buildBinaryStl(mesh, "test");
     expect(buffer.byteLength).toBe(stlByteLength(mesh));
     expect(new DataView(buffer).getUint32(80, true)).toBe(mesh.triangleCount);
+  });
+
+  it("keeps the STL header to plain ASCII bytes", () => {
+    const mesh = buildSprocketMesh(SPROCKET_DEFAULT_SPEC);
+    const buffer = buildBinaryStl(mesh, "Sprocket Designer — units: mm");
+    // Zero padding after the text is fine; a truncated multi-byte character is
+    // not, so only control bytes above the padding are rejected.
+    const header = new Uint8Array(buffer, 0, 80);
+    for (const byte of header) {
+      expect(byte === 0 || (byte >= 32 && byte < 127)).toBe(true);
+    }
   });
 });
 
@@ -554,45 +765,50 @@ describe("dimensional accuracy", () => {
     }
   });
 
-  it("reaches the full tip radius on every horizontal section", () => {
+  it("reaches the full tip radius at mid-height", () => {
     for (const spec of [FAN_DEFAULT_SPEC, PROPELLER_DEFAULT_SPEC]) {
       const { rings } = rotorOutline(spec);
       expect(rings.length).toBeGreaterThan(4);
+      expect(maxRadius(widestRing(rings))).toBeCloseTo(spec.tipDiameterMm / 2, 6);
       for (const ring of rings) {
-        expect(maxRadius(ring)).toBeCloseTo(spec.tipDiameterMm / 2, 6);
+        expect(maxRadius(ring)).toBeLessThanOrEqual(spec.tipDiameterMm / 2 + 1e-9);
         expect(minRadius(ring)).toBeCloseTo(spec.hubDiameterMm / 2, 6);
       }
     }
   });
 
   it("twists each blade as a rotated cross-section, not a chord", () => {
-    const { rings } = rotorOutline(FAN_DEFAULT_SPEC);
-    const derived = deriveRotor(FAN_DEFAULT_SPEC);
-    const tipRadius = FAN_DEFAULT_SPEC.tipDiameterMm / 2;
-    const tipIndex = rings[0].findIndex(
+    const spec = FAN_DEFAULT_SPEC;
+    const { rings, fractions } = rotorOutline(spec);
+    const derived = deriveRotor(spec);
+    const tipRadius = spec.tipDiameterMm / 2;
+    const widest = widestRing(rings);
+    const tipIndex = widest.findIndex(
       (point) => Math.abs(radiusOf(point) - tipRadius) < 1e-6,
     );
     expect(tipIndex).toBeGreaterThan(-1);
 
-    const start = Math.atan2(rings[0][tipIndex].y, rings[0][tipIndex].x);
+    // The widest slice is the first one the edge round leaves untouched, which
+    // need not be the bottom face, so measure the turn from that slice.
+    const startT = fractions[rings.indexOf(widest)];
+    const start = Math.atan2(widest[tipIndex].y, widest[tipIndex].x);
     rings.forEach((ring, k) => {
-      const t = k / (rings.length - 1);
       const angle = Math.atan2(ring[tipIndex].y, ring[tipIndex].x);
       let turn = angle - start;
       while (turn > Math.PI) turn -= 2 * Math.PI;
       while (turn < -Math.PI) turn += 2 * Math.PI;
-      expect(turn).toBeCloseTo((derived.leanMm * t) / tipRadius, 6);
+      expect(turn).toBeCloseTo((derived.leanMm * (fractions[k] - startT)) / tipRadius, 6);
     });
 
     // A deeper lean needs more slices to stay inside the tolerance.
-    const steep: RotorSpec = { ...FAN_DEFAULT_SPEC, bladeAngleDeg: 55 };
-    expect(rotorRingCount(steep)).toBeGreaterThan(rotorRingCount(FAN_DEFAULT_SPEC));
+    const steep: RotorSpec = { ...spec, bladeAngleDeg: 55 };
+    expect(rotorRingCount(steep)).toBeGreaterThan(rotorRingCount(spec));
   });
 
   it("cuts each blade tip to the entered chord", () => {
     const spec: RotorSpec = { ...FAN_DEFAULT_SPEC, tipRoundingMm: 0 };
     const tipRadius = spec.tipDiameterMm / 2;
-    const { bottom } = rotorOutline(spec);
+    const bottom = widestRing(rotorOutline(spec).rings);
     const start = bottom.findIndex(
       (point) => Math.abs(radiusOf(point) - tipRadius) < 1e-6,
     );
@@ -762,6 +978,8 @@ describe("solid integrity across the parameter space", () => {
     }
   });
 
+  // More slices per part now that the tip edge carries a round, so allow more
+  // than the default budget for the whole matrix.
   it("stays watertight across blade counts, sweeps and leans", () => {
     for (const bladeCount of [2, 3, 4, 6, 8, 10]) {
       for (const bladeSweepDeg of [-40, 0, 25, 45]) {
@@ -787,7 +1005,7 @@ describe("solid integrity across the parameter space", () => {
         }
       }
     }
-  });
+  }, 20000);
 
   it("keeps the extremes of the input ranges printable", () => {
     const big = buildSprocketMesh({

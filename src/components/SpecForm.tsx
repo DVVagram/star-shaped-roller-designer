@@ -42,6 +42,7 @@ export default function SpecForm({
   const unit = state.units;
   const values = state.values;
   const sharp = state.spikeShape === "sharp";
+  const flaps = state.spikeShape === "paddle";
 
   return (
     <form
@@ -174,7 +175,9 @@ export default function SpecForm({
             hint={
               sharp
                 ? "Sharp spikes finish in a point, so there is no tip land."
-                : "Flat land across the top of each spike."
+                : flaps
+                  ? "Width of each rectangular flap; its sides run square out of the core."
+                  : "Flat land across the top of each spike."
             }
             error={errors.get("tipWidth")}
           />

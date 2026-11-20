@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_BUILDER_STATE, buildSpec } from "./builder";
+import { DEFAULT_BUILDER_STATE, buildSpec, setUnits } from "./builder";
 import {
   SPIKE_SHAPE_ORDER,
   autoSpikeCount,
   boreOutline,
+  deriveStar,
   evaluateSpikeCount,
   polygonArea,
   validateStar,
@@ -51,6 +52,31 @@ describe("auto spike fit", () => {
 
   it("is always feasible for the default design", () => {
     expect(validateStar(BASE, { unit: "mm" }).ok).toBe(true);
+  });
+});
+
+describe("units", () => {
+  it("keeps the same design and spike count when switched to inches", () => {
+    const state = DEFAULT_BUILDER_STATE;
+    const inches = setUnits(state, "in");
+    expect(inches.values.spikeCount).toBe(state.values.spikeCount);
+    expect(buildSpec(inches).complete).toBe(true);
+
+    const mmSpec = buildSpec(state).spec as StarSpec;
+    const inchSpec = buildSpec(inches).spec as StarSpec;
+    for (const field of [
+      "outerDiameterMm",
+      "thicknessMm",
+      "spikeDepthMm",
+      "tipWidthMm",
+      "valleyWidthMm",
+      "taperMm",
+      "boreMm",
+    ] as const) {
+      expect(inchSpec[field]).toBeCloseTo(mmSpec[field], 1);
+    }
+    expect(inchSpec.spikeCount).toBe(mmSpec.spikeCount);
+    expect(inches.values.outerDiameter).toBe("3.1496");
   });
 });
 
@@ -106,9 +132,110 @@ describe("star profile", () => {
   });
 });
 
+/** Twelve 6 mm wide flaps on the 40 mm / 12 mm deep default core. */
+const FLAPS: StarSpec = { ...BASE, spikeShape: "paddle", spikeCount: 12, tipWidthMm: 6 };
+
+describe("rectangular flaps", () => {
+  it("turns every spike into a rectangle on a round core", () => {
+    const profile = createStarProfile(FLAPS);
+    const tipRadius = FLAPS.outerDiameterMm / 2;
+    const valleyRadius = tipRadius - FLAPS.spikeDepthMm;
+
+    // Every vertex is either a tip-circle corner or lies on the valley circle:
+    // there are no vertices on the straight sides at all.
+    for (const point of profile.points) {
+      const radius = Math.hypot(point.x, point.y);
+      const onTip = Math.abs(radius - tipRadius) < 1e-9;
+      const onValley = Math.abs(radius - valleyRadius) < 1e-9;
+      expect(onTip || onValley).toBe(true);
+    }
+
+    const corners = profile.points.filter(
+      (point) => Math.abs(Math.hypot(point.x, point.y) - tipRadius) < 1e-9,
+    );
+    expect(corners.length).toBe(2 * FLAPS.spikeCount);
+
+    for (let i = 0; i < corners.length; i += 2) {
+      const a = corners[i];
+      const b = corners[i + 1];
+      const chord = Math.hypot(a.x - b.x, a.y - b.y);
+      expect(chord).toBeCloseTo(FLAPS.tipWidthMm, 9);
+
+      // The flap is square to its radius, so its flat tip chord has no radial
+      // component: the chord is perpendicular to the midpoint direction.
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      expect(Math.abs((b.x - a.x) * mid.x + (b.y - a.y) * mid.y)).toBeLessThan(1e-9);
+      expect(Math.hypot(mid.x, mid.y)).toBeCloseTo(
+        Math.sqrt(tipRadius * tipRadius - (FLAPS.tipWidthMm / 2) ** 2),
+        9,
+      );
+    }
+  });
+
+  it("counts the flap as the tip land and its base arc as the spike base", () => {
+    const derived = deriveStar(FLAPS);
+    expect(derived.tipLandMm).toBeCloseTo(FLAPS.tipWidthMm, 9);
+    const valleyRadius = derived.valleyRadiusMm;
+    const expectedBase = 2 * Math.asin(FLAPS.tipWidthMm / 2 / valleyRadius) * valleyRadius;
+    expect(derived.spikeBaseArcMm).toBeCloseTo(expectedBase, 9);
+  });
+
+  it("builds one watertight shell, tapered and bored too", () => {
+    const variants: StarSpec[] = [
+      FLAPS,
+      { ...FLAPS, taperMm: 5 },
+      { ...FLAPS, boreShape: "hex" },
+      { ...FLAPS, spikeCount: 24, tipWidthMm: 3, spikeDepthMm: 8 },
+      { ...FLAPS, spikeCount: 3, spikeDepthMm: 18 },
+    ];
+    for (const spec of variants) {
+      const report = inspectStarSolid(spec);
+      expect(validateStar(spec, { unit: "mm" }).ok).toBe(true);
+      expect(report.watertight).toBe(true);
+      expect(report.manifold).toBe(true);
+      expect(report.connected).toBe(true);
+      expect(report.eulerCharacteristic).toBe(0);
+      expect(report.ok).toBe(true);
+      expect(report.volumeMm3).toBeGreaterThan(0);
+    }
+  });
+
+  it("shortens the flaps towards the tapered face without narrowing them", () => {
+    const spec: StarSpec = { ...FLAPS, taperMm: 5 };
+    const profile = createStarProfile(spec);
+    const topTipRadius = spec.outerDiameterMm / 2 - 5;
+    expect(profile.topAreaMm2).toBeLessThan(profile.baseAreaMm2);
+
+    const topCorners = profile.topPoints.filter(
+      (point) => Math.abs(Math.hypot(point.x, point.y) - topTipRadius) < 1e-9,
+    );
+    expect(topCorners.length).toBe(2 * spec.spikeCount);
+    for (let i = 0; i < topCorners.length; i += 2) {
+      const a = topCorners[i];
+      const b = topCorners[i + 1];
+      expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeCloseTo(spec.tipWidthMm, 9);
+    }
+  });
+
+  it("rejects a flap that does not fit the core or the printer", () => {
+    const wide = validateStar({ ...FLAPS, tipWidthMm: 60 }, { unit: "mm" });
+    expect(wide.ok).toBe(false);
+    expect(wide.errors.some((issue) => issue.field === "tipWidth")).toBe(true);
+
+    const thin = validateStar({ ...FLAPS, tipWidthMm: 0.6 }, { unit: "mm" });
+    expect(thin.ok).toBe(false);
+    expect(thin.errors.some((issue) => issue.field === "tipWidth")).toBe(true);
+
+    const empty = validateStar({ ...FLAPS, tipWidthMm: 0 }, { unit: "mm" });
+    expect(empty.ok).toBe(false);
+    expect(empty.errors.some((issue) => issue.field === "tipWidth")).toBe(true);
+  });
+});
+
 describe("solid", () => {
   const cases: Array<[string, StarSpec]> = [
     ["default", BASE],
+    ["rectangular flaps", FLAPS],
     ["sharp spikes", { ...BASE, spikeShape: "sharp", tipWidthMm: 0 }],
     ["swept claws", { ...BASE, spikeShape: "claw" }],
     ["hex hole", { ...BASE, boreShape: "hex" }],
@@ -156,6 +283,34 @@ describe("solid", () => {
     });
   }
 
+  it("puts the tapered outline on the top face of the solid, not the base one", () => {
+    const spec: StarSpec = { ...BASE, taperMm: 5 };
+    const boreArea = polygonArea(boreOutline(spec));
+    // The wall interpolates every vertex linearly, so the outline at height
+    // fraction t is the top outline of a profile tapered by 5·t, and the area
+    // is quadratic in t: Simpson over three samples is exact.
+    const areaAt = (fraction: number) =>
+      createStarProfile({ ...spec, taperMm: spec.taperMm * fraction }).topAreaMm2;
+    const meanArea =
+      (areaAt(0) + 4 * areaAt(0.5) + areaAt(1)) / 6 - boreArea;
+    const expected = meanArea * spec.thicknessMm;
+    const report = inspectStarSolid(spec);
+    expect(Math.abs(report.volumeMm3 - expected) / expected).toBeLessThan(2e-4);
+
+    const mesh = buildStarMesh(spec);
+    const half = spec.thicknessMm / 2;
+    let topMax = 0;
+    let bottomMax = 0;
+    for (let i = 0; i < mesh.positions.length; i += 3) {
+      const radius = Math.hypot(mesh.positions[i], mesh.positions[i + 1]);
+      const z = mesh.positions[i + 2];
+      if (Math.abs(z - half) < 1e-4) topMax = Math.max(topMax, radius);
+      if (Math.abs(z + half) < 1e-4) bottomMax = Math.max(bottomMax, radius);
+    }
+    expect(bottomMax).toBeCloseTo(spec.outerDiameterMm / 2, 3);
+    expect(topMax).toBeCloseTo(spec.outerDiameterMm / 2 - 5, 3);
+  });
+
   it("removes exactly the hole volume when the bore grows", () => {
     const small = inspectStarSolid({ ...BASE, boreMm: 6 });
     const large = inspectStarSolid({ ...BASE, boreMm: 12 });
@@ -182,6 +337,10 @@ describe("STL export", () => {
 
     const view = new DataView(buffer);
     expect(view.getUint32(80, true)).toBe(mesh.triangleCount);
+
+    for (const byte of new Uint8Array(buffer, 0, 80)) {
+      expect(byte === 0 || (byte >= 32 && byte < 127)).toBe(true);
+    }
   });
 
   it("keeps the mesh in millimetres around the origin", () => {

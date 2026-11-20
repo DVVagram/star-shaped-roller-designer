@@ -83,13 +83,18 @@ export function cleanRings(rings: Point2D[][]): Point2D[][] {
 export interface ExtrusionInput {
   /**
    * Outlines stacked from the bottom face upward. Every ring holds the same
-   * vertices in the same order and sits at an even height between the two faces,
+   * vertices in the same order and sits at a set height between the two faces,
    * so a twisted wall is a stack of bands rather than one long chord.
    */
   rings: Point2D[][];
   /** Through-hole, identical at both ends. */
   bore: Point2D[];
   thicknessMm: number;
+  /**
+   * Height of each ring as a fraction of the thickness, from 0 to 1. Omit for
+   * even spacing; pass it when a feature needs the slices bunched near a face.
+   */
+  ringFractions?: number[];
   /** Optional boss standing proud of the top face. */
   hub?: { outline: Point2D[]; heightMm: number } | null;
 }
@@ -144,7 +149,24 @@ export function buildExtrusion(input: ExtrusionInput): Mesh {
   const hubEnabled = hubOutline.length >= 3;
   const hubCount = hubOutline.length;
   const topFaceZ = hubEnabled ? halfThickness + (hubInput?.heightMm ?? 0) : halfThickness;
-  const zAt = (index: number) => -halfThickness + (thicknessMm * index) / (ringCount - 1);
+  const fractions = input.ringFractions;
+  if (fractions) {
+    if (fractions.length !== ringCount) {
+      throw new Error("Every profile ring needs a height fraction.");
+    }
+    for (let k = 0; k < ringCount; k += 1) {
+      const previous = k === 0 ? -Infinity : fractions[k - 1];
+      if (!(fractions[k] > previous) || fractions[k] < 0 || fractions[k] > 1) {
+        throw new Error("Height fractions must rise from the bottom face to the top.");
+      }
+    }
+    if (Math.abs(fractions[0]) > 1e-9 || Math.abs(fractions[ringCount - 1] - 1) > 1e-9) {
+      throw new Error("Height fractions must start at 0 and end at 1.");
+    }
+  }
+  const zAt = (index: number) =>
+    -halfThickness +
+    (fractions ? thicknessMm * fractions[index] : (thicknessMm * index) / (ringCount - 1));
 
   const boreBottom = ringCount * outerCount;
   const boreTop = boreBottom + boreCount;
@@ -623,8 +645,11 @@ export function buildBinaryStl(mesh: Mesh, header: string): ArrayBuffer {
   const view = new DataView(buffer);
   const { positions, indices } = mesh;
 
+  // The header is a byte block, so anything outside printable ASCII becomes a
+  // dash instead of a truncated multi-byte character.
   for (let i = 0; i < header.length && i < 80; i += 1) {
-    view.setUint8(i, header.charCodeAt(i) & 0xff);
+    const code = header.charCodeAt(i);
+    view.setUint8(i, code >= 32 && code < 127 ? code : 0x2d);
   }
   view.setUint32(80, mesh.triangleCount, true);
 

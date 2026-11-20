@@ -178,7 +178,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       {
         number: "02",
         title: "Shape the points",
-        body: "Pick rounded, truncated, sharp or swept claws, then tune tip width, valley width and a taper that narrows every point towards the top face.",
+        body: "Pick rounded, truncated, sharp or swept claws — or rectangles, which replace the points with rectangular flaps on a round core. Then tune tip width, valley width and a taper that narrows every point towards the top face.",
       },
       {
         number: "03",

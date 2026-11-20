@@ -15,6 +15,7 @@ export type FanField =
   | "rootWidth"
   | "tipWidth"
   | "tipRounding"
+  | "tipEdgeRounding"
   | "bladeHeight"
   | "bladeAngle"
   | "bladeSweep"
@@ -26,6 +27,7 @@ export const FAN_LENGTH_FIELDS: FanField[] = [
   "rootWidth",
   "tipWidth",
   "tipRounding",
+  "tipEdgeRounding",
   "bladeHeight",
   "bore",
 ];
@@ -38,6 +40,7 @@ export function fanDefaultValues(): Record<FanField, string> {
     rootWidth: "24",
     tipWidth: "17",
     tipRounding: "6",
+    tipEdgeRounding: "4",
     bladeHeight: "26",
     bladeAngle: "34",
     bladeSweep: "26",
@@ -68,6 +71,7 @@ export function buildFanSpec(
     rootWidthMm: length("rootWidth"),
     tipWidthMm: length("tipWidth"),
     tipRoundingMm: length("tipRounding"),
+    tipEdgeRoundingMm: length("tipEdgeRounding"),
     bladeHeightMm: length("bladeHeight"),
     bladeAngleDeg: bladeAngle ?? undefined,
     bladeSweepDeg: bladeSweep ?? undefined,
@@ -82,6 +86,7 @@ export function buildFanSpec(
     spec.rootWidthMm !== undefined &&
     spec.tipWidthMm !== undefined &&
     spec.tipRoundingMm !== undefined &&
+    spec.tipEdgeRoundingMm !== undefined &&
     spec.bladeHeightMm !== undefined &&
     spec.bladeAngleDeg !== undefined &&
     spec.bladeSweepDeg !== undefined &&

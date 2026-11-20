@@ -106,6 +106,11 @@ export default function FanBuilder() {
       source: "input",
     },
     {
+      label: "Edge rounding",
+      value: formatMeasure(derived.tipEdgeRoundingMm, units),
+      source: "input",
+    },
+    {
       label: "Blade area",
       value: `${formatNumber(derived.bladeAreaMm2 / 100, 1)} cm²`,
       source: "calc",
@@ -142,7 +147,7 @@ export default function FanBuilder() {
       return;
     }
     try {
-      const buffer = buildBinaryStl(buildRotorMesh(current), "Impeller Designer — units: mm");
+      const buffer = buildBinaryStl(buildRotorMesh(current), "Impeller Designer - units: mm");
       downloadStl(
         buffer,
         `impeller-${formatNumber(current.tipDiameterMm, 0)}d-${Math.round(
@@ -262,8 +267,17 @@ export default function FanBuilder() {
             value={values.tipRounding}
             unit={units}
             onChange={(value) => setField("tipRounding", value)}
-            hint="Radius on the blade ends. 0 leaves them square."
+            hint="Radius on the blade ends in plan. 0 leaves them square."
             error={errors.get("tipRounding")}
+          />
+          <NumberField
+            id="tipEdgeRounding"
+            label="Edge rounding"
+            value={values.tipEdgeRounding}
+            unit={units}
+            onChange={(value) => setField("tipEdgeRounding", value)}
+            hint="Radius on the top and bottom of the tip. 0 leaves the edge square."
+            error={errors.get("tipEdgeRounding")}
           />
           <NumberField
             id="bladeAngle"
