@@ -166,6 +166,9 @@ export const linkPlate: AnyDesign = defineDesign({
     checkSize(errors, units, "pitch", p.pitchMm + p.widthMm, p.thicknessMm);
     checkWall(errors, units, "bore", "ring around the pin", p.widthMm / 2 - p.boreMm / 2);
     if (p.boreMm >= p.widthMm - 1) errors.push({ field: "bore", level: "error", message: "The bore leaves no material at the edge." });
+    if (p.pitchMm <= p.boreMm + 1.2) {
+      errors.push({ field: "pitch", level: "error", message: "The two bores nearly meet; increase the pin pitch or reduce the bore." });
+    }
     if (p.thicknessMm < p.boreMm * 0.4) warnings.push({ field: "thickness", level: "warning", message: "A thin link ovalises its pin holes under load." });
 
     return {

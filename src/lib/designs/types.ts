@@ -9,6 +9,7 @@
 
 import type { Mesh } from "@/lib/kit/solid";
 
+import { contractFor, type DesignContract } from "./contracts";
 import { MAKING_NOTES } from "./making-notes";
 import { NOTES_TITLES } from "./notes-titles";
 import { USE_CASES } from "./use-cases";
@@ -45,6 +46,8 @@ export interface FieldDef {
   section: string;
   default: string;
   hint?: string;
+  /** What this field measures and what changing it affects. */
+  help?: string;
   min?: number;
   max?: number;
   options?: FieldOption[];
@@ -116,6 +119,8 @@ export interface AnyDesign {
   notes: string[];
   notesTitle: string;
   use: string;
+  /** Capability, standard, mating dimensions and unverified properties. */
+  contract: DesignContract;
   header: string;
   fields: FieldDef[];
   defaults: Record<string, string>;
@@ -137,6 +142,7 @@ export function defineDesign<P>(module: DesignModule<P>): AnyDesign {
     notes: MAKING_NOTES[module.id] ? [...module.notes, MAKING_NOTES[module.id]] : module.notes,
     notesTitle: module.notesTitle ?? NOTES_TITLES[module.id] ?? "How the geometry is built",
     use: module.use ?? USE_CASES[module.id] ?? "",
+    contract: contractFor(module.id, module.use ?? USE_CASES[module.id] ?? ""),
     header: module.header,
     fields: module.fields,
     defaults: Object.fromEntries(module.fields.map((field) => [field.key, field.default])),

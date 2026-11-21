@@ -8,3 +8,9 @@ dist-ssr
 .ref
 .ref2
 dev.log
+
+# Local audit outputs, browser profiles, downloads and preview logs
+.audit/*
+!.audit/*.mjs
+!.audit/routes.json
+preview.log

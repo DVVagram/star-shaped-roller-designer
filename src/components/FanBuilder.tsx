@@ -1,5 +1,10 @@
 import { useMemo, useRef, useState } from "react";
 
+import { renderRecordDrawingSvg } from "@/lib/designs/drawing";
+import { legacyRecord, fanEnteredValues } from "@/lib/designs/legacy";
+import { renderRecordSpecification } from "@/lib/designs/spec";
+import { downloadText } from "@/lib/kit/download";
+
 import { NumberField, OptionCards, Segmented } from "./fields";
 import DesignScaffold, { type ReadoutItem } from "./DesignScaffold";
 import { useUnitValues } from "./useUnitValues";
@@ -142,12 +147,12 @@ export default function FanBuilder() {
     }
     if (!report?.ok) {
       setExportError(
-        "The generated solid is not a single watertight shell, so it was not exported.",
+        "The generated solid is not a single closed, consistently wound shell, so it was not exported.",
       );
       return;
     }
     try {
-      const buffer = buildBinaryStl(buildRotorMesh(current), "Impeller Designer - units: mm");
+      const buffer = buildBinaryStl(buildRotorMesh(current), "FIT PROTOTYPE - Impeller Designer - units: mm");
       downloadStl(
         buffer,
         `impeller-${formatNumber(current.tipDiameterMm, 0)}d-${Math.round(
@@ -158,6 +163,39 @@ export default function FanBuilder() {
       console.error(error);
       setExportError("The STL could not be generated. Please try again.");
     }
+  }
+
+  function artifactRecord() {
+    if (!current || !mesh || !report?.ok) return null;
+    return legacyRecord(
+      "impeller",
+      "Axial impeller",
+      fanEnteredValues(values, units, boreShape),
+      readout.map(({ label, value, source }) => ({ label, value, source })),
+      warnings,
+      mesh,
+    );
+  }
+
+  function handleSpec() {
+    const record = artifactRecord();
+    if (!record) return;
+    downloadText(renderRecordSpecification(record), "impeller-spec.txt");
+  }
+
+  function handleDrawing() {
+    const record = artifactRecord();
+    if (!record) return;
+    downloadText(
+      renderRecordDrawingSvg({
+        id: record.id,
+        name: record.name,
+        contract: record.contract,
+        mesh: record.mesh!,
+      }),
+      "impeller-drawing.svg",
+      "image/svg+xml",
+    );
   }
 
   const form = (
@@ -371,10 +409,15 @@ export default function FanBuilder() {
         stale: !validation.ok,
       }}
       exportPanel={{
+        capability: "fit",
+        limitation: "No airflow, balance or safe-speed rating is provided; guard the rotor.",
+        onSpec: handleSpec,
+        onDrawing: handleDrawing,
+        artifactsDisabled: !watertight,
         onExport: handleExport,
         disabled: !validation.ok || !report?.ok,
         note: validation.ok
-          ? "Binary STL in millimetres, centred on the origin, ready to slice."
+          ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer."
           : "Export is disabled while the configuration has errors.",
         volume: Number.isFinite(volumeCm3) ? `${formatNumber(volumeCm3, 2)} cm³` : "—",
         triangles: report ? formatNumber(report.triangleCount, 0) : "—",

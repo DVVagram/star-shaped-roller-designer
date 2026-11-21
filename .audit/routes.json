@@ -1,0 +1,606 @@
+[
+ {
+  "id": "star",
+  "name": "Star roller",
+  "legacy": true
+ },
+ {
+  "id": "sprocket",
+  "name": "Chain sprocket",
+  "legacy": true
+ },
+ {
+  "id": "impeller",
+  "name": "Axial impeller",
+  "legacy": true
+ },
+ {
+  "id": "propeller",
+  "name": "Propeller",
+  "legacy": true
+ },
+ {
+  "id": "compression-spring",
+  "name": "Compression spring"
+ },
+ {
+  "id": "pipe-elbow",
+  "name": "Pipe elbow"
+ },
+ {
+  "id": "brake-rotor",
+  "name": "Brake rotor"
+ },
+ {
+  "id": "index-plate",
+  "name": "Index plate"
+ },
+ {
+  "id": "vent-grille",
+  "name": "Vent grille"
+ },
+ {
+  "id": "perforated-plate",
+  "name": "Perforated plate"
+ },
+ {
+  "id": "precision-spacer",
+  "name": "Precision spacer"
+ },
+ {
+  "id": "fan-grille",
+  "name": "Fan grille"
+ },
+ {
+  "id": "baffle-plate",
+  "name": "Baffle plate"
+ },
+ {
+  "id": "dovetail-rail",
+  "name": "Dovetail rail"
+ },
+ {
+  "id": "sink-strainer",
+  "name": "Sink strainer"
+ },
+ {
+  "id": "mounting-ring",
+  "name": "Mounting ring"
+ },
+ {
+  "id": "spur-gear",
+  "name": "Spur gear"
+ },
+ {
+  "id": "internal-gear",
+  "name": "Internal ring gear"
+ },
+ {
+  "id": "helical-gear",
+  "name": "Helical gear"
+ },
+ {
+  "id": "rack",
+  "name": "Gear rack"
+ },
+ {
+  "id": "timing-pulley",
+  "name": "Timing pulley"
+ },
+ {
+  "id": "ratchet-wheel",
+  "name": "Ratchet wheel"
+ },
+ {
+  "id": "geneva-wheel",
+  "name": "Geneva wheel"
+ },
+ {
+  "id": "disc-cam",
+  "name": "Disc cam"
+ },
+ {
+  "id": "eccentric-wheel",
+  "name": "Eccentric wheel"
+ },
+ {
+  "id": "splined-hub",
+  "name": "Splined hub"
+ },
+ {
+  "id": "square-flange",
+  "name": "Square flange"
+ },
+ {
+  "id": "oval-flange",
+  "name": "Oval flange"
+ },
+ {
+  "id": "bearing-plate",
+  "name": "Bearing plate"
+ },
+ {
+  "id": "nema-plate",
+  "name": "NEMA 17 plate"
+ },
+ {
+  "id": "t-slot-nut",
+  "name": "T-slot nut"
+ },
+ {
+  "id": "square-nut",
+  "name": "Square nut"
+ },
+ {
+  "id": "coupling-nut",
+  "name": "Coupling nut"
+ },
+ {
+  "id": "cross-knob",
+  "name": "Cross knob"
+ },
+ {
+  "id": "pointer-knob",
+  "name": "Pointer knob"
+ },
+ {
+  "id": "pivot-bracket",
+  "name": "Pivot bracket"
+ },
+ {
+  "id": "wing-nut",
+  "name": "Wing nut"
+ },
+ {
+  "id": "star-knob",
+  "name": "Star knob"
+ },
+ {
+  "id": "knurled-knob",
+  "name": "Knurled knob"
+ },
+ {
+  "id": "open-end-wrench",
+  "name": "Open-end wrench"
+ },
+ {
+  "id": "box-wrench",
+  "name": "Box-end wrench"
+ },
+ {
+  "id": "chain-link",
+  "name": "Chain link plate"
+ },
+ {
+  "id": "saw-blade",
+  "name": "Saw blade"
+ },
+ {
+  "id": "handwheel",
+  "name": "Handwheel"
+ },
+ {
+  "id": "flange",
+  "name": "Bolt flange"
+ },
+ {
+  "id": "mounting-plate",
+  "name": "Mounting plate"
+ },
+ {
+  "id": "hex-nut",
+  "name": "Hex nut"
+ },
+ {
+  "id": "washer",
+  "name": "Washer"
+ },
+ {
+  "id": "slot-bracket",
+  "name": "Slot bracket"
+ },
+ {
+  "id": "link-plate",
+  "name": "Link plate"
+ },
+ {
+  "id": "drill-guide",
+  "name": "Drill guide"
+ },
+ {
+  "id": "keytag",
+  "name": "Key tag"
+ },
+ {
+  "id": "plant-label",
+  "name": "Plant label"
+ },
+ {
+  "id": "gusset-plate",
+  "name": "Gusset plate"
+ },
+ {
+  "id": "keyhole-plate",
+  "name": "Keyhole plate"
+ },
+ {
+  "id": "switch-plate",
+  "name": "Switch plate"
+ },
+ {
+  "id": "tensioner-plate",
+  "name": "Tensioner plate"
+ },
+ {
+  "id": "cable-mount",
+  "name": "Cable tie mount"
+ },
+ {
+  "id": "thumb-screw",
+  "name": "Thumb screw"
+ },
+ {
+  "id": "thumb-nut",
+  "name": "Thumb nut"
+ },
+ {
+  "id": "dome-nut",
+  "name": "Dome nut"
+ },
+ {
+  "id": "hose-barb",
+  "name": "Hose barb"
+ },
+ {
+  "id": "barbed-reducer",
+  "name": "Barbed reducer"
+ },
+ {
+  "id": "bulkhead-fitting",
+  "name": "Bulkhead fitting"
+ },
+ {
+  "id": "cable-grommet",
+  "name": "Cable grommet"
+ },
+ {
+  "id": "tube-adapter",
+  "name": "Tube adapter"
+ },
+ {
+  "id": "pipette-tip",
+  "name": "Pipette tip"
+ },
+ {
+  "id": "jar-lid",
+  "name": "Jar lid"
+ },
+ {
+  "id": "incense-holder",
+  "name": "Incense holder"
+ },
+ {
+  "id": "plant-saucer",
+  "name": "Plant saucer"
+ },
+ {
+  "id": "tea-light-cup",
+  "name": "Tea light cup"
+ },
+ {
+  "id": "centering-cone",
+  "name": "Centering cone"
+ },
+ {
+  "id": "candlestick",
+  "name": "Candlestick"
+ },
+ {
+  "id": "egg-cup",
+  "name": "Egg cup"
+ },
+ {
+  "id": "honey-dipper",
+  "name": "Honey dipper"
+ },
+ {
+  "id": "spinning-top",
+  "name": "Spinning top"
+ },
+ {
+  "id": "bottle-stopper",
+  "name": "Bottle stopper"
+ },
+ {
+  "id": "tapered-plug",
+  "name": "Tapered plug"
+ },
+ {
+  "id": "pet-bowl",
+  "name": "Pet bowl"
+ },
+ {
+  "id": "planter-pot",
+  "name": "Planter pot"
+ },
+ {
+  "id": "wine-glass",
+  "name": "Wine glass"
+ },
+ {
+  "id": "goblet",
+  "name": "Goblet"
+ },
+ {
+  "id": "pipe-reducer",
+  "name": "Pipe reducer"
+ },
+ {
+  "id": "pipe-cap",
+  "name": "Pipe cap"
+ },
+ {
+  "id": "hose-adapter",
+  "name": "Hose adapter"
+ },
+ {
+  "id": "de-laval-nozzle",
+  "name": "De Laval nozzle"
+ },
+ {
+  "id": "nose-cone",
+  "name": "Nose cone"
+ },
+ {
+  "id": "torus",
+  "name": "Torus"
+ },
+ {
+  "id": "v-belt-pulley",
+  "name": "V-belt pulley"
+ },
+ {
+  "id": "round-belt-pulley",
+  "name": "Round-belt pulley"
+ },
+ {
+  "id": "stepped-pulley",
+  "name": "Stepped pulley"
+ },
+ {
+  "id": "flywheel",
+  "name": "Flywheel"
+ },
+ {
+  "id": "hemisphere-shell",
+  "name": "Hemisphere shell"
+ },
+ {
+  "id": "test-tube",
+  "name": "Test tube"
+ },
+ {
+  "id": "centrifuge-tube",
+  "name": "Centrifuge tube"
+ },
+ {
+  "id": "erlenmeyer-flask",
+  "name": "Erlenmeyer flask"
+ },
+ {
+  "id": "piston",
+  "name": "Piston"
+ },
+ {
+  "id": "oring-plug",
+  "name": "O-ring plug"
+ },
+ {
+  "id": "caulking-nozzle",
+  "name": "Caulking nozzle"
+ },
+ {
+  "id": "golf-tee",
+  "name": "Golf tee"
+ },
+ {
+  "id": "dowel-pin",
+  "name": "Dowel pin"
+ },
+ {
+  "id": "furniture-foot",
+  "name": "Furniture foot"
+ },
+ {
+  "id": "caster-wheel",
+  "name": "Caster wheel"
+ },
+ {
+  "id": "funnel",
+  "name": "Funnel"
+ },
+ {
+  "id": "vase",
+  "name": "Vase"
+ },
+ {
+  "id": "cup",
+  "name": "Tapered cup"
+ },
+ {
+  "id": "bowl",
+  "name": "Bowl"
+ },
+ {
+  "id": "bottle",
+  "name": "Bottle"
+ },
+ {
+  "id": "bell",
+  "name": "Bell"
+ },
+ {
+  "id": "lamp-shade",
+  "name": "Lamp shade"
+ },
+ {
+  "id": "parabolic-dish",
+  "name": "Parabolic dish"
+ },
+ {
+  "id": "spool",
+  "name": "Filament spool"
+ },
+ {
+  "id": "flanged-bushing",
+  "name": "Flanged bushing"
+ },
+ {
+  "id": "gasket",
+  "name": "Gasket ring"
+ },
+ {
+  "id": "portafilter-funnel",
+  "name": "Portafilter funnel"
+ },
+ {
+  "id": "biscuit-cutter",
+  "name": "Biscuit cutter"
+ },
+ {
+  "id": "alignment-pin",
+  "name": "Alignment pin"
+ },
+ {
+  "id": "taper-pin",
+  "name": "Taper pin"
+ },
+ {
+  "id": "eyelet",
+  "name": "Eyelet"
+ },
+ {
+  "id": "rivet",
+  "name": "Rivet"
+ },
+ {
+  "id": "bellows-boot",
+  "name": "Bellows boot"
+ },
+ {
+  "id": "suction-cup",
+  "name": "Suction cup"
+ },
+ {
+  "id": "bearing-cap",
+  "name": "Bearing cap"
+ },
+ {
+  "id": "yo-yo",
+  "name": "Yo-yo"
+ },
+ {
+  "id": "corner-bracket",
+  "name": "Corner bracket"
+ },
+ {
+  "id": "flat-brace",
+  "name": "Flat brace"
+ },
+ {
+  "id": "t-bracket",
+  "name": "T bracket"
+ },
+ {
+  "id": "cross-brace",
+  "name": "Cross brace"
+ },
+ {
+  "id": "french-cleat",
+  "name": "French cleat"
+ },
+ {
+  "id": "phone-stand",
+  "name": "Phone stand"
+ },
+ {
+  "id": "door-wedge",
+  "name": "Door wedge"
+ },
+ {
+  "id": "wall-hook",
+  "name": "Wall hook"
+ },
+ {
+  "id": "pegboard-hook",
+  "name": "Pegboard hook"
+ },
+ {
+  "id": "door-strike",
+  "name": "Door strike"
+ },
+ {
+  "id": "saddle-clamp",
+  "name": "Saddle clamp"
+ },
+ {
+  "id": "pipe-saddle",
+  "name": "Pipe saddle"
+ },
+ {
+  "id": "cable-comb",
+  "name": "Cable comb"
+ },
+ {
+  "id": "featherboard",
+  "name": "Featherboard"
+ },
+ {
+  "id": "hold-down-clamp",
+  "name": "Hold-down clamp"
+ },
+ {
+  "id": "eccentric-clamp",
+  "name": "Eccentric clamp"
+ },
+ {
+  "id": "zero-clearance-insert",
+  "name": "Zero-clearance insert"
+ },
+ {
+  "id": "desk-cable-clip",
+  "name": "Desk cable clip"
+ },
+ {
+  "id": "hinge-leaf",
+  "name": "Hinge leaf"
+ },
+ {
+  "id": "slotted-shim",
+  "name": "Slotted shim"
+ },
+ {
+  "id": "router-template",
+  "name": "Router template"
+ },
+ {
+  "id": "fan-mount",
+  "name": "Fan mount plate"
+ },
+ {
+  "id": "trivet",
+  "name": "Trivet"
+ },
+ {
+  "id": "bell-crank",
+  "name": "Bell crank"
+ },
+ {
+  "id": "hex-standoff",
+  "name": "Hex standoff"
+ },
+ {
+  "id": "sanding-drum",
+  "name": "Sanding drum"
+ }
+]

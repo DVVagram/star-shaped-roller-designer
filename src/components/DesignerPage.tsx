@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 
+import type { DesignContract } from "@/lib/designs/contracts";
+
+import CapabilityNotice from "./CapabilityNotice";
+
 export interface PageStep {
   number: string;
   title: string;
@@ -12,6 +16,8 @@ export interface DesignerPageProps {
   title: ReactNode;
   lede: string;
   useCase: string;
+  /** Capability label and limitations shown before the builder. */
+  contract?: DesignContract;
   chips: readonly { label: string; value: string }[];
   builderTitle: string;
   builderLede: string;
@@ -30,6 +36,7 @@ export default function DesignerPage({
   title,
   lede,
   useCase,
+  contract,
   chips,
   builderTitle,
   builderLede,
@@ -77,6 +84,8 @@ export default function DesignerPage({
           </dl>
         </div>
       </section>
+
+      {contract && <CapabilityNotice contract={contract} />}
 
       <section
         id="builder"

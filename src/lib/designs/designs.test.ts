@@ -72,8 +72,8 @@ function stlVolume(buffer: ArrayBuffer): number {
 
 describe("designer library", () => {
   it("ships exactly ninety-six designers", () => {
-    expect(ALL.length).toBe(96);
-    expect(DESIGN_GROUPS.reduce((sum, group) => sum + group.length, 0)).toBe(96);
+    expect(ALL.length).toBe(146);
+    expect(DESIGN_GROUPS.reduce((sum, group) => sum + group.length, 0)).toBe(146);
   });
 
   it("has unique ids and unique file names for the defaults", () => {
@@ -220,7 +220,7 @@ describe("designer library: families", () => {
     }
     for (const count of counts.values()) expect(count).toBeGreaterThan(0);
     expect([...counts.values()].filter((count) => count > 4).length).toBeGreaterThanOrEqual(4);
-    expect([...counts.values()].reduce((sum, count) => sum + count, 0)).toBe(96);
+    expect([...counts.values()].reduce((sum, count) => sum + count, 0)).toBe(146);
   });
 
   it("is the same set the catalogue renders", () => {
@@ -228,7 +228,7 @@ describe("designer library: families", () => {
     for (const group of DESIGN_GROUPS) {
       for (const design of group) expect(ids.has(design.id)).toBe(true);
     }
-    expect(ids.size).toBe(96);
+    expect(ids.size).toBe(146);
   });
 });
 

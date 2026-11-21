@@ -9,6 +9,7 @@ import PropellerBuilder from "@/components/PropellerBuilder";
 import SprocketBuilder from "@/components/SprocketBuilder";
 import StarBuilder from "@/components/StarBuilder";
 import { DESIGNS, designById } from "@/lib/designs";
+import { LEGACY_CONTRACTS } from "@/lib/designs/legacy";
 import { FAMILIES, type AnyDesign, type DesignFamily } from "@/lib/designs/types";
 import { USE_CASES } from "@/lib/designs/use-cases";
 
@@ -103,6 +104,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     blurb: "A star-spiked wheel by diameter, spike shape and centre hole.",
     use: USE_CASES.star,
     isNew: false,
+    contract: LEGACY_CONTRACTS.star,
   },
   {
     id: "sprocket",
@@ -112,6 +114,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     blurb: "Roller-chain seats cut to a real pitch and roller.",
     use: USE_CASES.sprocket,
     isNew: false,
+    contract: LEGACY_CONTRACTS.sprocket,
   },
   {
     id: "impeller",
@@ -121,6 +124,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     blurb: "Swept, leaned blades on a solid hub.",
     use: USE_CASES.impeller,
     isNew: false,
+    contract: LEGACY_CONTRACTS.impeller,
   },
   {
     id: "propeller",
@@ -130,6 +134,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     blurb: "Pitch-driven blades with a tapered chord.",
     use: USE_CASES.propeller,
     isNew: false,
+    contract: LEGACY_CONTRACTS.propeller,
   },
 ];
 
@@ -143,6 +148,7 @@ const ALL_ENTRIES: CatalogEntry[] = [
     blurb: design.blurb,
     use: design.use,
     isNew: true,
+    contract: design.contract,
   })),
 ];
 
@@ -196,7 +202,7 @@ function DesignerNav({ route }: { route: string }) {
           const next = event.target.value;
           if (next) window.location.hash = `#/${next}`;
         }}
-        className="max-w-[9.5rem] rounded-md border border-line bg-card px-2 py-1 text-[11px] font-medium text-ink transition hover:bg-paper-deep sm:max-w-[14rem]"
+        className="w-28 min-w-0 rounded-md border border-line bg-card px-2 py-1 text-[11px] font-medium text-ink transition hover:bg-paper-deep sm:w-auto sm:max-w-[14rem]"
       >
         <option value="">Jump to…</option>
         {families.map((family) => (
@@ -220,11 +226,12 @@ function genericPage(design: AnyDesign): PageConfig {
     title: design.name,
     lede: design.lede,
     useCase: design.use,
+    contract: design.contract,
     chips: design.chips,
     builderTitle: `Build your ${design.name.toLowerCase()}`,
     builderLede: "Millimetres or inches — every field is live and the solid follows.",
     builderNote:
-      "Every dimension is checked against a 180 × 180 × 180 mm build volume, and the STL unlocks only for a verified closed shell.",
+      "Dimensions are checked against a 180 × 180 × 180 mm build cube. Export unlocks only for a mesh that passes the topology checks; that is not a fit or safety test.",
     steps: [
       {
         number: "01",
@@ -238,14 +245,15 @@ function genericPage(design: AnyDesign): PageConfig {
       },
       {
         number: "03",
-        title: "Export the STL",
-        body: "The preview draws the indexed mesh the exporter writes, so the file is the part you have been looking at, in millimetres, centred on the origin.",
+        title: "Export and record",
+        body: "The preview draws the indexed mesh the exporter writes. Download the STL and the specification: the STL carries no units, material or capability data, so check scale and orientation in the slicer.",
       },
     ],
     checklist: [
       `A closed indexed mesh measured before export: one shell, every edge shared by two consistently wound triangles.`,
       `A binary STL built from the same vertices the preview renders — no bounding box, no repair pass.`,
       `Derived measurements from the entered dimensions, so the drawing, the volume and the file agree.`,
+      `A capabilities and limitations statement beside the export and in the downloadable specification.`,
     ],
     notesTitle: design.notesTitle,
     notes: design.notes,
@@ -276,6 +284,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       { label: "Spike depth", value: "0.5 – 80 mm" },
     ],
     useCase: USE_CASES.star,
+    contract: LEGACY_CATALOG[0].contract,
     builderTitle: "Build your roller",
     builderLede: "Millimetres or inches — every field is live.",
     builderNote:
@@ -320,13 +329,14 @@ const PAGES: Record<RouteId, PageConfig> = {
         cut for the chain.
       </>
     ),
-    lede: "Pick a roller chain, set the tooth count and the bore. The seats are cut to the real chain pitch and roller, so the wheel you print actually engages the links — and the pitch circle is reported before you slice.",
+    lede: "Pick a roller chain, set the tooth count and the bore. The seats are modelled from the entered pitch and roller, so the pitch circle, seat depth and tooth spacing follow your chain — engagement still depends on the actual chain and print clearance.",
     chips: [
       { label: "Teeth", value: "6 – 72" },
       { label: "Chain", value: "#25 – #50" },
       { label: "Seat", value: "roller + gap" },
     ],
     useCase: USE_CASES.sprocket,
+    contract: LEGACY_CATALOG[1].contract,
     builderTitle: "Build your sprocket",
     builderLede: "The preset sets pitch and roller; every field stays live.",
     builderNote:
@@ -350,7 +360,7 @@ const PAGES: Record<RouteId, PageConfig> = {
     ],
     checklist: [
       "A closed indexed mesh with one shell and one through-hole, verified before the download button unlocks.",
-      "Roller seats cut to the real roller diameter plus the clearance you set, on the true pitch circle for your tooth count.",
+      "Roller seats cut to the entered roller diameter plus the clearance you set, on the pitch circle for your tooth count.",
       "A measured solid volume and tooth depth, so you can check the part against the chain before printing.",
     ],
     notesTitle: "How the seat is cut",
@@ -363,14 +373,14 @@ const PAGES: Record<RouteId, PageConfig> = {
 
   impeller: {
     mark: <ImpellerMark className="size-3.5" />,
-    eyebrow: "Air moving",
-    title: (
-      <>
-        Impellers,
-        <br />
-        twisted to move air.
-      </>
-    ),
+          eyebrow: "Blade geometry",
+      title: (
+        <>
+          Impellers,
+          <br />
+          twisted and measured.
+        </>
+      ),
     lede: "An axial impeller rotor: blades swept around a solid hub, leaned to the blade angle you choose. Diameter, blade count, chord, height and lean are all live, and the passage between blades is checked as you type.",
     chips: [
       { label: "Blades", value: "2 – 24" },
@@ -378,6 +388,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       { label: "Blade angle", value: "0 – 70°" },
     ],
     useCase: USE_CASES.impeller,
+    contract: LEGACY_CATALOG[2].contract,
     builderTitle: "Build your impeller",
     builderLede: "Chords, sweep and lean are measured in millimetres and degrees.",
     builderNote:
@@ -429,6 +440,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       { label: "Tip Ø", value: "20 – 180 mm" },
     ],
     useCase: USE_CASES.propeller,
+    contract: LEGACY_CATALOG[3].contract,
     builderTitle: "Build your propeller",
     builderLede: "Pitch is the input; the blade angle is derived from it.",
     builderNote:
@@ -447,7 +459,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       {
         number: "03",
         title: "Export the STL",
-        body: "The blades, hub and bore come out as one closed shell, ready to slice and balance.",
+        body: "The blades, hub and bore come out as one closed shell. Balance, safe speed and airflow are not verified; review orientation and scale in the slicer.",
       },
     ],
     checklist: [
@@ -466,6 +478,58 @@ const PAGES: Record<RouteId, PageConfig> = {
 
 /* -------------------------------------------------------------------- app */
 
+function NotFound({ route }: { route: string }) {
+  const needle = route.replace(/[^a-z0-9-]/g, "").slice(0, 40);
+  const suggestions = ALL_ENTRIES.filter(
+    (entry) =>
+      (needle && (entry.id.includes(needle) || entry.name.toLowerCase().includes(needle))) ||
+      entry.family === "fixings",
+  ).slice(0, 4);
+
+  return (
+    <section className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+        Route not found
+      </p>
+      <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+        No designer called “{route}”.
+      </h1>
+      <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
+        The link may be mistyped or the designer may have been renamed. The full catalogue is
+        still available; direct routes keep the form <code>#/designer-id</code>.
+      </p>
+      <a
+        href="#/"
+        className="mt-6 inline-flex rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong"
+      >
+        Back to all {ALL_ENTRIES.length} designers
+      </a>
+      {suggestions.length > 0 && (
+        <div className="mt-8 border-t border-line pt-5">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+            Maybe you meant
+          </h2>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {suggestions.map((entry) => (
+              <li key={entry.id}>
+                <a
+                  href={`#/${entry.id}`}
+                  className="block rounded-xl border border-line bg-card px-3 py-2 text-sm transition hover:border-accent/50"
+                >
+                  {entry.name}
+                  <span className="mt-0.5 block font-mono text-[10px] text-muted">
+                    #/{entry.id}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function App() {
   const route = useRoute();
   const legacy = (ROUTE_IDS as readonly string[]).includes(route)
@@ -474,14 +538,38 @@ export default function App() {
   const design = legacy ? null : designById(route);
   const page = legacy ?? (design ? genericPage(design) : null);
 
+  useEffect(() => {
+    const heading = document.querySelector("main h1") as HTMLElement | null;
+    if (!heading) return;
+    heading.setAttribute("tabindex", "-1");
+    heading.focus({ preventScroll: true });
+  }, [route]);
+
   const renderPage = () => {
-    if (!page) return <Catalog entries={ALL_ENTRIES} />;
+    if (!page) {
+      return route === "home" ? (
+        <Catalog entries={ALL_ENTRIES} />
+      ) : (
+        <NotFound route={route} />
+      );
+    }
     const { builder, ...content } = page;
     return <DesignerPage {...content}>{builder}</DesignerPage>;
   };
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <button
+        type="button"
+        onClick={() => {
+          const main = document.getElementById("main");
+          main?.focus({ preventScroll: true });
+          main?.scrollIntoView({ block: "start" });
+        }}
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-ink focus:px-3 focus:py-2 focus:text-xs focus:font-semibold focus:text-white"
+      >
+        Skip to content
+      </button>
       <header className="sticky top-0 z-30 border-b border-line/80 bg-paper/80 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex h-14 items-center justify-between gap-4">
@@ -497,7 +585,9 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1">{renderPage()}</main>
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
+        {renderPage()}
+      </main>
 
       <footer className="bg-paper">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 sm:px-6">
@@ -509,16 +599,18 @@ export default function App() {
               </span>
             </div>
             <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted">
-              Ninety-six parametric designers in one static site: gears, pulleys,
-              fixings, vessels, springs, labware and household parts, plus the original
-              star rollers, sprockets, impellers and propellers. Everything is generated
-              locally in the browser — no accounts, no uploads, no CAD kernel.
+              {ALL_ENTRIES.length} parametric designers in one static site: gears, pulleys,
+              fixings, vessels, springs, labware, workshop fixtures and household parts,
+              plus the original star rollers, sprockets, impellers and propellers.
+              Everything is generated locally in the browser — no accounts, no uploads,
+              no CAD kernel. Capability labels state what has and has not been checked.
             </p>
           </div>
           <div className="text-xs leading-relaxed text-muted sm:text-right">
             <p>
-              Every model is generated from the fields you enter, then verified as a single
-              closed shell before an STL is offered.
+              Every model is generated from the fields you enter and checked as a single
+              closed shell before an STL is offered. That is a topology check, not a fit,
+              strength or safety certification; read the capability label before printing.
             </p>
             <p className="mt-2">© {new Date().getFullYear()} Parametric Wheel Works</p>
           </div>

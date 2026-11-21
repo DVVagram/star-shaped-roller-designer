@@ -1,6 +1,12 @@
 /** Every designer added in this branch, in catalog order. */
 
 import { motionDesigns } from "./motion-designs";
+import { revolveFasteners } from "./revolve-fasteners";
+import { revolveHome } from "./revolve-home";
+import { revolveWorkshop } from "./revolve-workshop";
+import { workshopBrackets } from "./workshop-brackets";
+import { workshopClamps } from "./workshop-clamps";
+import { workshopMounts } from "./workshop-mounts";
 import { prismDiscs } from "./prism-discs";
 import { prismGears } from "./prism-gears";
 import { prismHardware } from "./prism-hardware";
@@ -23,6 +29,12 @@ export const DESIGN_GROUPS: AnyDesign[][] = [
   revolveHousehold,
   revolveParts,
   motionDesigns,
+  workshopBrackets,
+  workshopClamps,
+  workshopMounts,
+  revolveFasteners,
+  revolveWorkshop,
+  revolveHome,
 ];
 
 export const DESIGNS: AnyDesign[] = DESIGN_GROUPS.flat();
@@ -41,6 +53,12 @@ export function designsInFamily(family: DesignFamily): AnyDesign[] {
 
 export {
   motionDesigns,
+  revolveFasteners,
+  revolveHome,
+  revolveWorkshop,
+  workshopBrackets,
+  workshopClamps,
+  workshopMounts,
   prismDiscs,
   prismGears,
   prismHardware,

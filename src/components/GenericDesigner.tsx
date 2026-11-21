@@ -7,7 +7,15 @@ import {
   stlByteLength,
   type Mesh,
 } from "@/lib/kit/solid";
+import { CAPABILITIES } from "@/lib/designs/contracts";
+import { downloadText } from "@/lib/kit/download";
 import { formatNumber } from "@/lib/kit/units";
+import { buildDrawingSvg, drawingFileName } from "@/lib/designs/drawing";
+import {
+  buildSpecification,
+  envelopeFits,
+  specificationFileName,
+} from "@/lib/designs/spec";
 import type { AnyDesign, FieldDef } from "@/lib/designs/types";
 
 import DesignScaffold from "./DesignScaffold";
@@ -23,7 +31,17 @@ function rangeHint(field: FieldDef): string | undefined {
           ? `${field.min}–${field.max}°`
           : `${field.min}–${field.max}`
       : undefined;
-  return [field.hint, limit].filter(Boolean).join(" · ") || undefined;
+  const measure =
+    field.kind === "length"
+      ? "Length; enter in mm or in"
+      : field.kind === "angle"
+        ? "Angle in degrees"
+        : field.kind === "count"
+          ? "Whole number"
+          : undefined;
+  return [field.help ?? field.hint, measure, limit, "Edits rebuild the mesh and readouts."]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 /**
@@ -80,9 +98,12 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
   const visible = design.fields.filter((field) => field.visible?.(values) ?? true);
   const sections = Array.from(new Set(visible.map((field) => field.section)));
 
-  const watertight = Boolean(valid && report?.ok);
+  const fitsBuildVolume = Boolean(mesh && envelopeFits(mesh));
+  const watertight = Boolean(valid && report?.ok && fitsBuildVolume);
   const volumeCm3 = report?.ok ? report.volumeMm3 / 1000 : Number.NaN;
   const fileBytes = mesh ? stlByteLength(mesh) : 0;
+  const fieldLabel = (key: string) =>
+    design.fields.find((field) => field.key === key)?.label ?? key;
 
   function handleExport() {
     setExportError(null);
@@ -96,12 +117,46 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
       );
       return;
     }
+    if (!fitsBuildVolume) {
+      setExportError("The generated part does not fit the 180 mm build cube, so it was not exported.");
+      return;
+    }
     try {
-      const buffer = buildBinaryStl(design.build(raw), design.header);
+      const buffer = buildBinaryStl(
+        design.build(raw),
+        `${CAPABILITIES[design.contract.capability].short.toUpperCase()} - ${design.header}`,
+      );
       downloadStl(buffer, design.fileName(raw));
     } catch (error) {
       console.error(error);
       setExportError("The STL could not be generated. Please try again.");
+    }
+  }
+
+  function handleSpec() {
+    if (!valid || !report?.ok) return;
+    try {
+      downloadText(
+        buildSpecification(design, raw),
+        specificationFileName(design, raw),
+      );
+    } catch (error) {
+      console.error(error);
+      setExportError("The specification could not be generated. Please try again.");
+    }
+  }
+
+  function handleDrawing() {
+    if (!valid || !report?.ok) return;
+    try {
+      downloadText(
+        buildDrawingSvg(design, raw),
+        drawingFileName(design, raw),
+        "image/svg+xml",
+      );
+    } catch (error) {
+      console.error(error);
+      setExportError("The dimension sheet could not be generated. Please try again.");
     }
   }
 
@@ -131,6 +186,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
             ))}
           </select>
           {error && <p className="mt-1 text-[11px] leading-snug text-red-700">{error}</p>}
+          <p className="mt-1 text-[11px] leading-snug text-muted/80">{rangeHint(field)}</p>
         </div>
       );
     }
@@ -141,7 +197,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
           <Toggle
             id={id}
             label={field.label}
-            hint={field.hint}
+            hint={rangeHint(field)}
             checked={values[field.key] === "true"}
             onChange={(next) => setField(field.key, next ? "true" : "false")}
           />
@@ -202,8 +258,13 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
           ))}
         </div>
       }
-      general={generalErrors}
-      warnings={result.warnings.map((issue) => issue.message)}
+      general={[
+        ...generalErrors,
+        ...(report?.ok && !fitsBuildVolume
+          ? ["The part exceeds the 180 mm build cube. Reduce an overall dimension before exporting."]
+          : []),
+      ]}
+      warnings={result.warnings.map((issue) => `${fieldLabel(issue.field)}: ${issue.message}`)}
       errorCount={result.errors.length}
       validationOk={valid}
       solidOk={Boolean(report?.ok)}
@@ -220,9 +281,14 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
       }}
       exportPanel={{
         onExport: handleExport,
+        onSpec: handleSpec,
+        onDrawing: handleDrawing,
+        artifactsDisabled: !watertight,
+        capability: design.contract.capability,
+        limitation: design.contract.limitations[0],
         disabled: !watertight,
         note: valid
-          ? "Binary STL in millimetres, centred on the origin, ready to slice."
+          ? `${report && report.zeroAreaFaces > 0 ? `${report.zeroAreaFaces} zero-area cap face${report.zeroAreaFaces === 1 ? "" : "s"} from hole bridging are reported; slicers normally skip them. ` : ""}Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer.`
           : "Export is disabled while the configuration has errors.",
         volume: Number.isFinite(volumeCm3) ? `${formatNumber(volumeCm3, 2)} cm³` : "—",
         triangles: report ? formatNumber(report.triangleCount, 0) : "—",

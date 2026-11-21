@@ -9,7 +9,7 @@ import type { StarMesh } from "./mesh";
  * block, so it stays plain ASCII — a typographic dash would be truncated into a
  * control character by the writer.
  */
-export const STL_HEADER = "Star Shaped Roller Designer - units: mm";
+export const STL_HEADER = "FIT PROTOTYPE - Star Shaped Roller Designer - units: mm";
 
 export function stlByteLength(mesh: StarMesh): number {
   return 84 + mesh.triangleCount * 50;

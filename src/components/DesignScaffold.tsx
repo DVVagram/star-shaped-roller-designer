@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 
+import { CAPABILITIES, type CapabilityId } from "@/lib/designs/contracts";
+
+import { CapabilityBadge } from "./CapabilityNotice";
 import MeshPreview, { type PreviewMesh } from "./MeshPreview";
 
 export interface ReadoutItem {
@@ -28,6 +31,11 @@ export interface ScaffoldExport {
   file: string;
   watertight: boolean;
   error: string | null;
+  capability?: CapabilityId;
+  limitation?: string;
+  onSpec?: () => void;
+  onDrawing?: () => void;
+  artifactsDisabled?: boolean;
 }
 
 interface DesignScaffoldProps {
@@ -164,6 +172,27 @@ export default function DesignScaffold({
         </div>
 
         <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
+          {exportPanel.capability && (
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <CapabilityBadge capability={exportPanel.capability} />
+              <button
+                type="button"
+                onClick={() => {
+                  const panel = document.getElementById("capability");
+                  panel?.scrollIntoView({ block: "start" });
+                  (panel?.querySelector("h2") as HTMLElement | null)?.focus();
+                }}
+                className="text-[10px] font-medium text-muted underline decoration-line underline-offset-2 hover:text-ink"
+              >
+                Limits
+              </button>
+            </div>
+          )}
+          {exportPanel.capability && exportPanel.limitation && (
+            <p className="mb-3 rounded-lg border border-amber-300/60 bg-amber-50/70 px-2.5 py-2 text-[11px] leading-relaxed text-amber-900">
+              {CAPABILITIES[exportPanel.capability].short}: {exportPanel.limitation}
+            </p>
+          )}
           <button
             type="button"
             onClick={exportPanel.onExport}
@@ -172,7 +201,32 @@ export default function DesignScaffold({
           >
             Download STL
           </button>
-          <p className="mt-2 text-center text-[11px] text-muted">{exportPanel.note}</p>
+          <p className="mt-2 text-center text-[11px] leading-relaxed text-muted">{exportPanel.note}</p>
+
+          {(exportPanel.onSpec || exportPanel.onDrawing) && (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {exportPanel.onSpec && (
+                <button
+                  type="button"
+                  onClick={exportPanel.onSpec}
+                  disabled={exportPanel.artifactsDisabled}
+                  className="rounded-lg border border-line bg-white px-2 py-2 text-[11px] font-medium text-ink transition hover:bg-paper-deep disabled:cursor-not-allowed disabled:text-muted/50"
+                >
+                  Specification (.txt)
+                </button>
+              )}
+              {exportPanel.onDrawing && (
+                <button
+                  type="button"
+                  onClick={exportPanel.onDrawing}
+                  disabled={exportPanel.artifactsDisabled}
+                  className="rounded-lg border border-line bg-white px-2 py-2 text-[11px] font-medium text-ink transition hover:bg-paper-deep disabled:cursor-not-allowed disabled:text-muted/50"
+                >
+                  Dimension sheet (.svg)
+                </button>
+              )}
+            </div>
+          )}
 
           <dl className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
             {[
@@ -195,8 +249,8 @@ export default function DesignScaffold({
               ●
             </span>
             {exportPanel.watertight
-              ? "Watertight, manifold shell verified"
-              : "Solid not verified — export blocked"}
+              ? "Mesh topology and 180 mm envelope verified — not a fit or safety test"
+              : "Mesh not verified — export blocked"}
           </p>
 
           {exportPanel.error && (

@@ -139,7 +139,7 @@ export const eggCup: AnyDesign = defineDesign({
   ],
   notes: [
     "The cup is a straight taper with a flat floor, and the foot is a cone under it. Both are part of one closed profile, so the cup is hollow and the foot is solid in a single turn.",
-    "A 44 mm cup suits a medium egg; a large egg wants about 48 mm. Print it in food-safe filament if it will touch the egg, or line it with a paper case.",
+    "A 44 mm cup suits a medium egg; a large egg wants about 48 mm. A filament sold for food contact is not a guarantee after printing, so line the cup with a paper case or peel the egg before it goes in.",
   ],
   header: "Egg Cup Designer - units: mm",
   fields: [

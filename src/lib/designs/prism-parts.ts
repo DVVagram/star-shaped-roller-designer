@@ -578,6 +578,9 @@ export const chainLink: AnyDesign = defineDesign({
     if (p.pinMm >= p.plateWidthMm) {
       errors.push({ field: "pinDiameter", level: "error", message: "The pin holes meet in the middle of the plate." });
     }
+    if (p.pitchMm <= p.pinMm + 1.2) {
+      errors.push({ field: "pitch", level: "error", message: "The pin holes nearly meet; increase the pitch or reduce the pin hole." });
+    }
     if (p.plateWidthMm > p.pitchMm + p.plateWidthMm * 0.9) pushWarning(warnings, "plateWidth", "The plate is very wide for its pitch.");
 
     return {

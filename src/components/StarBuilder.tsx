@@ -26,9 +26,14 @@ import {
   type SpikeShape,
   type StarSpec,
 } from "@/lib/star/geometry";
+import { renderRecordDrawingSvg } from "@/lib/designs/drawing";
+import { legacyRecord, starEnteredValues } from "@/lib/designs/legacy";
+import { renderRecordSpecification } from "@/lib/designs/spec";
+import { downloadText } from "@/lib/kit/download";
 import { buildStarMesh, inspectStarSolid, type SolidReport } from "@/lib/star/mesh";
 import { buildBinaryStl, stlFileName } from "@/lib/star/stl";
 
+import { CapabilityBadge } from "./CapabilityNotice";
 import SpecForm from "./SpecForm";
 
 const StarPreview = lazy(() => import("./StarPreview"));
@@ -96,6 +101,49 @@ export default function StarBuilder() {
   const volumeCm3 =
     solid && solid.ok ? solid.volumeMm3 / 1000 : Number.NaN;
   const fileBytes = solid ? 84 + solid.triangleCount * 50 : 0;
+
+  function artifactMesh() {
+    try {
+      return buildStarMesh(previewSpec);
+    } catch {
+      return null;
+    }
+  }
+
+  function artifactRecord() {
+    if (!validation.ok || !solid?.ok) return null;
+    const mesh = artifactMesh();
+    if (!mesh) return null;
+    return legacyRecord(
+      "star",
+      "Star roller",
+      starEnteredValues(state),
+      readout.map(({ label, value, source }) => ({ label, value, source })),
+      validation.warnings.map((issue) => issue.message),
+      mesh,
+    );
+  }
+
+  function handleSpec() {
+    const record = artifactRecord();
+    if (!record) return;
+    downloadText(renderRecordSpecification(record), "star-roller-spec.txt");
+  }
+
+  function handleDrawing() {
+    const record = artifactRecord();
+    if (!record) return;
+    downloadText(
+      renderRecordDrawingSvg({
+        id: record.id,
+        name: record.name,
+        contract: record.contract,
+        mesh: record.mesh!,
+      }),
+      "star-roller-drawing.svg",
+      "image/svg+xml",
+    );
+  }
 
   const readout = useMemo(
     () => [
@@ -179,7 +227,7 @@ export default function StarBuilder() {
     }
     if (!solid?.ok) {
       setExportError(
-        "The generated solid is not a single watertight shell, so it was not exported.",
+        "The generated solid is not a single closed, consistently wound shell, so it was not exported.",
       );
       return;
     }
@@ -341,6 +389,24 @@ export default function StarBuilder() {
 
         {/* ----------------------------------------------------------- export */}
         <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <CapabilityBadge capability="fit" />
+            <button
+              type="button"
+              onClick={() => {
+                const panel = document.getElementById("capability");
+                panel?.scrollIntoView({ block: "start" });
+                (panel?.querySelector("h2") as HTMLElement | null)?.focus();
+              }}
+              className="text-[10px] font-medium text-muted underline decoration-line underline-offset-2 hover:text-ink"
+            >
+              Limits
+            </button>
+          </div>
+          <p className="mb-3 rounded-lg border border-amber-300/60 bg-amber-50/70 px-2.5 py-2 text-[11px] leading-relaxed text-amber-900">
+            Fit prototype: not a rated drive wheel; spike strength, grip and shaft torque are not
+            validated.
+          </p>
           <button
             type="button"
             onClick={handleExport}
@@ -349,11 +415,30 @@ export default function StarBuilder() {
           >
             Download STL
           </button>
-          <p className="mt-2 text-center text-[11px] text-muted">
+          <p className="mt-2 text-center text-[11px] leading-relaxed text-muted">
             {validation.ok
-              ? "Binary STL in millimetres, centred on the origin, ready to slice."
+              ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer."
               : "Export is disabled while the configuration has errors."}
           </p>
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={handleSpec}
+              disabled={!validation.ok || !solid?.ok}
+              className="rounded-lg border border-line bg-white px-2 py-2 text-[11px] font-medium text-ink transition hover:bg-paper-deep disabled:cursor-not-allowed disabled:text-muted/50"
+            >
+              Specification (.txt)
+            </button>
+            <button
+              type="button"
+              onClick={handleDrawing}
+              disabled={!validation.ok || !solid?.ok}
+              className="rounded-lg border border-line bg-white px-2 py-2 text-[11px] font-medium text-ink transition hover:bg-paper-deep disabled:cursor-not-allowed disabled:text-muted/50"
+            >
+              Dimension sheet (.svg)
+            </button>
+          </div>
 
           <dl className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
             {[
@@ -386,8 +471,8 @@ export default function StarBuilder() {
               ●
             </span>
             {watertight
-              ? "Watertight, manifold shell verified"
-              : "Solid not verified — export blocked"}
+              ? "Mesh topology and 180 mm envelope verified — not a fit or safety test"
+              : "Mesh not verified — export blocked"}
           </p>
 
           {exportError && (

@@ -523,6 +523,8 @@ export interface SolidReport {
   /** Number of through-holes; 0 for a plain closed solid, 1 for a tube. */
   genus: number;
   validFaces: boolean;
+  /** Faces whose three vertices are collinear or coincident. */
+  zeroAreaFaces: number;
   volumeMm3: number;
   triangleCount: number;
 }
@@ -562,6 +564,7 @@ export function inspectMesh(mesh: Mesh): SolidReport {
 
   const faceKeys = new Set<string>();
   let validFaces = true;
+  let zeroAreaFaces = 0;
   for (let i = 0; i < indices.length; i += 3) {
     const a = indices[i];
     const b = indices[i + 1];
@@ -570,6 +573,19 @@ export function inspectMesh(mesh: Mesh): SolidReport {
       validFaces = false;
       break;
     }
+    const ax = mesh.positions[a * 3];
+    const ay = mesh.positions[a * 3 + 1];
+    const az = mesh.positions[a * 3 + 2];
+    const abx = mesh.positions[b * 3] - ax;
+    const aby = mesh.positions[b * 3 + 1] - ay;
+    const abz = mesh.positions[b * 3 + 2] - az;
+    const acx = mesh.positions[c * 3] - ax;
+    const acy = mesh.positions[c * 3 + 1] - ay;
+    const acz = mesh.positions[c * 3 + 2] - az;
+    const crossX = aby * acz - abz * acy;
+    const crossY = abz * acx - abx * acz;
+    const crossZ = abx * acy - aby * acx;
+    if (Math.hypot(crossX, crossY, crossZ) <= 1e-12) zeroAreaFaces += 1;
     const key = [a, b, c].sort((x, y) => x - y).join(":");
     if (faceKeys.has(key)) {
       validFaces = false;
@@ -646,6 +662,7 @@ export function inspectMesh(mesh: Mesh): SolidReport {
     components,
     eulerCharacteristic,
     validFaces,
+    zeroAreaFaces,
     volumeMm3: watertight ? mesh.volumeMm3 : 0,
     triangleCount,
   };

@@ -1,9 +1,9 @@
 # Parametric Wheel Works
 
-Ninety-six parametric designers for **3D-printable parts**, in one static site:
-the original four wheels and rotors, forty-six gears, pulleys, fixings, vessels,
-ducts and mechanisms, and fifty more plates, grilles, labware and household
-parts.
+One hundred and forty-six parametric designers for **3D-printable parts**, in one
+static site: the original four wheels and rotors, ninety-six gears, pulleys,
+fixings, vessels, ducts and mechanisms, and fifty more workshop fixtures, turned
+fittings and household forms.
 
 | Designer     | What it makes                                                        |
 | ------------ | -------------------------------------------------------------------- |
@@ -13,9 +13,35 @@ parts.
 | **Propeller**   | Pitched props whose blade angle is derived from the advance per rev |
 
 Every designer renders a live three.js preview of the same indexed mesh it
-measures, reports the closed-shell volume, and exports a binary STL in
-millimetres. Invalid or non-manifold configurations block the download instead
-of producing a broken file.
+measures, reports the closed-shell volume, and exports a binary STL. Coordinates
+are millimetres by convention; STL itself carries no units, material or
+tolerance data. Invalid or non-manifold configurations block the download
+instead of producing a broken file.
+
+## Capability, not a certificate
+
+A watertight mesh proves topology, not that a part will fit, carry load, seal,
+move air or survive heat. Every catalogue card and designer page therefore
+carries a capability label:
+
+- **Shape / display model** — editable geometry with no verified duty.
+- **Fit prototype** — measure the mating part, calibrate the printer and
+  test-print before relying on a dimension.
+- **Functional candidate** — only after the named fit and load checks are made
+  and recorded. No designer currently qualifies; none is labelled functional.
+- **Not suitable for the named high-risk use** — pressure, flame, cutting,
+  braking, torque, clinical, centrifugation or similar duty is excluded.
+
+Each designer also states the standard it actually implements (usually none), the
+mating dimensions it needs, its fit allowance and the properties nobody checked.
+The same statement is repeated beside the export button and written into the
+downloadable specification. `docs/CAPABILITY.md` records the evidence behind the
+labels, and `docs/DESIGN-AUDIT.md` is generated from the registry with every
+designer's capability, standard, mate and first limitation. The four original
+builders also download a specification and a dimension sheet. Exporting a fit
+prototype is allowed only after the mesh passes the
+topology and envelope checks; that is still not permission to treat it as a
+certified part.
 
 Everything runs in the browser: no CAD kernel, no server, no account, no uploads.
 
@@ -91,6 +117,20 @@ forty-six marked.
 
 `docs/DESIGNERS-2.md` lists the 320 candidates these fifty were chosen from.
 
+## The third fifty
+
+| Family | Designers |
+| --- | --- |
+| **Brackets and hooks** | Corner bracket, flat brace, T bracket, cross brace, french cleat, phone stand, door wedge, wall hook, pegboard hook, door strike |
+| **Clamps and workholding** | Saddle clamp, pipe saddle, cable comb, featherboard, hold-down clamp, eccentric clamp, zero-clearance insert, desk cable clip, hinge leaf, slotted shim |
+| **Mounts and turning** | Router template, fan mount plate, trivet, bell crank, hex standoff, sanding drum |
+| **Barbed and turned fittings** | Thumb screw, thumb nut, dome nut, hose barb, barbed reducer, bulkhead fitting, cable grommet, tube adapter, pipette tip, jar lid |
+| **Cutters and pins** | Portafilter funnel, biscuit cutter, alignment pin, taper pin, eyelet, rivet, bellows boot, suction cup, bearing cap, yo-yo |
+| **Household forms** | Incense holder, plant saucer, tea light cup, centering cone |
+
+`docs/DESIGNERS-1000.md` lists one thousand numbered candidates, with these fifty
+marked built.
+
 Every new designer is a `defineDesign()` module. One field list drives the form,
 the unit conversion, the millimetre parameters, the validation copy, the readout,
 the preview and the STL file name, so the drawn part, the printed numbers and the
@@ -128,13 +168,15 @@ For the prism extruder:
   spring or an elbow is closed by construction rather than by stitching.
 
 `inspectMesh()` then verifies the result: every directed edge must cancel against
-its reverse, there must be a single connected shell, and no repeated or zero-area
-faces. It accepts any closed orientable surface — `χ = 2` for a plain solid, `0`
+its reverse, there must be a single connected shell, and no repeated faces or
+faces with repeated vertex indices. Earcut's hole bridges can leave zero-area cap
+slivers; those are counted and reported rather than hidden, and slicers normally
+skip them. It accepts any closed orientable surface — `χ = 2` for a plain solid, `0`
 for a tube, `−2` for a plate with two holes — and reports the genus instead of
 assuming every part has a bore. Only then is a volume reported or an STL offered.
 The volume is the divergence-theorem volume of that closed mesh.
 
-### Why the shapes fit
+### How the shapes are generated
 
 - **Star**: one spike owns `2π / N`, split between tip land, valley land and a
   flank; auto-fit takes the largest count where all three still fit.
@@ -153,7 +195,7 @@ The volume is the divergence-theorem volume of that closed mesh.
 | 3D       | three.js + OrbitControls                                 |
 | Geometry | In-repo profiles + one deterministic indexed-mesh extruder |
 | Export   | Binary STL writer (no dependency)                        |
-| Tests    | Vitest — 496 geometry, designer and STL tests            |
+| Tests    | Vitest — geometry, designer, contract, spec and copy tests |
 
 No database, no API keys and no environment variables.
 
@@ -174,7 +216,7 @@ npm test           # Vitest
 ```
 
 `npm run build` emits a static site in `dist/`. Routes are hash-based: `#/` is the
-catalogue, `#/<designer-id>` opens any of the ninety-six (for example `#/spur-gear` or
+catalogue, `#/<designer-id>` opens any of the one hundred and forty-six (for example `#/spur-gear` or
 `#/sprocket`), so any static host works with no rewrite rules.
 
 ---
@@ -185,10 +227,10 @@ catalogue, `#/<designer-id>` opens any of the ninety-six (for example `#/spur-ge
 src/
   App.tsx                    suite shell: header, hash router, catalog, footer
   components/
-    Catalog.tsx              the ninety-six cards, grouped by family
+    Catalog.tsx              the one hundred and forty-six cards, grouped by family
     DesignerPage.tsx         hero + builder slot + explainer shared by every page
     DesignScaffold.tsx       two-column builder: inputs, measurements, preview, export
-    GenericDesigner.tsx      schema-driven form used by all ninety-six new designs
+    GenericDesigner.tsx      schema-driven form used by all one hundred and forty-six new designs
     DesignMark.tsx           one family glyph per catalog card
     MeshPreview.tsx          three.js canvas (WebGL fallback, reset view)
     SprocketBuilder.tsx      sprocket form, validation, readout, STL
@@ -208,10 +250,19 @@ src/
     designs/revolve-*.ts     the revolved designs (vessels, mechanical, household, parts)
     designs/motion-designs.ts  spring and pipe elbow
     designs/index.ts         the registry and id lookup
+    designs/contracts.ts     capability, standard, mate and limitation declarations
+    designs/legacy.ts        contracts and input labels for the original four
+    designs/spec.ts          downloadable specification from one record shape
+    designs/drawing.ts       dimension sheet from the exported mesh
     sprocket.ts              spec, roller-seat profile, mesh, validation, form helpers
     rotor.ts                 shared blade-rotor core (impeller and propeller)
     fan.ts / propeller.ts    form field sets and spec builders
     star/                    the original star roller engine
+```
+
+```
+scripts/
+  design-audit.ts          regenerates docs/DESIGN-AUDIT.md from the registry
 ```
 
 ---
@@ -247,3 +298,10 @@ src/
   and non-circular rims are out of scope. A funnel's spout is concentric.
 - Printability checks describe geometry only. Layer adhesion, wall count and
   material still decide whether a print survives.
+- **No designer is functionally certified.** Gears are not validated against a
+  mating gear, sprockets against a chain, threads are absent, springs use an
+  illustrative modulus, and vessels are not pressure-, heat- or food-rated. The
+  capability labels and `docs/CAPABILITY.md` are part of the product, not a
+  footnote.
+- **Fit is never guaranteed.** Measure the real mating part and print a coupon;
+  the app applies no printer, material or tolerance calibration.

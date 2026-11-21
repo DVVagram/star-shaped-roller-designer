@@ -1,5 +1,10 @@
 import { useMemo, useRef, useState } from "react";
 
+import { renderRecordDrawingSvg } from "@/lib/designs/drawing";
+import { legacyRecord, sprocketEnteredValues } from "@/lib/designs/legacy";
+import { renderRecordSpecification } from "@/lib/designs/spec";
+import { downloadText } from "@/lib/kit/download";
+
 import { NumberField, OptionCards, PresetButtons, Segmented, Toggle } from "./fields";
 import DesignScaffold, { type ReadoutItem } from "./DesignScaffold";
 import { useUnitValues } from "./useUnitValues";
@@ -158,14 +163,14 @@ export default function SprocketBuilder() {
     }
     if (!report?.ok) {
       setExportError(
-        "The generated solid is not a single watertight shell, so it was not exported.",
+        "The generated solid is not a single closed, consistently wound shell, so it was not exported.",
       );
       return;
     }
     try {
       const buffer = buildBinaryStl(
         buildSprocketMesh(current),
-        "Sprocket Designer - units: mm",
+        "FIT PROTOTYPE - Sprocket Designer - units: mm",
       );
       downloadStl(
         buffer,
@@ -175,6 +180,42 @@ export default function SprocketBuilder() {
       console.error(error);
       setExportError("The STL could not be generated. Please try again.");
     }
+  }
+
+  function artifactRecord() {
+    if (!current || !mesh || !report?.ok) return null;
+    return legacyRecord(
+      "sprocket",
+      "Chain sprocket",
+      sprocketEnteredValues(values, units, { toothProfile, boreShape, hubEnabled }),
+      readout.map(({ label, value, source }) => ({ label, value, source })),
+      warnings,
+      mesh,
+    );
+  }
+
+  function handleSpec() {
+    const record = artifactRecord();
+    if (!record) return;
+    downloadText(
+      renderRecordSpecification(record),
+      `sprocket-${record.inputs.find((i) => i.label === "Teeth")?.value ?? "part"}-spec.txt`,
+    );
+  }
+
+  function handleDrawing() {
+    const record = artifactRecord();
+    if (!record) return;
+    downloadText(
+      renderRecordDrawingSvg({
+        id: record.id,
+        name: record.name,
+        contract: record.contract,
+        mesh: record.mesh!,
+      }),
+      `sprocket-${record.inputs.find((i) => i.label === "Teeth")?.value ?? "part"}-drawing.svg`,
+      "image/svg+xml",
+    );
   }
 
   const form = (
@@ -420,10 +461,15 @@ export default function SprocketBuilder() {
         stale: !validation.ok,
       }}
       exportPanel={{
+        capability: "fit",
+        limitation: "Chain engagement is not demonstrated; test-fit a short chain run.",
+        onSpec: handleSpec,
+        onDrawing: handleDrawing,
+        artifactsDisabled: !watertight,
         onExport: handleExport,
         disabled: !validation.ok || !report?.ok,
         note: validation.ok
-          ? "Binary STL in millimetres, centred on the origin, ready to slice."
+          ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer."
           : "Export is disabled while the configuration has errors.",
         volume: Number.isFinite(volumeCm3) ? `${formatNumber(volumeCm3, 2)} cm³` : "—",
         triangles: report ? formatNumber(report.triangleCount, 0) : "—",
