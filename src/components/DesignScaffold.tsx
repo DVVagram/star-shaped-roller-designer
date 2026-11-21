@@ -249,7 +249,7 @@ export default function DesignScaffold({
               ●
             </span>
             {exportPanel.watertight
-              ? "Mesh topology and 180 mm envelope verified — not a fit or safety test"
+              ? "Mesh topology verified — not a fit or safety test"
               : "Mesh not verified — export blocked"}
           </p>
 

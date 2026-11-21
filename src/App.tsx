@@ -228,10 +228,8 @@ function genericPage(design: AnyDesign): PageConfig {
     useCase: design.use,
     contract: design.contract,
     chips: design.chips,
-    builderTitle: `Build your ${design.name.toLowerCase()}`,
-    builderLede: "Millimetres or inches — every field is live and the solid follows.",
     builderNote:
-      "Dimensions are checked against a 180 × 180 × 180 mm build cube. Export unlocks only for a mesh that passes the topology checks; that is not a fit or safety test.",
+      "Dimensions are checked for a valid, finite overall size. Export unlocks only for a mesh that passes the topology checks; that is not a fit or safety test.",
     steps: [
       {
         number: "01",
@@ -246,7 +244,7 @@ function genericPage(design: AnyDesign): PageConfig {
       {
         number: "03",
         title: "Export and record",
-        body: "The preview draws the indexed mesh the exporter writes. Download the STL and the specification: the STL carries no units, material or capability data, so check scale and orientation in the slicer.",
+        body: "The preview draws the indexed mesh the exporter writes. Download the STL and the specification: the STL carries no units, material or capability data, so check scale and orientation in your software.",
       },
     ],
     checklist: [
@@ -277,18 +275,16 @@ const PAGES: Record<RouteId, PageConfig> = {
         made to spec.
       </>
     ),
-    lede: "Design a 3D-printable star-spiked wheel by diameter, spike shape and centre hole. The point count fits itself to the room you give it, the solid updates as you type, and the STL comes out watertight.",
+    lede: "Design a star-spiked wheel by diameter, spike shape and centre hole. The point count fits itself to the room you give it, the solid updates as you type, and the STL comes out watertight.",
     chips: [
       { label: "Spikes", value: "3 – 96" },
-      { label: "Wheel Ø", value: "20 – 180 mm" },
+      { label: "Wheel Ø", value: "20 – 1000 mm" },
       { label: "Spike depth", value: "0.5 – 80 mm" },
     ],
     useCase: USE_CASES.star,
     contract: LEGACY_CATALOG[0].contract,
-    builderTitle: "Build your roller",
-    builderLede: "Millimetres or inches — every field is live.",
     builderNote:
-      "Printable range: 3–96 spikes inside a 180 × 180 × 180 mm build volume. Anything outside is blocked before export.",
+      "Spike range: 3–96. Auto-fit reports the largest count that fits your wheel; a count whose lands or flanks collide is blocked before export.",
     steps: [
       {
         number: "01",
@@ -309,12 +305,12 @@ const PAGES: Record<RouteId, PageConfig> = {
     checklist: [
       "A closed indexed mesh: every edge is shared by exactly two consistently wound triangles, so the exported STL is watertight by construction rather than by repair.",
       "A binary STL in millimetres with the real spike profile, valley, centre hole and hub — not a bounding box or an approximation.",
-      "A measured solid volume, so you can size the part before you slice.",
+      "A measured solid volume, so you can size the part before you make it.",
     ],
     notesTitle: "How the points fit",
     notes: [
-      "Each spike owns one pitch of 2π / N. Inside that pitch it spends angular room on its tip land, its valley land and a printable flank. Auto-fit takes the largest count whose lands and flanks still fit at your diameter and depth — so widening the wheel adds points and deepening the spikes takes them away.",
-      "Print spikes with at least three perimeters and a small layer height; tall thin points are the first thing to snap on a printed roller.",
+      "Each spike owns one pitch of 2π / N. Inside that pitch it spends angular room on its tip land, its valley land and a usable flank. Auto-fit takes the largest count whose lands and flanks still fit at your diameter and depth — so widening the wheel adds points and deepening the spikes takes them away.",
+      "Keep the tips substantial: tall, thin points are the first thing to chip or bend in handling.",
     ],
     builder: <StarBuilder />,
   },
@@ -329,7 +325,7 @@ const PAGES: Record<RouteId, PageConfig> = {
         cut for the chain.
       </>
     ),
-    lede: "Pick a roller chain, set the tooth count and the bore. The seats are modelled from the entered pitch and roller, so the pitch circle, seat depth and tooth spacing follow your chain — engagement still depends on the actual chain and print clearance.",
+    lede: "Pick a roller chain, set the tooth count and the bore. The seats are modelled from the entered pitch and roller, so the pitch circle, seat depth and tooth spacing follow your chain — engagement still depends on the actual chain and fit clearance.",
     chips: [
       { label: "Teeth", value: "6 – 72" },
       { label: "Chain", value: "#25 – #50" },
@@ -337,10 +333,8 @@ const PAGES: Record<RouteId, PageConfig> = {
     ],
     useCase: USE_CASES.sprocket,
     contract: LEGACY_CATALOG[1].contract,
-    builderTitle: "Build your sprocket",
-    builderLede: "The preset sets pitch and roller; every field stays live.",
     builderNote:
-      "Printable range: 6–72 teeth inside a 180 × 180 × 180 mm build volume. Teeth that collide with the seats are blocked before export.",
+      "Tooth range: 6–72. Teeth that collide with the seats are blocked before export.",
     steps: [
       {
         number: "01",
@@ -361,12 +355,12 @@ const PAGES: Record<RouteId, PageConfig> = {
     checklist: [
       "A closed indexed mesh with one shell and one through-hole, verified before the download button unlocks.",
       "Roller seats cut to the entered roller diameter plus the clearance you set, on the pitch circle for your tooth count.",
-      "A measured solid volume and tooth depth, so you can check the part against the chain before printing.",
+      "A measured solid volume and tooth depth, so you can check the part against the chain before making it.",
     ],
     notesTitle: "How the seat is cut",
     notes: [
       "A chain roller sits in a circular seat whose centre is on the pitch circle. The profile follows the part of that circle facing the axis, so the seat floor is the root radius and the seat edges meet the flanks tangentially. Because the pitch circle grows as the tooth count rises, a given roller takes up less of each pitch — which is why small sprockets need more clearance.",
-      "Too tight and the chain binds; too loose and it skips a tooth. Start with 0.15 mm of clearance per side, print one link pair to test, then adjust.",
+      "Too tight and the chain binds; too loose and it skips a tooth. Start with 0.15 mm of clearance per side, make one link pair to test, then adjust.",
     ],
     builder: <SprocketBuilder />,
   },
@@ -384,15 +378,13 @@ const PAGES: Record<RouteId, PageConfig> = {
     lede: "An axial impeller rotor: blades swept around a solid hub, leaned to the blade angle you choose. Diameter, blade count, chord, height and lean are all live, and the passage between blades is checked as you type.",
     chips: [
       { label: "Blades", value: "2 – 24" },
-      { label: "Tip Ø", value: "20 – 180 mm" },
+      { label: "Tip Ø", value: "20 – 1000 mm" },
       { label: "Blade angle", value: "0 – 70°" },
     ],
     useCase: USE_CASES.impeller,
     contract: LEGACY_CATALOG[2].contract,
-    builderTitle: "Build your impeller",
-    builderLede: "Chords, sweep and lean are measured in millimetres and degrees.",
     builderNote:
-      "Printable range: 2–24 blades inside a 180 × 180 × 180 mm build volume. Blades that overlap or lean into a neighbour are blocked before export.",
+      "Blade range: 2–24. Blades that overlap or lean into a neighbour are blocked before export.",
     steps: [
       {
         number: "01",
@@ -407,13 +399,13 @@ const PAGES: Record<RouteId, PageConfig> = {
       {
         number: "03",
         title: "Export the STL",
-        body: "The leaned walls are one closed shell, so the rotor slices without repair — and the hub bore is part of the same solid.",
+        body: "The leaned walls are one closed shell, so the rotor needs no repair — and the hub bore is part of the same solid.",
       },
     ],
     checklist: [
       "One watertight shell: hub, blades and bore are built together, with no booleans or mesh repair.",
       "The blades are a leaned extrusion of the plan — the top face is sheared by the blade angle, so the wall twists from root to tip.",
-      "A measured solid volume and the narrowest passage, so you know the part can be printed before you commit.",
+      "A measured solid volume and the narrowest passage, so you know the geometry is sound before you commit to a process.",
     ],
     notesTitle: "How the blades are made",
     notes: [
@@ -437,14 +429,12 @@ const PAGES: Record<RouteId, PageConfig> = {
     chips: [
       { label: "Blades", value: "2 – 8" },
       { label: "Pitch", value: "mm / rev" },
-      { label: "Tip Ø", value: "20 – 180 mm" },
+      { label: "Tip Ø", value: "20 – 1000 mm" },
     ],
     useCase: USE_CASES.propeller,
     contract: LEGACY_CATALOG[3].contract,
-    builderTitle: "Build your propeller",
-    builderLede: "Pitch is the input; the blade angle is derived from it.",
     builderNote:
-      "Printable range: 2–8 blades inside a 180 × 180 × 180 mm build volume. A pitch that would lean a blade into its neighbour is blocked before export.",
+      "Blade range: 2–8. A pitch that would lean a blade into its neighbour is blocked before export.",
     steps: [
       {
         number: "01",
@@ -459,18 +449,18 @@ const PAGES: Record<RouteId, PageConfig> = {
       {
         number: "03",
         title: "Export the STL",
-        body: "The blades, hub and bore come out as one closed shell. Balance, safe speed and airflow are not verified; review orientation and scale in the slicer.",
+        body: "The blades, hub and bore come out as one closed shell. Balance, safe speed and airflow are not verified; review orientation and scale in your software.",
       },
     ],
     checklist: [
       "One closed shell built from two corresponding outlines, so there is nothing to stitch or repair before slicing.",
       "A real pitch: the blade angle is derived from the advance per revolution at 70 % radius, not typed in twice.",
-      "A measured volume, blade area and narrowest passage — enough to compare two props before printing either.",
+      "A measured volume, blade area and narrowest passage — enough to compare two props before making either.",
     ],
     notesTitle: "How the pitch works",
     notes: [
       "Pitch is the distance a prop would travel forward in one revolution if nothing slipped. At any radius r the blade sits at an angle of atan(pitch / 2πr) to the disc, so the same pitch means a steeper angle near the hub and a shallower one at the tip. The designer evaluates that angle at 70 % radius — the station that does most of the work.",
-      "Printed props need balancing: sand the leading blade until the tip rests level, and print in a material that survives the rpm you intend to run.",
+      "Props need balancing: finish the leading blade until the tip rests level, and use a material that survives the rpm you intend to run.",
     ],
     builder: <PropellerBuilder />,
   },
@@ -610,7 +600,7 @@ export default function App() {
             <p>
               Every model is generated from the fields you enter and checked as a single
               closed shell before an STL is offered. That is a topology check, not a fit,
-              strength or safety certification; read the capability label before printing.
+              strength or safety certification; read the capability label before making.
             </p>
             <p className="mt-2">© {new Date().getFullYear()} Parametric Wheel Works</p>
           </div>

@@ -8,14 +8,11 @@
 export const MM_PER_INCH = 25.4;
 export const TWO_PI = Math.PI * 2;
 
-/** Bambu Lab A1 Mini build volume, applied to every designer. */
-export const BUILD_VOLUME_MM = { x: 180, y: 180, z: 180 } as const;
-
-/** Minimum printable wall between a hole and the outside of a part. */
+/** Minimum material left between a hole and the outside of a part. */
 export const MIN_WALL_MM = 1.6;
-/** How far a chord may stray from the curve it replaces. A twentieth of a nozzle. */
+/** How far a chord may stray from the curve it replaces. */
 export const CURVE_TOLERANCE_MM = 0.02;
-/** Smallest gap or land the app still calls printable. */
+/** Smallest gap or land the app models as a distinct feature. */
 export const MIN_FEATURE_MM = 0.8;
 
 export type LengthUnit = "mm" | "in";

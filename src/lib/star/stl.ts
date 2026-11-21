@@ -18,9 +18,9 @@ export function stlByteLength(mesh: StarMesh): number {
 /**
  * Binary STL of the exact mesh the preview renders.
  *
- * STL carries no units, so the file stays in millimetres — the unit every
- * slicer assumes — with the model centred on the origin and sitting on its
- * base plane at z = 0 in the slicer once rotated flat.
+ * STL carries no units, so the file stays in millimetres — the unit most
+ * software assumes — with the model centred on the origin and sitting on its
+ * base plane at z = 0 once rotated flat.
  */
 export function buildBinaryStl(mesh: StarMesh): ArrayBuffer {
   const buffer = new ArrayBuffer(stlByteLength(mesh));

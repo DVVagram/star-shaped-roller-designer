@@ -16,7 +16,6 @@
  */
 
 import {
-  BUILD_VOLUME_MM,
   CURVE_TOLERANCE_MM,
   MIN_FEATURE_MM,
   MIN_WALL_MM,
@@ -155,7 +154,6 @@ export interface SprocketDerived {
   thicknessMm: number;
   totalHeightMm: number;
   circumferenceMm: number;
-  fitsBuildVolume: boolean;
   feasible: boolean;
   limitingFactor: string | null;
 }
@@ -209,9 +207,6 @@ export function deriveSprocket(spec: SprocketSpec): SprocketDerived {
     thicknessMm: spec.thicknessMm,
     totalHeightMm: totalHeight,
     circumferenceMm: TWO_PI * pitchRadius,
-    fitsBuildVolume:
-      tipRadius * 2 <= BUILD_VOLUME_MM.x + 1e-9 &&
-      totalHeight <= BUILD_VOLUME_MM.z + 1e-9,
     feasible: limitingFactor === null && rootRadius > 0.2,
     limitingFactor: rootRadius > 0.2 ? limitingFactor : "the roller seat depth",
   };
@@ -221,7 +216,7 @@ export function deriveSprocket(spec: SprocketSpec): SprocketDerived {
  * One closed counter-clockwise outline around every tooth.
  *
  * Each feature (seat arc, flank, tip land) is sampled until its chords sit
- * within `CURVE_TOLERANCE_MM` of the real curve, so the drawn and printed
+ * within `CURVE_TOLERANCE_MM` of the real curve, so the drawn and formed
  * profile is the calculated one at every tooth count and tooth size.
  */
 export function sprocketOutline(spec: SprocketSpec): Point2D[] {
@@ -433,17 +428,6 @@ export function validateSprocket(
       }
     }
 
-    if (!derived.fitsBuildVolume) {
-      const widthBlocked = derived.outsideDiameterMm > BUILD_VOLUME_MM.x + 1e-9;
-      errors.push({
-        field: widthBlocked ? "pitch" : "thickness",
-        level: "error",
-        message: widthBlocked
-          ? `${shown(derived.outsideDiameterMm)} across does not fit the 180 × 180 × 180 mm build volume.`
-          : `${shown(derived.totalHeightMm)} tall (wheel plus hub) does not fit the 180 × 180 × 180 mm build volume.`,
-      });
-    }
-
     if (derived.teeth < 9) {
       warnings.push({
         field: "teeth",
@@ -455,14 +439,14 @@ export function validateSprocket(
       warnings.push({
         field: "clearance",
         level: "warning",
-        message: "No seat clearance means a printed chain will bind; 0.1 mm or more is safer.",
+        message: "No seat clearance means a chain will bind; 0.1 mm or more is safer.",
       });
     }
     if (derived.tipLandMm < MIN_FEATURE_MM) {
       warnings.push({
         field: "tipWidth",
         level: "warning",
-        message: "Pointed teeth chip; a tip land of about 1 mm survives printing better.",
+        message: "Pointed teeth chip; a tip land of about 1 mm survives making better.",
       });
     }
     if (full.thicknessMm < 3) {
@@ -476,7 +460,7 @@ export function validateSprocket(
       warnings.push({
         field: "teeth",
         level: "warning",
-        message: "Above 48 teeth the pitch is fine enough that a printed chain may skip.",
+        message: "Above 48 teeth the pitch is fine enough that a chain may skip.",
       });
     }
   }

@@ -1,5 +1,5 @@
 /**
- * Checks the numbers the app prints against the numbers the geometry implies.
+ * Checks the numbers the app reports against the numbers the geometry implies.
  *
  * These are deliberately not snapshot tests: each one recomputes a closed-form
  * value (a pitch diameter, a torus volume, a spring rate) and compares it with

@@ -200,7 +200,7 @@ describe("rotor geometry", () => {
     expect(report.volumeMm3).toBeGreaterThan(1000);
   });
 
-  it("leaves a printable passage between blades", () => {
+  it("leaves a usable passage between blades", () => {
     const derived = deriveRotor(FAN_DEFAULT_SPEC);
     expect(derived.minPassageMm).toBeGreaterThan(1);
     expect(derived.feasible).toBe(true);
@@ -1007,7 +1007,7 @@ describe("solid integrity across the parameter space", () => {
     }
   }, 20000);
 
-  it("keeps the extremes of the input ranges printable", () => {
+  it("keeps the extremes of the input ranges valid", () => {
     const big = buildSprocketMesh({
       ...SPROCKET_DEFAULT_SPEC,
       pitchMm: 6.35,

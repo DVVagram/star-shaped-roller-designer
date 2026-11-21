@@ -98,16 +98,25 @@ const probe = `(() => {
   const builder = document.querySelector('#builder');
   const how = document.querySelector('#how');
   const canvas = document.querySelector('canvas');
-  const useParagraph = [...document.querySelectorAll('p')].filter((p) => p.textContent.trim().startsWith('Use case'))[0];
-  const useText = useParagraph ? useParagraph.textContent.replace('Use case', '').trim() : '';
+  const useParagraph = document.querySelector('#use-case');
+  const useText = useParagraph ? useParagraph.textContent.trim() : '';
   const notes = how ? how.innerText : '';
   const capability = document.querySelector('#capability');
+  const about = document.querySelector('#about');
+  const form = document.querySelector('#builder > div');
+  const top = (el) => (el ? Math.round(el.getBoundingClientRect().top + window.scrollY) : null);
   const buttons = [...document.querySelectorAll('button')];
   return {
     h1: h1 ? h1.innerText : '',
     canvas: canvas ? { width: canvas.width, height: canvas.height, cssW: canvas.clientWidth, cssH: canvas.clientHeight } : null,
     builder: Boolean(builder),
     how: Boolean(how),
+    builderTop: top(builder),
+    formTop: top(form),
+    aboutTop: top(about),
+    useTop: top(useParagraph),
+    howTop: top(how),
+    capabilityTop: top(capability),
     useText,
     notesLength: notes.length,
     notes: notes.slice(0, 900),
@@ -143,6 +152,12 @@ for (const route of routes) {
     info.canvas.cssW > 0 &&
     info.builder &&
     info.how &&
+    info.formTop !== null &&
+    info.formTop < 320 &&
+    info.builderTop < info.formTop &&
+    info.formTop < info.aboutTop &&
+    info.formTop < info.useTop &&
+    info.howTop < info.capabilityTop &&
     info.useText.length > 20 &&
     info.notesLength > 400 &&
     info.capabilityLength > 80 &&
@@ -276,8 +291,13 @@ const mobileDesigner = await evaluate(`(() => {
   const fields = [...document.querySelectorAll('input, select')];
   const labelled = fields.filter((el) => el.id && document.querySelector('label[for="' + el.id + '"]'));
   const buttons = [...document.querySelectorAll('button')];
+  const top = (el) => (el ? Math.round(el.getBoundingClientRect().top + window.scrollY) : null);
   return {
     overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    builderTop: top(document.querySelector('#builder')),
+    formTop: top(document.querySelector('#builder > div')),
+    aboutTop: top(document.querySelector('#about')),
+    useCaseTop: top(document.querySelector('#use-case')),
     capability: capability ? capability.getBoundingClientRect().height : 0,
     fields: fields.length,
     labelled: labelled.length,
@@ -291,6 +311,10 @@ const mobileDesigner = await evaluate(`(() => {
 check(
   "mobile-designer-accessibility",
   mobileDesigner.overflow <= 1 &&
+    mobileDesigner.formTop < 320 &&
+    mobileDesigner.builderTop < mobileDesigner.formTop &&
+    mobileDesigner.formTop < mobileDesigner.aboutTop &&
+    mobileDesigner.formTop < mobileDesigner.useCaseTop &&
     mobileDesigner.capability > 50 &&
     mobileDesigner.fields > 0 &&
     mobileDesigner.fields === mobileDesigner.labelled &&

@@ -2,7 +2,6 @@
 
 import { buildPrism } from "@/lib/kit/prism";
 import {
-  BUILD_VOLUME_MM,
   MIN_WALL_MM,
   TWO_PI,
   boreOutline,
@@ -40,31 +39,23 @@ import {
 const measure = (value: number, units: LengthUnit) => formatMeasure(value, units);
 const round = (value: number, decimals = 2) => formatNumber(value, decimals);
 
+/** Guards against a zero or non-finite overall size before geometry is built. */
 function checkSize(
   errors: DesignIssue[],
-  units: LengthUnit,
+  _units: LengthUnit,
   field: string,
   diameterMm: number,
   heightMm: number,
 ): boolean {
-  let ok = true;
-  if (diameterMm > BUILD_VOLUME_MM.x + 1e-9) {
-    errors.push({
-      field,
-      level: "error",
-      message: `${measure(diameterMm, units)} across does not fit the 180 mm bed.`,
-    });
-    ok = false;
+  if (Number.isFinite(diameterMm) && Number.isFinite(heightMm) && diameterMm > 0 && heightMm > 0) {
+    return true;
   }
-  if (heightMm > BUILD_VOLUME_MM.z + 1e-9) {
-    errors.push({
-      field,
-      level: "error",
-      message: `${measure(heightMm, units)} tall does not fit the 180 mm build height.`,
-    });
-    ok = false;
-  }
-  return ok;
+  errors.push({
+    field,
+    level: "error",
+    message: "The overall size must be a positive, finite number.",
+  });
+  return false;
 }
 
 function checkWall(
@@ -108,7 +99,7 @@ export const spurGear: AnyDesign = defineDesign({
   ],
   notes: [
     "Tooth thickness at the pitch circle is πm/2 minus the backlash. At any radius r the half tooth angle is ψp + inv(α) − inv(αr), where inv is tan α − α, so the flank is generated rather than drawn. Below the base circle the involute does not exist, so the flank runs radially down to the root — the usual full-depth simplification.",
-    "Two gears mesh when they share a module and pressure angle. Their centre distance is (m/2)(N₁ + N₂); add a little backlash for a printed pair, because a printed tooth is wider than its drawing after the first layer squashes out.",
+    "Two gears mesh when they share a module and pressure angle. Their centre distance is (m/2)(N₁ + N₂); add a little backlash for a mating pair, because a formed tooth can be wider than its drawing after the first pass.",
   ],
   header: "Spur Gear Designer - units: mm",
   fields: [
@@ -218,7 +209,7 @@ export const internalGear: AnyDesign = defineDesign({
   ],
   notes: [
     "The empty space is what meshes, so its half-width at radius r is ψp + inv(α) − inv(αr). That narrows as the radius grows, which is why an internal tooth is wide at its inward tip and narrow at the rim-side root. The rim is a plain circle outside the cavity floor, so the ring has one continuous outer wall.",
-    "Internal pairs run in the same direction and need a smaller centre distance than the equivalent external pair: it is (m/2)(N_ring − N_pinion). Print a small test pair first — the clearance is less forgiving than on an external set.",
+    "Internal pairs run in the same direction and need a smaller centre distance than the equivalent external pair: it is (m/2)(N_ring − N_pinion). Make a small test pair first — the clearance is less forgiving than on an external set.",
   ],
   header: "Internal Ring Gear Designer - units: mm",
   fields: [
@@ -259,7 +250,7 @@ export const internalGear: AnyDesign = defineDesign({
     const outer = cavityFloor + p.rimWidthMm;
     checkSize(errors, units, "module", outer * 2, p.faceWidthMm);
     if (outer - cavityFloor < MIN_WALL_MM) {
-      errors.push({ field: "rimWidth", level: "error", message: "The rim is thinner than a printable wall." });
+      errors.push({ field: "rimWidth", level: "error", message: "The rim is thinner than a substantial wall." });
     }
     if (p.addendumMm >= g.pitchRadiusMm * 0.6) {
       errors.push({ field: "addendum", level: "error", message: "The inward addendum reaches the axis." });
@@ -284,7 +275,7 @@ export const internalGear: AnyDesign = defineDesign({
     if (halfAngleAt(cavityFloor) < 0.004) {
       errors.push({ field: "dedendum", level: "error", message: "The cavity floor closes the teeth; reduce the dedendum, backlash or module." });
     }
-    if (p.rimWidthMm < 3) pushWarning(warnings, "rimWidth", "A thin ring distorts when it comes off the bed.");
+    if (p.rimWidthMm < 3) pushWarning(warnings, "rimWidth", "A thin ring distorts when it comes off the surface.");
 
     return {
       errors,
@@ -341,7 +332,7 @@ export const helicalGear: AnyDesign = defineDesign({
   ],
   notes: [
     "A helix angle β advances the tooth by faceWidth · tan β across the face. Divided by the pitch radius that is the total twist in radians; the designer stacks enough rotated sections that no band twists more than 1.5°, which is what keeps the flank smooth instead of a stair.",
-    "Helical gears are quieter because the contact rolls across the face instead of engaging all at once. They also push a thrust load along the shaft, so a printed pair needs a shoulder or a bearing that can take it.",
+    "Helical gears are quieter because the contact rolls across the face instead of engaging all at once. They also push a thrust load along the shaft, so a mating pair needs a shoulder or a bearing that can take it.",
   ],
   header: "Helical Gear Designer - units: mm",
   fields: [
@@ -501,9 +492,6 @@ export const rack: AnyDesign = defineDesign({
     if (g.rootHalfThicknessMm * 2 >= g.pitchMm) {
       errors.push({ field: "backlash", level: "error", message: "The teeth overlap at the root line." });
     }
-    if (g.lengthMm > BUILD_VOLUME_MM.x) {
-      errors.push({ field: "teeth", level: "error", message: "The rack is longer than the 180 mm bed." });
-    }
     if (p.baseHeightMm < g.toothHeightMm) pushWarning(warnings, "baseHeight", "The bar is thinner than the tooth depth.");
 
     return {
@@ -554,7 +542,7 @@ export const timingPulley: AnyDesign = defineDesign({
   ],
   notes: [
     "The pitch circle is pN/π, the circle the belt's tensile cords sit on. The teeth reach depth/2 outward and the root sits depth/2 inward, so the pitch line runs through the middle of the tooth and the belt wraps it without slipping a tooth.",
-    "A printed pulley needs a little more backlash than a moulded one. If the belt climbs the flanks, reduce the tooth width by 0.1 mm before you change the diameter.",
+    "A pulley needs a little more backlash than a moulded one. If the belt climbs the flanks, reduce the tooth width by 0.1 mm before you change the diameter.",
   ],
   header: "Timing Pulley Designer - units: mm",
   fields: [
@@ -662,16 +650,16 @@ export const ratchetWheel: AnyDesign = defineDesign({
   chips: [
     { label: "Teeth", value: "6 – 60" },
     { label: "Face rake", value: "0 – 30°" },
-    { label: "Tip Ø", value: "20 – 180 mm" },
+    { label: "Tip Ø", value: "20 – 1000 mm" },
   ],
   notes: [
     "Each tooth starts at the root circle with a short, nearly radial driving face, runs across a flat tip land, then falls back to the root on a long straight back. The rake angle is measured away from radial: more rake lets the pawl self-release, less rake holds a heavier load.",
-    "A ratchet needs a pawl that stays engaged. Print the pawl with a spring arm or add a torsion spring, and keep the tip land at least 1 mm wide so the point does not peen over.",
+    "A ratchet needs a pawl that stays engaged. Make the pawl with a spring arm or add a torsion spring, and keep the tip land at least 1 mm wide so the point does not peen over.",
   ],
   header: "Ratchet Wheel Designer - units: mm",
   fields: [
     { key: "teeth", label: "Teeth", kind: "count", section: "Wheel", default: "12", min: 6, max: 60 },
-    { key: "outerDiameter", label: "Tip diameter", kind: "length", section: "Wheel", default: "60", min: 20, max: 180 },
+    { key: "outerDiameter", label: "Tip diameter", kind: "length", section: "Wheel", default: "60", min: 20, max: 1000 },
     { key: "rootDiameter", label: "Root diameter", kind: "length", section: "Wheel", default: "48", min: 10, max: 170 },
     { key: "faceAngle", label: "Face rake", kind: "number", section: "Tooth", default: "8", min: 0, max: 30 },
     { key: "tipLand", label: "Tip land", kind: "length", section: "Tooth", default: "1.5", min: 0, max: 8 },
@@ -693,7 +681,7 @@ export const ratchetWheel: AnyDesign = defineDesign({
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
     pushInteger(errors, "teeth", "Teeth", p.teeth, 6, 60);
-    pushRange(errors, units, "outerDiameter", "Tip diameter", p.outerDiameterMm, 20, 180);
+    pushRange(errors, units, "outerDiameter", "Tip diameter", p.outerDiameterMm, 20, 1000);
     pushRange(errors, units, "rootDiameter", "Root diameter", p.rootDiameterMm, 10, 170);
     pushRange(errors, units, "faceAngle", "Face rake", p.faceAngleDeg, 0, 30, false);
     pushRange(errors, units, "tipLand", "Tip land", p.tipLandMm, 0, 8);
@@ -771,7 +759,7 @@ export const genevaWheel: AnyDesign = defineDesign({
   lede: "Radial slots with parallel sides and a radiused end, cut through the rim. The driver's pin enters a slot at the tangent point and pushes the wheel through one pitch, then leaves it locked between steps.",
   chips: [
     { label: "Slots", value: "3 – 12" },
-    { label: "Wheel Ø", value: "20 – 180 mm" },
+    { label: "Wheel Ø", value: "20 – 1000 mm" },
     { label: "Slot depth", value: "4 – 90 mm" },
   ],
   notes: [
@@ -781,7 +769,7 @@ export const genevaWheel: AnyDesign = defineDesign({
   header: "Geneva Wheel Designer - units: mm",
   fields: [
     { key: "slots", label: "Slots", kind: "count", section: "Wheel", default: "4", min: 3, max: 12 },
-    { key: "outerDiameter", label: "Wheel diameter", kind: "length", section: "Wheel", default: "60", min: 20, max: 180 },
+    { key: "outerDiameter", label: "Wheel diameter", kind: "length", section: "Wheel", default: "60", min: 20, max: 1000 },
     { key: "slotDepth", label: "Slot depth", kind: "length", section: "Slot", default: "18", min: 4, max: 90 },
     { key: "slotWidth", label: "Slot width", kind: "length", section: "Slot", default: "6", min: 2, max: 24 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Wheel", default: "6", min: 2, max: 30 },
@@ -799,7 +787,7 @@ export const genevaWheel: AnyDesign = defineDesign({
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
     pushInteger(errors, "slots", "Slots", p.slots, 3, 12);
-    pushRange(errors, units, "outerDiameter", "Wheel diameter", p.outerDiameterMm, 20, 180);
+    pushRange(errors, units, "outerDiameter", "Wheel diameter", p.outerDiameterMm, 20, 1000);
     pushRange(errors, units, "slotDepth", "Slot depth", p.slotDepthMm, 4, 90);
     pushRange(errors, units, "slotWidth", "Slot width", p.slotWidthMm, 2, 24);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2, 30);
@@ -1023,7 +1011,7 @@ export const eccentricWheel: AnyDesign = defineDesign({
   lede: "The distance between the outer circle and the bore is the throw. Mount the wheel on a shaft and the outside traces a circle of radius equal to the eccentricity, which is the simplest way to turn rotation into a short reciprocating stroke.",
   chips: [
     { label: "Throw", value: "2 × offset" },
-    { label: "Outer Ø", value: "16 – 180 mm" },
+    { label: "Outer Ø", value: "16 – 1000 mm" },
     { label: "Offset", value: "0 – 60 mm" },
   ],
   notes: [
@@ -1032,7 +1020,7 @@ export const eccentricWheel: AnyDesign = defineDesign({
   ],
   header: "Eccentric Wheel Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Disc", default: "50", min: 16, max: 180 },
+    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Disc", default: "50", min: 16, max: 1000 },
     { key: "bore", label: "Bore", kind: "length", section: "Disc", default: "10", min: 1, max: 80 },
     { key: "offset", label: "Bore offset", kind: "length", section: "Disc", default: "6", min: 0, max: 60, hint: "Stroke = twice this." },
     { key: "thickness", label: "Thickness", kind: "length", section: "Disc", default: "10", min: 2, max: 40 },
@@ -1046,7 +1034,7 @@ export const eccentricWheel: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerDiameterMm, 16, 180);
+    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerDiameterMm, 16, 1000);
     pushRange(errors, units, "bore", "Bore", p.boreMm, 1, 80);
     pushRange(errors, units, "offset", "Bore offset", p.offsetMm, 0, 60);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2, 40);
@@ -1113,7 +1101,7 @@ export const splinedHub: AnyDesign = defineDesign({
   ],
   notes: [
     "Each spline is a radial tooth with straight flanks: it runs from the minor diameter out to the major diameter, and its tip land is the spline width. The tooth space at the root is the root circumference divided by the spline count, minus that width.",
-    "Straight splines are the printable choice because there is no undercut to sag. Leave 0.15 mm per flank of clearance and make the sleeve a little longer than the hub so the load is shared across the full face.",
+    "Straight splines are the straightforward choice because there is no undercut to sag. Leave 0.15 mm per flank of clearance and make the sleeve a little longer than the hub so the load is shared across the full face.",
   ],
   header: "Splined Hub Designer - units: mm",
   fields: [

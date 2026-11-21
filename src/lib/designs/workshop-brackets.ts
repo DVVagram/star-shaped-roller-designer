@@ -37,7 +37,7 @@ export const cornerBracket: AnyDesign = defineDesign({
   family: "fixings",
   eyebrow: "Right-angle plate",
   blurb: "An L plate with a real leg width and a screw line down each leg.",
-  lede: "A right-angle bracket cut as one flat L and printed on its face. Both legs carry their own row of screws, and the leg width and plate thickness are independent, so the bracket can be as stiff as the joint needs.",
+  lede: "A right-angle bracket cut as one flat L and made on its face. Both legs carry their own row of screws, and the leg width and plate thickness are independent, so the bracket can be as stiff as the joint needs.",
   use: "Joining two boards or panels at 90 degrees inside a cabinet, a frame or a repair.",
   notesTitle: "How the two legs are drilled",
   chips: [
@@ -47,7 +47,7 @@ export const cornerBracket: AnyDesign = defineDesign({
   ],
   notes: [
     "Each leg gets its own evenly spaced screw row, offset from the inside corner by the leg width, so a screw can never split the corner itself. The rows are checked for a screw diameter of clearance between centres before the mesh is built.",
-    "Print the bracket flat on one face with three perimeters. A printed L is weakest at the inside corner, so keep the leg width at least four times the plate thickness for a loaded joint.",
+    "Make the bracket flat on one face with a solid wall. A bracket is weakest at the inside corner, so keep the leg width at least four times the plate thickness for a loaded joint.",
   ],
   header: "Corner Bracket Designer - units: mm",
   fields: [
@@ -163,7 +163,7 @@ export const flatBrace: AnyDesign = defineDesign({
   ],
   notes: [
     "The screws are distributed between two margins that each leave a full hole plus three millimetres to the rounded end. The designer checks the resulting pitch, so a short strap with many screws is rejected instead of drilling overlapping holes.",
-    "Print the strap flat with the screw holes vertical. Four perimeters around each hole carry far more load than infill, and a countersink on the outer face keeps the screw head from lifting the strap.",
+    "Make the strap flat with the screw holes vertical. A solid wall around each hole carries far more load than a thin section, and a countersink on the outer face keeps the screw head from lifting the strap.",
   ],
   header: "Flat Brace Designer - units: mm",
   fields: [
@@ -253,7 +253,7 @@ export const tBracket: AnyDesign = defineDesign({
   ],
   notes: [
     "The bar screws sit on the bar centre line and the stem screws on the stem centre line, each row bounded by a hole radius plus four millimetres. The two rows cannot collide because the bar begins above the stem, which the outline enforces.",
-    "Print it flat and drive the screws with washers. The T is loaded across the bar-stem junction, so keep the plate at least 4 mm thick and use four perimeters rather than a high infill percentage.",
+    "Make it flat and drive the screws with washers. The T is loaded across the bar-stem junction, so keep the plate at least 4 mm thick and use a solid wall rather than a solid section.",
   ],
   header: "T Bracket Designer - units: mm",
   fields: [
@@ -371,7 +371,7 @@ export const crossBrace: AnyDesign = defineDesign({
   ],
   notes: [
     "Every arm is the same length, so the four screws sit on a true square and the load is shared evenly. The hole centre is placed clear of the crossing square by a full radius plus four millimetres, which is what keeps the cap triangulation clean.",
-    "Print the plate flat. A plus plate is loaded in shear at the inside corners, so round the outside corners in the slicer or leave the default sharp corners and use five perimeters.",
+    "Make the plate flat. A plus plate is loaded in shear at the inside corners, so round the outside corners in the software or leave the default sharp corners and use a solid wall.",
   ],
   header: "Cross Brace Designer - units: mm",
   fields: [
@@ -473,7 +473,7 @@ export const frenchCleat: AnyDesign = defineDesign({
   ],
   notes: [
     "The two mating faces are both at 45 degrees, so the joint closes by sliding down and pulls the cabinet tight to the wall as it seats. The bevel is a real line in the extruded section, not a chamfer applied to the ends.",
-    "Print with the bevel up and the long axis on the bed, or print it on its back with support under the bevel. Two perimeters plus a solid infill is stronger here than a thick wall, because the cleat fails by splitting along the layer lines.",
+    "Make it with the bevel up and the long axis flat, or make it on its back with a fixture under the bevel. Two wall thicknesses plus a solid section is stronger here than a thick wall, because the cleat fails by splitting along the process marks.",
   ],
   header: "French Cleat Designer - units: mm",
   fields: [
@@ -556,7 +556,7 @@ export const phoneStand: AnyDesign = defineDesign({
   ],
   notes: [
     "The phone rests on the slope between the lip and the back edge, so the lean angle is the angle of that slope, reported from the same two points that build the profile. The lip height is independent of the slope, which lets a thick case clear it.",
-    "Print it lying on one side so the layer lines run across the wedge rather than along the lip. A lip printed upright is a lever that snaps off the first time the phone is dropped into the stand.",
+    "Make it lying on one side so the process marks run across the wedge rather than along the lip. A lip formed upright is a lever that snaps off the first time the phone is dropped into the stand.",
   ],
   header: "Phone Stand Designer - units: mm",
   fields: [
@@ -646,7 +646,7 @@ export const doorWedge: AnyDesign = defineDesign({
   ],
   notes: [
     "The wedge is a right triangle in profile: the full height stands at the back edge and the taper runs to nothing at the toe. The finger hole is placed inside the thick end and checked against every edge with a real wall clearance.",
-    "Print it on one side with the taper rising across the layers, not along them, so the tip does not delaminate under a door. A little rubber cement or a strip of grip tape under the base stops it sliding on a hard floor.",
+    "Make it on one side with the taper rising across the grain, not along it, so the tip does not delaminate under a door. A little rubber cement or a strip of grip tape under the base stops it sliding on a hard floor.",
   ],
   header: "Door Wedge Designer - units: mm",
   fields: [
@@ -751,7 +751,7 @@ export const wallHook: AnyDesign = defineDesign({
   ],
   notes: [
     "The arm leaves the plate at the bottom and the lip rises at its end, so a hanging load pulls the arm down and into the plate rather than peeling it away. Screw holes sit on the plate centre line, above the arm, with a full wall to the plate edges.",
-    "Print it with the plate flat on the bed and the arm rising in the Z direction; the layer lines then run around the hook instead of across the root of the arm. Use four perimeters and a 0.2 mm layer for the arm root.",
+    "Make it with the plate flat and the arm rising in the Z direction; the process marks then run around the hook instead of across the root of the arm. Use a solid wall with 0.2 mm of material at the arm root.",
   ],
   header: "Wall Hook Designer - units: mm",
   fields: [
@@ -858,7 +858,7 @@ export const pegboardHook: AnyDesign = defineDesign({
   ],
   notes: [
     "Two pins on a vertical pitch stop the hook swinging about a single hole; the plate is a full 30 mm wide so the upper pin has material all round it. The arm leaves the bottom of the plate and turns up at the tip, which keeps a tool from walking off when the board is knocked.",
-    "Print it with the plate flat and the pins vertical, then press it into the board before loading it. The pins are the weak point: use four perimeters and never scale the pin diameter below 5 mm.",
+    "Make it with the plate flat and the pins vertical, then press it into the board before loading it. The pins are the weak point: use a solid wall and never scale the pin diameter below 5 mm.",
   ],
   header: "Pegboard Hook Designer - units: mm",
   fields: [
@@ -964,7 +964,7 @@ export const doorStrike: AnyDesign = defineDesign({
   ],
   notes: [
     "The slot is an obround hole with semicircular ends, cut through the plate on the centre line. Its length is checked against the plate, and the two screw holes are kept clear of the slot by at least half a screw diameter plus four millimetres.",
-    "Print the plate flat with the slot vertical and countersink the screw holes from the front. A strike takes a repeated impact, so print it solid or with five perimeters rather than a low infill.",
+    "Make the plate flat with the slot vertical and countersink the screw holes from the front. A strike takes a repeated impact, so make it solid rather than a sparse section.",
   ],
   header: "Door Strike Designer - units: mm",
   fields: [

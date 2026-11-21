@@ -1,7 +1,6 @@
 /** Small helpers shared by the prism designers. */
 
 import {
-  BUILD_VOLUME_MM,
   MIN_WALL_MM,
   boreOutline,
   formatMeasure,
@@ -19,31 +18,23 @@ import {
 export const measure = (value: number, units: LengthUnit) => formatMeasure(value, units);
 export const round = (value: number, decimals = 2) => formatNumber(value, decimals);
 
+/** Guards against a zero or non-finite overall size before geometry is built. */
 export function checkSize(
   errors: DesignIssue[],
-  units: LengthUnit,
+  _units: LengthUnit,
   field: string,
   diameterMm: number,
   heightMm: number,
 ): boolean {
-  let ok = true;
-  if (diameterMm > BUILD_VOLUME_MM.x + 1e-9) {
-    errors.push({
-      field,
-      level: "error",
-      message: `${measure(diameterMm, units)} across does not fit the 180 mm bed.`,
-    });
-    ok = false;
+  if (Number.isFinite(diameterMm) && Number.isFinite(heightMm) && diameterMm > 0 && heightMm > 0) {
+    return true;
   }
-  if (heightMm > BUILD_VOLUME_MM.z + 1e-9) {
-    errors.push({
-      field,
-      level: "error",
-      message: `${measure(heightMm, units)} tall does not fit the 180 mm build height.`,
-    });
-    ok = false;
-  }
-  return ok;
+  errors.push({
+    field,
+    level: "error",
+    message: "The overall size must be a positive, finite number.",
+  });
+  return false;
 }
 
 export function checkWall(
@@ -221,7 +212,7 @@ export function distanceToRing(point: Point2D, ring: Point2D[]): number {
   return shortest;
 }
 
-/** A hole must sit inside the outline with a printable wall all round. */
+/** A hole must sit inside the outline with material left all round. */
 export function checkHoleFits(
   errors: DesignIssue[],
   units: LengthUnit,

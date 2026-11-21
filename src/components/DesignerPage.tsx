@@ -16,11 +16,9 @@ export interface DesignerPageProps {
   title: ReactNode;
   lede: string;
   useCase: string;
-  /** Capability label and limitations shown before the builder. */
+  /** Capability label and limitations shown below the builder. */
   contract?: DesignContract;
   chips: readonly { label: string; value: string }[];
-  builderTitle: string;
-  builderLede: string;
   builderNote: string;
   steps: readonly PageStep[];
   checklist: readonly string[];
@@ -29,7 +27,7 @@ export interface DesignerPageProps {
   children: ReactNode;
 }
 
-/** The shared page shell: hero, builder slot, explainer and notes. */
+/** The shared page shell: compact title, builder first, explanation below. */
 export default function DesignerPage({
   mark,
   eyebrow,
@@ -38,8 +36,6 @@ export default function DesignerPage({
   useCase,
   contract,
   chips,
-  builderTitle,
-  builderLede,
   builderNote,
   steps,
   checklist,
@@ -49,65 +45,63 @@ export default function DesignerPage({
 }: DesignerPageProps) {
   return (
     <>
-      <section className="mx-auto max-w-6xl px-4 pb-10 pt-10 sm:px-6 sm:pt-16">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end">
-          <div>
-            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
-              <span aria-hidden="true" className="text-accent">
-                {mark}
-              </span>
-              {eyebrow}
-            </p>
-            <h1 className="mt-4 max-w-2xl text-[2.6rem] font-semibold leading-[1.03] tracking-tight sm:text-6xl">
-              {title}
-            </h1>
-            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted">{lede}</p>
-            <p className="mt-4 flex max-w-xl gap-2 border-l-2 border-accent/60 pl-3 text-sm leading-relaxed text-ink">
-              <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
-                Use case
-              </span>
-              <span className="-ml-1">{useCase}</span>
-            </p>
-          </div>
-
-          <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-line bg-line text-xs">
-            {chips.map((chip) => (
-              <div key={chip.label} className="bg-card px-4 py-3.5">
-                <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
-                  {chip.label}
-                </dt>
-                <dd className="mt-0.5 font-mono text-[13px] text-ink numeric whitespace-nowrap">
-                  {chip.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-
-      {contract && <CapabilityNotice contract={contract} />}
-
       <section
         id="builder"
-        aria-label={builderTitle}
-        className="mx-auto max-w-6xl px-4 pb-16 sm:px-6"
+        aria-label="Designer"
+        className="mx-auto max-w-6xl px-4 pb-14 pt-7 sm:px-6 sm:pt-9"
       >
-        <div className="mb-5 flex flex-col gap-2 border-t border-line pt-8 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{builderTitle}</h2>
-            <p className="mt-1 text-sm text-muted">{builderLede}</p>
-          </div>
-          <p className="max-w-sm text-xs leading-relaxed text-muted">{builderNote}</p>
-        </div>
+        <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+          <span aria-hidden="true" className="text-accent">
+            {mark}
+          </span>
+          {eyebrow}
+        </p>
+        <h1 className="mt-2 max-w-3xl text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl">
+          {title}
+        </h1>
 
-        {children}
+        <div className="mt-6">{children}</div>
       </section>
 
-      <section
-        id="how"
-        aria-label="How it works"
-        className="border-y border-line bg-paper-deep/50"
-      >
+      <section id="about" className="border-t border-line bg-paper-deep/50">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
+            <div>
+              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+                About this designer
+              </h2>
+              <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted">{lede}</p>
+              <div className="mt-4 max-w-xl border-l-2 border-accent/60 pl-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+                  Use case
+                </p>
+                <p id="use-case" className="mt-1 text-sm leading-relaxed text-ink">
+                  {useCase}
+                </p>
+              </div>
+              <p className="mt-4 max-w-xl text-xs leading-relaxed text-muted">
+                <span className="font-semibold text-ink">Build notes: </span>
+                {builderNote}
+              </p>
+            </div>
+
+            <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-line bg-line text-xs">
+              {chips.map((chip) => (
+                <div key={chip.label} className="bg-card px-4 py-3.5">
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                    {chip.label}
+                  </dt>
+                  <dd className="mt-0.5 font-mono text-[13px] text-ink numeric whitespace-nowrap">
+                    {chip.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" className="border-y border-line bg-paper-deep/50">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">How it works</h2>
@@ -150,6 +144,12 @@ export default function DesignerPage({
           </div>
         </div>
       </section>
+
+      {contract && (
+        <div className="pt-10">
+          <CapabilityNotice contract={contract} />
+        </div>
+      )}
     </>
   );
 }

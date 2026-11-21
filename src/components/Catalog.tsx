@@ -73,7 +73,7 @@ export default function Catalog({ entries }: { entries: CatalogEntry[] }) {
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted">
               Gears, pulleys, plates, vessels, springs, labware and workshop fixtures — each
               generated from the numbers you type. Every card states its capability: a checked
-              shape, a fit prototype or a high-risk use the printed part must not serve.
+              shape, a fit prototype or a high-risk use the physical part must not serve.
             </p>
           </div>
 
@@ -176,7 +176,7 @@ export default function Catalog({ entries }: { entries: CatalogEntry[] }) {
         <p aria-live="polite" className="mt-2 text-xs text-muted">
           {filtered.length} designer{filtered.length === 1 ? "" : "s"}
           {activeFilter ? " matching" : " in the library"}. Capability labels describe verified
-          scope, not printability alone.
+          scope, not formability alone.
         </p>
       </section>
 

@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Parametric designer for 3D-printable star-spiked rollers with a live 3D preview and STL export.",
+  "description": "Parametric designer library with a live 3D preview and STL export.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

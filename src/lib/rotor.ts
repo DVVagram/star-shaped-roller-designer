@@ -15,7 +15,6 @@
  */
 
 import {
-  BUILD_VOLUME_MM,
   CURVE_TOLERANCE_MM,
   MIN_FEATURE_MM,
   MIN_WALL_MM,
@@ -52,8 +51,8 @@ export interface RotorSpec {
 }
 
 export const ROTOR_LIMITS = {
-  tipDiameterMm: { min: 20, max: 180 },
-  hubDiameterMm: { min: 5, max: 150 },
+  tipDiameterMm: { min: 20, max: 1000 },
+  hubDiameterMm: { min: 5, max: 1000 },
   bladeCount: { min: 2, max: 24 },
   rootWidthMm: { min: 1, max: 80 },
   tipWidthMm: { min: 0.8, max: 80 },
@@ -199,7 +198,6 @@ export interface RotorDerived {
   boreRadiusMm: number;
   hubWallMm: number;
   heightMm: number;
-  fitsBuildVolume: boolean;
   feasible: boolean;
   limitingFactor: string | null;
 }
@@ -254,9 +252,6 @@ export function deriveRotor(spec: RotorSpec): RotorDerived {
     boreRadiusMm: boreRadius,
     hubWallMm: hubRadius - boreRadius,
     heightMm: totalHeight,
-    fitsBuildVolume:
-      tipRadius * 2 <= BUILD_VOLUME_MM.x + 1e-9 &&
-      totalHeight <= BUILD_VOLUME_MM.z + 1e-9,
     feasible: limitingFactor === null,
     limitingFactor,
   };
@@ -634,17 +629,6 @@ export function validateRotor(
       });
     }
 
-    if (!derived.fitsBuildVolume) {
-      const widthBlocked = derived.tipRadiusMm * 2 > BUILD_VOLUME_MM.x + 1e-9;
-      errors.push({
-        field: widthBlocked ? "tipDiameter" : "bladeHeight",
-        level: "error",
-        message: widthBlocked
-          ? `${shown(derived.tipRadiusMm * 2)} across does not fit the 180 × 180 × 180 mm build volume.`
-          : `${shown(derived.heightMm)} tall does not fit the 180 × 180 × 180 mm build volume.`,
-      });
-    }
-
     if (derived.bladeCount < 3) {
       warnings.push({
         field: "bladeCount",
@@ -678,14 +662,14 @@ export function validateRotor(
       warnings.push({
         field: "tipWidth",
         level: "warning",
-        message: "Blades under 2 mm wide are fragile in a printed part.",
+        message: "Blades under 2 mm wide are fragile in a physical part.",
       });
     }
     if (derived.leanMm > derived.leanLimitMm * 0.8) {
       warnings.push({
         field: "bladeAngle",
         level: "warning",
-        message: "The blades lean close to their neighbours — check the gaps before printing.",
+        message: "The blades lean close to their neighbours — check the gaps before making.",
       });
     }
   }

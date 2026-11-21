@@ -170,7 +170,7 @@ export function renderRecordDrawingSvg(record: DrawingRecord): string {
   <text x="40" y="398" font-size="11" fill="#15171c">Overall envelope: ${formatNumber(maxX - minX, 2)} × ${formatNumber(maxY - minY, 2)} × ${formatNumber(maxZ - minZ, 2)} mm (X × Y × Z)</text>
   <text x="40" y="418" font-size="10" fill="#57534e">Projected wireframe of the exported mesh; internal holes appear as edges. Origin (0,0,0) is marked in blue.</text>
   <text x="40" y="436" font-size="10" fill="#57534e">${escapeXml(contract.mating)}</text>
-  <text x="40" y="454" font-size="10" fill="#b91c1c">Not a tolerance drawing. Verify dimensions on a test print; the STL carries no units or metadata.</text>
+  <text x="40" y="454" font-size="10" fill="#b91c1c">Not a tolerance drawing. Verify dimensions on a test piece; the STL carries no units or metadata.</text>
   <text x="40" y="472" font-size="10" fill="#57534e">Fit allowance: ${escapeXml(contract.fitAllowance)}</text>
   <text x="40" y="490" font-size="10" fill="#57534e">Limitation: ${escapeXml(contract.limitations[0] ?? "")}</text>
   <line x1="40" y1="508" x2="780" y2="508" stroke="#e7e3da"/>

@@ -11,8 +11,8 @@ forty-six and carry no mark.
 Selection favoured parts where:
 
 1. the geometry can be generated exactly from a handful of numbers, with a
-   closed-form check the app can print next to the preview;
-2. the result is a single closed shell that prints without support in at least
+   closed-form check the app can verify next to the preview;
+2. the result is a single closed shell that can be made without a fixture in at least
    one orientation;
 3. the part is recognisable and useful on its own, not a fragment of a larger
    assembly;
@@ -84,14 +84,14 @@ Selection favoured parts where:
 46. Chain guide — a curved shoe that wraps the chain.
 47. Chain tensioner block — a slotted slider with a wear face.
 48. Belt clamp — a plate with a toothed grip for an open belt.
-49. Belt splice — a finger joint for a printed belt.
+49. Belt splice — a finger joint for a fabricated belt.
 50. Cable pulley block — two cheeks and a sheave.
 51. Snatch block — a pulley that opens on one side.
 52. Chainring — a bicycle chainring with a four-arm spider.
 53. Cassette cog — a single splined cog.
 54. Freewheel body — a ratchet inside a sprocket.
 55. Timing-belt idler — a toothed idler that keeps the belt in phase.
-56. Flat-belt splice comb — the interlocking half of a printed belt joint.
+56. Flat-belt splice comb — the interlocking half of a fabricated belt joint.
 
 ## 3. Shafts, hubs, couplings and bearings (28)
 
@@ -184,7 +184,7 @@ Selection favoured parts where:
 137. Tap wrench body — a T-handle with a square collet.
 138. Clamp knob — a knob with a threaded insert pocket.
 139. Index knob — a spring-detent knob.
-140. Knob with a scale — a grip with a printed degree ring.
+140. Knob with a scale — a grip with a marked degree ring.
 
 ## 6. Plates, brackets and enclosures (30)
 
@@ -205,7 +205,7 @@ Selection favoured parts where:
 155. DIN rail clip — a spring clip for a 35 mm rail.
 156. Cable gland plate — a plate with a row of strain-relief holes.
 157. Cable comb — a plate with slots for a wire harness.
-158. Strain relief — a printed two-part cable clamp.
+158. Strain relief — a two-part cable clamp.
 159. Panel mount — a rectangular bezel with screw tabs.
 160. VESA plate — a 75/100 mm mounting square.
 161. Pipe clamp — a saddle clamp for a nominal pipe size.
@@ -354,7 +354,7 @@ Selection favoured parts where:
 289. **Open-end wrench** ✓ — a jaw at 15° with a real opening.
 290. **Box wrench** ✓ — a twelve-point ring on a handle.
 291. Wing nut driver — a socket that seats a wing nut.
-292. Spanner insert — a printed jaw that takes a hex bit.
+292. Spanner insert — a jaw that takes a hex bit.
 293. Socket — a hex or double-hex socket with a square drive.
 294. Bit holder — a 1/4 in hex bit holder.
 295. Screwdriver bit — a flat or Phillips bit.

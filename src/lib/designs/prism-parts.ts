@@ -61,7 +61,7 @@ export const wingNut: AnyDesign = defineDesign({
   ],
   notes: [
     "The outline radius follows `waist/2 + (span/2 − waist/2)(1 − cos(wings·θ))/2`, which puts a wing at every half period and a smooth waist between them. The bore is a plain through-hole, sized for the stud rather than the thread.",
-    "Print a wing nut on its face with the wings in the bed plane. Layer lines then run along the wings instead of across them, which is where a printed wing usually splits.",
+    "Make a wing nut on its face with the wings in the base plane. Process marks then run along the wings instead of across them, which is where a wing usually splits.",
   ],
   header: "Wing Nut Designer - units: mm",
   fields: [
@@ -229,7 +229,7 @@ export const knurledKnob: AnyDesign = defineDesign({
   family: "fixings",
   eyebrow: "Straight knurl",
   blurb: "A cylindrical knob with a straight-knurled grip band.",
-  lede: "Straight knurling is a ring of narrow axial ridges, so it is a prism and prints cleanly. Set the knob diameter, how many ridges you want and how deep they cut, and the grip is cut all the way through the height.",
+  lede: "Straight knurling is a ring of narrow axial ridges, so it is a prism and makes cleanly. Set the knob diameter, how many ridges you want and how deep they cut, and the grip is cut all the way through the height.",
   chips: [
     { label: "Ridges", value: "8 – 72" },
     { label: "Knob Ø", value: "10 – 140 mm" },
@@ -237,7 +237,7 @@ export const knurledKnob: AnyDesign = defineDesign({
   ],
   notes: [
     "The ridge tips sit on the entered diameter and the roots are one depth inside it. The root land is the root circumference divided by the ridge count, minus the ridge width, so the ridges stay evenly spaced as the count changes.",
-    "Sharp V ridges are hard on the hand and on the printer. A small flat on each ridge, 0.3–0.6 mm wide, gives a grip that is both comfortable and printable.",
+    "Sharp V ridges are hard on the hand and on the tool. A small flat on each ridge, 0.3–0.6 mm wide, gives a grip that is both comfortable and strong enough to hold.",
   ],
   header: "Knurled Knob Designer - units: mm",
   fields: [
@@ -340,16 +340,16 @@ export const openEndWrench: AnyDesign = defineDesign({
   lede: "The jaw is two parallel flats cut into a round head, with a semicircular back so the corners cannot start a crack. Enter the opening, how deep the jaw bites and the handle length; the profile is a single closed outline with no separate head to glue on.",
   chips: [
     { label: "Jaw", value: "4 – 40 mm" },
-    { label: "Length", value: "60 – 180 mm" },
+    { label: "Length", value: "60 – 1000 mm" },
     { label: "Thickness", value: "3 – 20 mm" },
   ],
   notes: [
     "The mouth is a slot of the entered width, cut to the jaw depth and closed by a half-round. The head is a full circle around it, so the two prongs are joined by solid material behind the slot rather than by a thin web.",
-    "Print the wrench flat with the jaw in the bed plane, and use at least four perimeters. A printed open-end wrench is for light assembly work — the jaw will spread before a steel one would round off.",
+    "Make the wrench flat with the jaw in the base plane, and use a substantial wall. An open-end wrench is for light assembly work — the jaw will spread before a steel one would round off.",
   ],
   header: "Open End Wrench Designer - units: mm",
   fields: [
-    { key: "length", label: "Overall length", kind: "length", section: "Wrench", default: "120", min: 60, max: 180 },
+    { key: "length", label: "Overall length", kind: "length", section: "Wrench", default: "120", min: 60, max: 1000 },
     { key: "headDiameter", label: "Head diameter", kind: "length", section: "Wrench", default: "34", min: 12, max: 80 },
     { key: "jawWidth", label: "Jaw opening", kind: "length", section: "Jaw", default: "14", min: 4, max: 40 },
     { key: "jawDepth", label: "Jaw depth", kind: "length", section: "Jaw", default: "18", min: 4, max: 50 },
@@ -367,7 +367,7 @@ export const openEndWrench: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "length", "Overall length", p.lengthMm, 60, 180);
+    pushRange(errors, units, "length", "Overall length", p.lengthMm, 60, 1000);
     pushRange(errors, units, "headDiameter", "Head diameter", p.headDiameterMm, 12, 80);
     pushRange(errors, units, "jawWidth", "Jaw opening", p.jawWidthMm, 4, 40);
     pushRange(errors, units, "jawDepth", "Jaw depth", p.jawDepthMm, 4, 50);
@@ -440,15 +440,15 @@ export const boxWrench: AnyDesign = defineDesign({
   chips: [
     { label: "Opening", value: "6 – 36 mm AF" },
     { label: "Points", value: "6 or 12" },
-    { label: "Length", value: "70 – 180 mm" },
+    { label: "Length", value: "70 – 1000 mm" },
   ],
   notes: [
     "Across-flats sets the apothem of the opening, so its circumradius is AF/2 / cos(π/n). A twelve-point ring lets you re-engage every 30°, which matters where the handle cannot swing far.",
-    "The ring has to be deep enough to take the nut's full height, but a printed ring is strongest when its wall is at least 3 mm. If the fastener is tight, print the ring in PETG rather than PLA.",
+    "The ring has to be deep enough to take the nut's full height, but a ring is strongest when its wall is at least 3 mm. If the fastener is tight, make the ring in a tough material rather than a rigid material.",
   ],
   header: "Box End Wrench Designer - units: mm",
   fields: [
-    { key: "length", label: "Overall length", kind: "length", section: "Wrench", default: "140", min: 70, max: 180 },
+    { key: "length", label: "Overall length", kind: "length", section: "Wrench", default: "140", min: 70, max: 1000 },
     { key: "headDiameter", label: "Head diameter", kind: "length", section: "Wrench", default: "36", min: 14, max: 90 },
     { key: "opening", label: "Across flats", kind: "length", section: "Ring", default: "16", min: 4, max: 36 },
     { key: "points", label: "Points", kind: "select", section: "Ring", default: "12", options: [
@@ -469,7 +469,7 @@ export const boxWrench: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "length", "Overall length", p.lengthMm, 70, 180);
+    pushRange(errors, units, "length", "Overall length", p.lengthMm, 70, 1000);
     pushRange(errors, units, "headDiameter", "Head diameter", p.headDiameterMm, 14, 90);
     pushRange(errors, units, "opening", "Across flats", p.openingMm, 4, 36);
     pushInteger(errors, "points", "Points", p.points, 6, 12);
@@ -487,7 +487,7 @@ export const boxWrench: AnyDesign = defineDesign({
       errors.push({ field: "points", level: "error", message: "Use a six- or twelve-point opening." });
     }
     if (p.lengthMm < p.headDiameterMm * 1.4) errors.push({ field: "length", level: "error", message: "The handle is shorter than the head." });
-    if (p.openingMm > 30) pushWarning(warnings, "opening", "Above 30 mm the printed ring needs a lot of torque to survive.");
+    if (p.openingMm > 30) pushWarning(warnings, "opening", "Above 30 mm the ring needs a lot of torque to survive.");
 
     return {
       errors,
@@ -546,7 +546,7 @@ export const chainLink: AnyDesign = defineDesign({
   ],
   notes: [
     "The outline is two equal end arcs joined by their common external tangents, so the plate is a true stadium and the wall is constant. Pin holes are centred on the pitch points; the wall at each hole is half the plate width minus the pin radius.",
-    "Print link plates in the flat orientation with the pin axis vertical. The plate is a tension part, so orient the layers along its length — never across the two holes.",
+    "Make link plates in the flat orientation with the pin axis vertical. The plate is a tension part, so orient the grain along its length — never across the two holes.",
   ],
   header: "Chain Link Plate Designer - units: mm",
   fields: [
@@ -637,7 +637,7 @@ export const sawBlade: AnyDesign = defineDesign({
   lede: "Teeth are cut with a hooked leading face and a straight clearance back, then an arbor hole is bored through the plate. Set the diameter, tooth count, tooth depth and hook angle; the gullet geometry follows from them.",
   chips: [
     { label: "Teeth", value: "6 – 80" },
-    { label: "Blade Ø", value: "40 – 180 mm" },
+    { label: "Blade Ø", value: "40 – 1000 mm" },
     { label: "Hook", value: "0 – 30°" },
   ],
   notes: [
@@ -646,7 +646,7 @@ export const sawBlade: AnyDesign = defineDesign({
   ],
   header: "Saw Blade Designer - units: mm",
   fields: [
-    { key: "diameter", label: "Blade diameter", kind: "length", section: "Blade", default: "100", min: 40, max: 180 },
+    { key: "diameter", label: "Blade diameter", kind: "length", section: "Blade", default: "100", min: 40, max: 1000 },
     { key: "teeth", label: "Teeth", kind: "count", section: "Blade", default: "24", min: 6, max: 80 },
     { key: "toothDepth", label: "Tooth depth", kind: "length", section: "Tooth", default: "6", min: 1, max: 20 },
     { key: "hookAngle", label: "Hook angle", kind: "number", section: "Tooth", default: "12", min: 0, max: 30 },
@@ -672,7 +672,7 @@ export const sawBlade: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "diameter", "Blade diameter", p.diameterMm, 40, 180);
+    pushRange(errors, units, "diameter", "Blade diameter", p.diameterMm, 40, 1000);
     pushInteger(errors, "teeth", "Teeth", p.teeth, 6, 80);
     pushRange(errors, units, "toothDepth", "Tooth depth", p.toothDepthMm, 1, 20);
     pushRange(errors, units, "hookAngle", "Hook angle", p.hookAngleDeg, 0, 30, false);
@@ -772,16 +772,16 @@ export const handwheel: AnyDesign = defineDesign({
   lede: "A rim, a hub and a set of radial spokes, with the gaps cut right through. Set the rim width, spoke width and count and the cut-outs follow; each opening is an annular sector, so the spokes are evenly loaded.",
   chips: [
     { label: "Spokes", value: "3 – 10" },
-    { label: "Wheel Ø", value: "40 – 180 mm" },
+    { label: "Wheel Ø", value: "40 – 1000 mm" },
     { label: "Rim", value: "3 – 30 mm" },
   ],
   notes: [
     "The openings are separate through-holes between the hub and the rim, which is why the wheel is one connected shell rather than a set of glued spokes. Each gap is bounded by two circular arcs and two radial spoke sides.",
-    "A printed handwheel is strongest when it is printed flat: the layers then run in the plane of the wheel and the spokes are loaded along their length rather than across the layer bonds.",
+    "A handwheel is strongest when it is made flat: the material grain then runs in the plane of the wheel and the spokes are loaded along their length rather than across the bonds.",
   ],
   header: "Handwheel Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Wheel diameter", kind: "length", section: "Wheel", default: "100", min: 40, max: 180 },
+    { key: "outerDiameter", label: "Wheel diameter", kind: "length", section: "Wheel", default: "100", min: 40, max: 1000 },
     { key: "hubDiameter", label: "Hub diameter", kind: "length", section: "Hub", default: "30", min: 8, max: 100 },
     { key: "bore", label: "Bore", kind: "length", section: "Hub", default: "10", min: 1, max: 60 },
     { key: "rimWidth", label: "Rim width", kind: "length", section: "Rim", default: "10", min: 3, max: 30 },
@@ -801,7 +801,7 @@ export const handwheel: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Wheel diameter", p.outerDiameterMm, 40, 180);
+    pushRange(errors, units, "outerDiameter", "Wheel diameter", p.outerDiameterMm, 40, 1000);
     pushRange(errors, units, "hubDiameter", "Hub diameter", p.hubDiameterMm, 8, 100);
     pushRange(errors, units, "bore", "Bore", p.boreMm, 1, 60);
     pushRange(errors, units, "rimWidth", "Rim width", p.rimWidthMm, 3, 30);
@@ -884,10 +884,10 @@ export const flange: AnyDesign = defineDesign({
   family: "fixings",
   eyebrow: "Bolt circle",
   blurb: "A bored disc with an evenly spaced bolt circle.",
-  lede: "Set the outer diameter, the bore and the bolt circle, and the holes are placed at exact angular spacing around it. The readout gives the edge and web walls, so you can see whether the pattern leaves enough material before you print.",
+  lede: "Set the outer diameter, the bore and the bolt circle, and the holes are placed at exact angular spacing around it. The readout gives the edge and web walls, so you can see whether the pattern leaves enough material before you make.",
   chips: [
     { label: "Bolts", value: "2 – 12" },
-    { label: "Outer Ø", value: "30 – 180 mm" },
+    { label: "Outer Ø", value: "30 – 1000 mm" },
     { label: "Bolt circle", value: "10 – 170 mm" },
   ],
   notes: [
@@ -896,7 +896,7 @@ export const flange: AnyDesign = defineDesign({
   ],
   header: "Bolt Flange Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Flange", default: "80", min: 30, max: 180 },
+    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Flange", default: "80", min: 30, max: 1000 },
     { key: "bore", label: "Bore", kind: "length", section: "Flange", default: "30", min: 2, max: 120 },
     { key: "boltCircle", label: "Bolt circle", kind: "length", section: "Bolts", default: "60", min: 10, max: 170 },
     { key: "boltHole", label: "Bolt hole", kind: "length", section: "Bolts", default: "8", min: 2, max: 20 },
@@ -914,7 +914,7 @@ export const flange: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerDiameterMm, 30, 180);
+    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerDiameterMm, 30, 1000);
     pushRange(errors, units, "bore", "Bore", p.boreMm, 2, 120);
     pushRange(errors, units, "boltCircle", "Bolt circle", p.boltCircleMm, 10, 170);
     pushRange(errors, units, "boltHole", "Bolt hole", p.boltHoleMm, 2, 20);
@@ -987,20 +987,20 @@ export const mountingPlate: AnyDesign = defineDesign({
   family: "fixings",
   eyebrow: "Rounded corners",
   blurb: "A rounded plate with four corner holes and a matching inset.",
-  lede: "A rectangular plate with radiused corners and a bolt hole near each one. Length, width, corner radius and hole inset are all live; the designer checks that every hole clears the rounded corner by a printable wall.",
+  lede: "A rectangular plate with radiused corners and a bolt hole near each one. Length, width, corner radius and hole inset are all live; the designer checks that every hole clears the rounded corner by a substantial wall.",
   chips: [
-    { label: "Plate", value: "20 – 180 mm" },
+    { label: "Plate", value: "20 – 1000 mm" },
     { label: "Holes", value: "4 corner" },
     { label: "Corner radius", value: "0 – 30 mm" },
   ],
   notes: [
-    "Holes sit at ±(length/2 − inset), ±(width/2 − inset). The corner arcs are tangent to both edges, so a hole near a corner can break out through the arc even when it looks clear on the straight edges — the validator measures the real distance to the finished outline.",
-    "Counterbores and slots are a machining feature rather than a print feature, so this plate keeps plain through-holes. Print it flat; if the part carries a load, add ribs on the underside instead of thickening the whole plate.",
+    "Holes sit at ±(length/2 − inset), ±(width/2 − inset). The corner arcs are tangent to both edges, so a hole near a corner can break out through the arc even when it looks clear on the straight edges — the validator measures the real distance to the outline.",
+    "Counterbores and slots are a machining feature rather than a make feature, so this plate keeps plain through-holes. Make it flat; if the part carries a load, add ribs on the underside instead of thickening the whole plate.",
   ],
   header: "Mounting Plate Designer - units: mm",
   fields: [
-    { key: "length", label: "Length", kind: "length", section: "Plate", default: "100", min: 20, max: 180 },
-    { key: "width", label: "Width", kind: "length", section: "Plate", default: "60", min: 20, max: 180 },
+    { key: "length", label: "Length", kind: "length", section: "Plate", default: "100", min: 20, max: 1000 },
+    { key: "width", label: "Width", kind: "length", section: "Plate", default: "60", min: 20, max: 1000 },
     { key: "cornerRadius", label: "Corner radius", kind: "length", section: "Plate", default: "8", min: 0, max: 30 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Plate", default: "5", min: 2, max: 30 },
     { key: "holeDiameter", label: "Hole diameter", kind: "length", section: "Holes", default: "5", min: 1, max: 20 },
@@ -1017,8 +1017,8 @@ export const mountingPlate: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "length", "Length", p.lengthMm, 20, 180);
-    pushRange(errors, units, "width", "Width", p.widthMm, 20, 180);
+    pushRange(errors, units, "length", "Length", p.lengthMm, 20, 1000);
+    pushRange(errors, units, "width", "Width", p.widthMm, 20, 1000);
     pushRange(errors, units, "cornerRadius", "Corner radius", p.cornerRadiusMm, 0, 30);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2, 30);
     pushRange(errors, units, "holeDiameter", "Hole diameter", p.holeMm, 1, 20);
@@ -1121,7 +1121,7 @@ export const hexNut: AnyDesign = defineDesign({
   ],
   notes: [
     "A regular hexagon with across-flats AF has circumradius AF/√3, because the apothem is AF/2. The outline is generated at that exact radius, so the flats sit at the entered distance rather than being approximated by a circle.",
-    "The bore is a clearance hole for the thread, not a modelled thread. For a printed nut, make the bore 0.3 mm larger than the bolt's major diameter and use a slightly coarser layer height so the flats do not sag.",
+    "The bore is a clearance hole for the thread, not a modelled thread. For a nut, make the bore 0.3 mm larger than the bolt's major diameter and use a slightly coarser surface finish so the flats do not sag.",
   ],
   header: "Hex Nut Designer - units: mm",
   fields: [
@@ -1197,19 +1197,19 @@ export const washer: AnyDesign = defineDesign({
   family: "fixings",
   eyebrow: "Load spreader",
   blurb: "A flat annulus sized by its outside and inside diameters.",
-  lede: "A plain washer is the simplest part in the library and the one most often printed slightly wrong. Set the outside and inside diameters and the thickness, and the annulus is exact — no faceting on either edge.",
+  lede: "A plain washer is the simplest part in the library and the one most often made slightly wrong. Set the outside and inside diameters and the thickness, and the annulus is exact — no faceting on either edge.",
   chips: [
-    { label: "Outer Ø", value: "5 – 180 mm" },
+    { label: "Outer Ø", value: "5 – 1000 mm" },
     { label: "Inner Ø", value: "2 – 120 mm" },
     { label: "Thickness", value: "0.5 – 20 mm" },
   ],
   notes: [
-    "Both circles are true annulus walls: the bore is a second ring with reversed winding, so the hole is exactly the entered diameter and the flat faces stay flat. That makes the washer a good test print for hole shrinkage on a new machine.",
-    "Measure the printed bore before you print a batch. An FDM hole typically comes out 0.1–0.2 mm under size, so a washer that should clear a bolt is often drawn 0.2 mm larger.",
+    "Both circles are true annulus walls: the bore is a second ring with reversed winding, so the hole is exactly the entered diameter and the flat faces stay flat. That makes the washer a good test piece for hole shrinkage on a new machine.",
+    "Measure the bore before you make a batch. A drilled or formed hole typically comes out 0.1–0.2 mm under size, so a washer that should clear a bolt is often drawn 0.2 mm larger.",
   ],
   header: "Washer Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Washer", default: "20", min: 5, max: 180 },
+    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Washer", default: "20", min: 5, max: 1000 },
     { key: "innerDiameter", label: "Inner diameter", kind: "length", section: "Washer", default: "8.4", min: 2, max: 120 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Washer", default: "1.6", min: 0.5, max: 20 },
     { key: "chamfer", label: "Edge break", kind: "length", section: "Washer", default: "0.2", min: 0, max: 2 },
@@ -1223,7 +1223,7 @@ export const washer: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerMm, 5, 180);
+    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerMm, 5, 1000);
     pushRange(errors, units, "innerDiameter", "Inner diameter", p.innerMm, 2, 120);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 0.5, 20);
     pushRange(errors, units, "chamfer", "Edge break", p.chamferMm, 0, 2);

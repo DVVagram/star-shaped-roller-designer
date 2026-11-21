@@ -411,7 +411,7 @@ export default function PropellerBuilder() {
         onExport: handleExport,
         disabled: !validation.ok || !report?.ok,
         note: validation.ok
-          ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer."
+          ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your software."
           : "Export is disabled while the configuration has errors.",
         volume: Number.isFinite(volumeCm3) ? `${formatNumber(volumeCm3, 2)} cm³` : "—",
         triangles: report ? formatNumber(report.triangleCount, 0) : "—",

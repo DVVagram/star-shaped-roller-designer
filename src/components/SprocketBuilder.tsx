@@ -288,7 +288,7 @@ export default function SprocketBuilder() {
             value={values.clearance}
             unit={units}
             onChange={(value) => change("clearance", value)}
-            hint="Per side. 0.1–0.2 mm keeps a printed chain free."
+            hint="Per side. 0.1–0.2 mm keeps a chain free."
             error={errors.get("clearance")}
           />
           <div className="rounded-xl border border-line bg-paper/60 px-3 py-2.5">
@@ -469,7 +469,7 @@ export default function SprocketBuilder() {
         onExport: handleExport,
         disabled: !validation.ok || !report?.ok,
         note: validation.ok
-          ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer."
+          ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your software."
           : "Export is disabled while the configuration has errors.",
         volume: Number.isFinite(volumeCm3) ? `${formatNumber(volumeCm3, 2)} cm³` : "—",
         triangles: report ? formatNumber(report.triangleCount, 0) : "—",

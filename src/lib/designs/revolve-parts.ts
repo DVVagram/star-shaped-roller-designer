@@ -42,7 +42,7 @@ export const testTube: AnyDesign = defineDesign({
   ],
   notes: [
     "The bottom is a quarter arc of the outside radius, and the bore is the same arc at the inner radius, so the wall stays constant around the curve. The rim is a flat annulus.",
-    "Printed tubes are not autoclavable and not solvent resistant. Use them for dry samples, rinsing or a pen holder, not for chemistry that matters.",
+    "Finished tubes are not autoclavable and not solvent resistant. Use them for dry samples, rinsing or a pen holder, not for chemistry that matters.",
   ],
   header: "Test Tube Designer - units: mm",
   fields: [
@@ -129,7 +129,7 @@ export const centrifugeTube: AnyDesign = defineDesign({
   ],
   notes: [
     "The cone runs from the tube wall to a small radius at the tip, and the bore follows the same cone offset by the wall. The tip is left with a solid wall thickness rather than a point.",
-    "Never spin a printed tube in a real centrifuge: the loads are far beyond a layer bond. This is a handling and storage tube with the right shape.",
+    "Never spin a tube in a real centrifuge: the loads are far beyond a material bond. This is a handling and storage tube with the right shape.",
   ],
   header: "Centrifuge Tube Designer - units: mm",
   fields: [
@@ -229,7 +229,7 @@ export const erlenmeyerFlask: AnyDesign = defineDesign({
   ],
   notes: [
     "The body is a truncated cone from the flat base to the shoulder, then a straight neck to the rim. The bore follows the same two sections offset by the wall, so the cone and the neck share one profile.",
-    "A printed flask is fine for mixing and storage but not for heating. If it has to take a stopper, size the neck to the stopper's small diameter and let the taper do the sealing.",
+    "A flask is fine for mixing and storage but not for heating. If it has to take a stopper, size the neck to the stopper's small diameter and let the taper do the sealing.",
   ],
   header: "Erlenmeyer Flask Designer - units: mm",
   fields: [
@@ -333,7 +333,7 @@ export const piston: AnyDesign = defineDesign({
   ],
   notes: [
     "The grooves are square notches in the outer profile, each of an exact width and depth and spaced by the groove pitch. The skirt is a counter-bore from the bottom, so the crown stays solid above the ring land.",
-    "A printed piston needs clearance: make it 0.2–0.4 mm under the bore, and do not expect the rings to seal. It is for a model engine or a display, not a compressor.",
+    "A piston needs clearance: make it 0.2–0.4 mm under the bore, and do not expect the rings to seal. It is for a model engine or a display, not a compressor.",
   ],
   header: "Piston Designer - units: mm",
   fields: [
@@ -444,7 +444,7 @@ export const oringPlug: AnyDesign = defineDesign({
   ],
   notes: [
     "The groove is a rectangle in the profile: its width, depth and distance from the flange are all entered, so an O-ring of known section can be given the right squeeze. The groove floor is flat, which is what an O-ring wants.",
-    "A printed groove is not smooth enough to seal on its own. Smear silicone grease on the ring and use a slightly deeper groove than the handbook value, because the first layer squashes out.",
+    "A groove is not smooth enough to seal on its own. Smear silicone grease on the ring and use a slightly deeper groove than the handbook value, because the first contact can squash it.",
   ],
   header: "O-Ring Plug Designer - units: mm",
   fields: [
@@ -536,7 +536,7 @@ export const caulkingNozzle: AnyDesign = defineDesign({
   family: "vessels",
   eyebrow: "Cone tip",
   blurb: "A tapered tube with a narrow cuttable tip.",
-  lede: "A cone from the cartridge thread down to a small tip, with a constant wall so it stays printable at the point.",
+  lede: "A cone from the cartridge thread down to a small tip, with a constant wall so it stays sound at the point.",
   chips: [
     { label: "Base Ø", value: "10 – 50 mm" },
     { label: "Tip Ø", value: "2 – 16 mm" },
@@ -544,7 +544,7 @@ export const caulkingNozzle: AnyDesign = defineDesign({
   ],
   notes: [
     "The tube is a cone outside and inside, so the bore tapers with the wall and the bead size is set by where you cut the tip. The tip is left blunt with the wall thickness, not a knife edge.",
-    "Cut the tip square with a sharp blade and mould the bead before it skins. A printed nozzle is a one-use part in most sealants; make a few.",
+    "Cut the tip square with a sharp blade and mould the bead before it skins. A nozzle is a one-use part in most sealants; make a few.",
   ],
   header: "Caulking Nozzle Designer - units: mm",
   fields: [
@@ -630,7 +630,7 @@ export const golfTee: AnyDesign = defineDesign({
   ],
   notes: [
     "The cup is an annular recess in the top face and the point is a cone to the axis, so the tee is one solid with a real seat. The shank is a straight cylinder between them.",
-    "A printed tee survives a few drives at most. Print it in PETG with the shank vertical and use it for practice rather than competition.",
+    "A tee survives a few drives at most. Make it in a tough material with the shank vertical and use it for practice rather than competition.",
   ],
   header: "Golf Tee Designer - units: mm",
   fields: [
@@ -720,7 +720,7 @@ export const dowelPin: AnyDesign = defineDesign({
   ],
   notes: [
     "Both ends are chamfered in the profile, which is an exact 45° break because the pin is a cylinder. The chamfer is limited so the two ends cannot meet.",
-    "A printed pin is a locating pin, not a bearing. Print it a little oversize and sand it to a press fit, or use it as a sacrificial alignment pin.",
+    "A pin is a locating pin, not a bearing. Make it a little oversize and sand it to a press fit, or use it as a sacrificial alignment pin.",
   ],
   header: "Dowel Pin Designer - units: mm",
   fields: [
@@ -801,7 +801,7 @@ export const furnitureFoot: AnyDesign = defineDesign({
   ],
   notes: [
     "The foot tapers from the top down, and the bottom face has a recess for a self-adhesive felt pad. Both tapers and the recess are one profile, so the foot is a single solid.",
-    "A printed foot creeps under a heavy leg. Use a thick wall and a wide top, and glue the felt in rather than relying on the adhesive alone.",
+    "A foot creeps under a heavy leg. Use a thick wall and a wide top, and glue the felt in rather than relying on the adhesive alone.",
   ],
   header: "Furniture Foot Designer - units: mm",
   fields: [
@@ -892,7 +892,7 @@ export const casterWheel: AnyDesign = defineDesign({
   ],
   notes: [
     "The tread groove is a pair of shoulders turned into the rim, and the bore is a straight through-hole with a chamfer on both sides. The result is one profile with no separate hub.",
-    "A printed wheel runs best on a smooth floor and a metal axle. Make the bore 0.2 mm over the axle and let the wheel turn on the axle rather than on a printed bearing.",
+    "A wheel runs best on a smooth floor and a metal axle. Make the bore 0.2 mm over the axle and let the wheel turn on the axle rather than on a bearing.",
   ],
   header: "Caster Wheel Designer - units: mm",
   fields: [

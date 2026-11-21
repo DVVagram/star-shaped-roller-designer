@@ -31,8 +31,8 @@ export const compressionSpring: AnyDesign = defineDesign({
     { label: "Wire", value: "0.5 – 10 mm" },
   ],
   notes: [
-    "The mean diameter is the outside diameter minus one wire, and the rate is `k = G·d⁴ / (8·D³·n)` with G = 3.5 GPa for PLA. That is the same equation a metal spring uses; only the shear modulus changes, which is why a printed spring is much softer than a steel one of the same size.",
-    "A printed spring wants a pitch of at least 1.5 wire diameters so the coils cannot fuse, and it should be compressed only to about 25 % of its free length. Print it upright with the wire in the bed — supports inside the coils are impossible to remove.",
+    "The mean diameter is the outside diameter minus one wire, and the rate is `k = G·d⁴ / (8·D³·n)` with G = 3.5 GPa (an illustrative polymer modulus). That is the same equation a metal spring uses; only the shear modulus changes, which is why a spring is much softer than a steel one of the same size.",
+    "A spring wants a pitch of at least 1.5 wire diameters so the coils cannot fuse, and it should be compressed only to about 25 % of its free length. Make it with the axis vertical and the wire supported along its length; anything left inside the coils is impossible to remove.",
   ],
   header: "Compression Spring Designer - units: mm",
   fields: [
@@ -62,9 +62,9 @@ export const compressionSpring: AnyDesign = defineDesign({
     if (mean <= p.wireMm * 1.2) errors.push({ field: "wireDiameter", level: "error", message: "The wire leaves no room for the coil." });
     if (p.pitchMm < p.wireMm * 1.15) errors.push({ field: "pitch", level: "error", message: "The coils touch — increase the pitch above one wire diameter." });
     if (p.pitchMm > p.outerMm) pushWarning(warnings, "pitch", "A pitch wider than the spring diameter makes a very open coil.");
-    if (p.coils > 20) pushWarning(warnings, "coils", "Above twenty coils the mesh gets large and the spring is hard to print cleanly.");
+    if (p.coils > 20) pushWarning(warnings, "coils", "Above twenty coils the mesh gets large and the spring is hard to make cleanly.");
 
-    const modulus = 3500; // N/mm², PLA
+    const modulus = 3500; // N/mm², illustrative polymer shear modulus
     const rate = (modulus * p.wireMm ** 4) / (8 * mean ** 3 * p.coils);
     const index = mean / p.wireMm;
 
@@ -80,7 +80,7 @@ export const compressionSpring: AnyDesign = defineDesign({
         { label: "Free length", value: measure(freeLength, units), source: "calc" },
         { label: "Spring index", value: round(index, 2), source: "calc" },
         {
-          label: "Rate (PLA)",
+          label: "Rate (assumed modulus)",
           value: units === "in" ? `${round(rate * 5.7101, 2)} lb/in` : `${round(rate, 3)} N/mm`,
           source: "calc",
         },
@@ -126,7 +126,7 @@ export const pipeElbow: AnyDesign = defineDesign({
   ],
   notes: [
     "The cross-section is an annulus perpendicular to the path at every station, so the bore stays round around the bend. The inside of the bend is a real torus surface, which is why the wall thickness stays constant even when the bend radius is tight.",
-    "Keep the bend radius at least 1.5 pipe diameters or the inner wall pinches. Print with the bend flat on the bed and the axis vertical at both ends if possible; a bend printed upright needs support under the outside of the arc.",
+    "Keep the bend radius at least 1.5 pipe diameters or the inner wall pinches. Make it with the bend flat and the axis vertical at both ends if possible; a bend formed upright needs a fixture under the outside of the arc.",
   ],
   header: "Pipe Elbow Designer - units: mm",
   fields: [

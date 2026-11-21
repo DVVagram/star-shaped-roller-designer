@@ -19,7 +19,7 @@ export function CapabilityBadge({
   );
 }
 
-/** Capability, required mate and unverified properties, shown before the builder. */
+/** Capability, required mate and unverified properties, shown below the builder. */
 export default function CapabilityNotice({ contract }: { contract: DesignContract }) {
   const meta = CAPABILITIES[contract.capability];
   return (
@@ -64,7 +64,7 @@ export default function CapabilityNotice({ contract }: { contract: DesignContrac
         <div className="mt-4 grid gap-4 border-t border-line pt-4 text-xs sm:grid-cols-2">
           <div>
             <h3 className="font-semibold uppercase tracking-[0.1em] text-red-800">
-              Limitations — read before printing
+              Limitations — read before making
             </h3>
             <ul className="mt-2 space-y-1.5 leading-relaxed text-muted">
               {contract.limitations.map((item) => (
@@ -92,7 +92,7 @@ export default function CapabilityNotice({ contract }: { contract: DesignContrac
               ))}
             </ul>
             <p className="mt-2 leading-relaxed text-muted/80">
-              The app checks only mesh topology and the 180 mm envelope. A watertight mesh is not
+              The app checks only mesh topology and overall dimensions. A watertight mesh is not
               a functional, fit or safety test.
             </p>
           </div>

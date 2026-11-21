@@ -51,7 +51,7 @@ backlog, not shipped designs.
 0043 Weld nut — a nut with tabs that weld to a steel frame.
 0044 Cage nut — a clip nut for a square rack hole.
 0045 Rivet nut — a blind nut that sets in thin sheet.
-0046 Insert nut — a heat-set nut for a printed boss.
+0046 Insert nut — a heat-set nut for a plastic boss.
 0047 Square nut — a nut that cannot turn in a square pocket.
 0048 Hex nut — a standard nut sized by the spanner.
 0049 Flange nut — a nut with a built-in washer face.
@@ -145,7 +145,7 @@ backlog, not shipped designs.
 0134 Yoke bracket — a bracket that carries a rotating yoke.
 0135 Pivot bracket — a plate with a pivot boss for a lever.
 0136 **★ Hinge leaf** — a flat hinge half with screw holes and a pin line.
-0137 Hinge knuckle — a barrel that forms the pivot of a printed hinge.
+0137 Hinge knuckle — a barrel that forms the pivot of a hinge.
 0138 Piano hinge leaf — a long leaf with a row of screw holes.
 0139 Butt hinge plate — a square hinge plate for a cabinet door.
 0140 Strap hinge — a long strap that carries a gate.

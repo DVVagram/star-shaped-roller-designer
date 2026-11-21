@@ -162,8 +162,8 @@ function inspectStl(file, label) {
     header,
     finite,
     size,
-    fits: size.every((value) => value <= 180.5),
-    capability: /FIT PROTOTYPE/i.test(header),
+    sized: size.every((value) => value > 0),
+    capability: /^(SHAPE MODEL|FIT PROTOTYPE|FUNCTIONAL CANDIDATE|HIGH-RISK USE EXCLUDED)/i.test(header),
   };
 }
 
@@ -210,7 +210,7 @@ try {
     libraryStl.count > 0 &&
       libraryStl.bytes === libraryStl.expected &&
       libraryStl.finite &&
-      libraryStl.fits &&
+      libraryStl.sized &&
       libraryStl.capability &&
       libraryStl.size.every((value) => value > 5),
     libraryStl,
@@ -233,6 +233,53 @@ try {
     Object.values(librarySvg).every(Boolean),
     { file: path.basename(librarySvgFile), ...librarySvg },
   );
+
+  const bannedCopy = /build volume|3D-printable|print bed|slicer|printer|filament|\bPLA\b|\bPETG\b/i;
+  const libraryCopy = await evaluate("document.body.innerText");
+  check("library-copy-neutral", !bannedCopy.test(libraryCopy), {
+    matches: libraryCopy.match(bannedCopy)?.[0] ?? null,
+  });
+
+  /* ------------------------------------------- oversized model, no build limit */
+  const oversizedDir = path.join(ROOT, "oversized");
+  await setDownloadDir(oversizedDir);
+  await navigate(`${BASE}/#/index-plate`);
+  await waitFor("Boolean(document.querySelector('#index-plate-outerDiameter'))");
+  await sleep(700);
+
+  const oversizedTyped = await evaluate(`(() => {
+    const input = document.querySelector('#index-plate-outerDiameter');
+    if (!input) return false;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+    setter.call(input, '300');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    return true;
+  })()`);
+  if (!oversizedTyped) throw new Error("Could not type an oversized plate diameter");
+  await sleep(900);
+
+  const oversizedReady = await evaluate(`(() => {
+    const button = [...document.querySelectorAll('button')].find((b) =>
+      /Download STL/.test(b.textContent || ''),
+    );
+    return Boolean(button) && !button.disabled;
+  })()`);
+  check("oversized-export-enabled", oversizedReady, { oversizedReady });
+
+  if (oversizedReady) {
+    await clickText("Download STL");
+    const oversizedStlFile = await waitFile(oversizedDir, ".stl");
+    const oversizedStl = inspectStl(oversizedStlFile, path.basename(oversizedStlFile));
+    check(
+      "oversized-stl-not-blocked",
+      oversizedStl.count > 0 &&
+        oversizedStl.bytes === oversizedStl.expected &&
+        oversizedStl.finite &&
+        oversizedStl.capability &&
+        oversizedStl.size[0] > 299,
+      oversizedStl,
+    );
+  }
 
   /* ------------------------------------------------------------- legacy page */
   const legacyDir = path.join(ROOT, "legacy");
@@ -279,7 +326,7 @@ try {
     legacyStl.count > 0 &&
       legacyStl.bytes === legacyStl.expected &&
       legacyStl.finite &&
-      legacyStl.fits &&
+      legacyStl.sized &&
       legacyStl.capability &&
       legacyStl.size.some((value) => value > 75 && value < 92),
     legacyStl,
@@ -302,6 +349,11 @@ try {
     Object.values(legacySvg).every(Boolean),
     { file: path.basename(legacySvgFile), ...legacySvg },
   );
+
+  const legacyCopy = await evaluate("document.body.innerText");
+  check("legacy-copy-neutral", !bannedCopy.test(legacyCopy), {
+    matches: legacyCopy.match(bannedCopy)?.[0] ?? null,
+  });
 } catch (error) {
   check("download-harness", false, String(error));
 }

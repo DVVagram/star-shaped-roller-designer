@@ -417,7 +417,7 @@ export default function StarBuilder() {
           </button>
           <p className="mt-2 text-center text-[11px] leading-relaxed text-muted">
             {validation.ok
-              ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer."
+              ? "Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your software."
               : "Export is disabled while the configuration has errors."}
           </p>
 
@@ -471,7 +471,7 @@ export default function StarBuilder() {
               ●
             </span>
             {watertight
-              ? "Mesh topology and 180 mm envelope verified — not a fit or safety test"
+              ? "Mesh topology verified — not a fit or safety test"
               : "Mesh not verified — export blocked"}
           </p>
 

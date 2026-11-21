@@ -42,7 +42,7 @@ export const incenseHolder: AnyDesign = defineDesign({
   ],
   notes: [
     "The socket is a cone rather than a straight hole, so the stick wedges somewhere along it instead of dropping through. Its depth is kept below the holder height, which leaves a solid floor under the stick and stops ash falling through.",
-    "Print it in a heat-resistant filament and put a metal or ceramic dish underneath: a printed holder is fine for the stick but not for a hot ash fall. A wider base is worth more than a taller socket for stability.",
+    "Make it in a heat-resistant material and put a metal or ceramic dish underneath: a holder is fine for the stick but not for a hot ash fall. A wider base is worth more than a taller socket for stability.",
   ],
   header: "Incense Holder Designer - units: mm",
   fields: [
@@ -128,17 +128,17 @@ export const plantSaucer: AnyDesign = defineDesign({
   use: "Standing a houseplant pot on a shelf or a windowsill without water marking the surface.",
   notesTitle: "How the rim holds the water",
   chips: [
-    { label: "Saucer Ø", value: "60 – 180 mm" },
+    { label: "Saucer Ø", value: "60 – 1000 mm" },
     { label: "Height", value: "5 – 30 mm" },
     { label: "Wall", value: "2 – 6 mm" },
   ],
   notes: [
-    "The inside floor sits one floor-thickness above the base and the rim rises to the full height, so the dish holds a real volume. The rim is a straight wall with no undercut, which means the saucer prints without support and cleans easily.",
-    "Print it in PETG if it will sit in sunlight; PLA creeps under a heavy pot on a warm windowsill. A saucer that is too shallow for the pot's drainage rate is worse than none, so size the height for the pot, not the shelf.",
+    "The inside floor sits one floor-thickness above the base and the rim rises to the full height, so the dish holds a real volume. The rim is a straight wall with no undercut, which means the saucer makes without a fixture and cleans easily.",
+    "Make it in a tough material if it will sit in sunlight; a rigid material creeps under a heavy pot on a warm windowsill. A saucer that is too shallow for the pot's drainage rate is worse than none, so size the height for the pot, not the shelf.",
   ],
   header: "Plant Saucer Designer - units: mm",
   fields: [
-    { key: "diameter", label: "Saucer diameter", kind: "length", section: "Saucer", default: "140", min: 60, max: 180 },
+    { key: "diameter", label: "Saucer diameter", kind: "length", section: "Saucer", default: "140", min: 60, max: 1000 },
     { key: "height", label: "Rim height", kind: "length", section: "Saucer", default: "14", min: 5, max: 30 },
     { key: "wall", label: "Rim wall", kind: "length", section: "Saucer", default: "3", min: 2, max: 6 },
     { key: "floor", label: "Floor thickness", kind: "length", section: "Saucer", default: "2.5", min: 1.5, max: 6 },
@@ -152,7 +152,7 @@ export const plantSaucer: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "diameter", "Saucer diameter", p.diameterMm, 60, 180);
+    pushRange(errors, units, "diameter", "Saucer diameter", p.diameterMm, 60, 1000);
     pushRange(errors, units, "height", "Rim height", p.heightMm, 5, 30);
     pushRange(errors, units, "wall", "Rim wall", p.wallMm, 2, 6);
     pushRange(errors, units, "floor", "Floor thickness", p.floorMm, 1.5, 6);
@@ -224,7 +224,7 @@ export const teaLightCup: AnyDesign = defineDesign({
   ],
   notes: [
     "The recess is a blind bore from the top, with a flat floor that supports the whole tea light cup. The wall between the recess and the outside is reported, and the floor is kept thin enough that the candle sits down inside the holder rather than on top of it.",
-    "Print it in a metal-filled or heat-resistant filament if the candle burns all the way down; a plain PLA cup softens under a hot aluminium case. Never leave a burning candle unattended, and keep the holder on a heat-proof surface.",
+    "Make it in a heat-resistant material if the candle burns all the way down; a plain rigid-material cup softens under a hot aluminium case. Never leave a burning candle unattended, and keep the holder on a heat-proof surface.",
   ],
   header: "Tea Light Cup Designer - units: mm",
   fields: [
@@ -313,7 +313,7 @@ export const centeringCone: AnyDesign = defineDesign({
   ],
   notes: [
     "The bore is a through-hole, so a bolt or a shaft can pass through the cone while the outside taper does the centring. The wall at the small end is checked, which is the limit on how much the cone can be tapered before it becomes a thin shell.",
-    "Print it with the axis vertical and the small end up; the taper then prints without support. A centring cone is a guide, not a load-bearing wedge, so tighten the real fixing before the cone takes any force.",
+    "Make it with the axis vertical and the small end up; the taper can be formed without a fixture. A centring cone is a guide, not a load-bearing wedge, so tighten the real fixing before the cone takes any force.",
   ],
   header: "Centering Cone Designer - units: mm",
   fields: [

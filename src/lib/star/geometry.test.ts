@@ -217,7 +217,7 @@ describe("rectangular flaps", () => {
     }
   });
 
-  it("rejects a flap that does not fit the core or the printer", () => {
+  it("rejects a flap that does not fit the core or the wheel", () => {
     const wide = validateStar({ ...FLAPS, tipWidthMm: 60 }, { unit: "mm" });
     expect(wide.ok).toBe(false);
     expect(wide.errors.some((issue) => issue.field === "tipWidth")).toBe(true);

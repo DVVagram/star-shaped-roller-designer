@@ -55,7 +55,7 @@ export const saddleClamp: AnyDesign = defineDesign({
   ],
   notes: [
     "The seat is a semicircle centred on the top edge, so the cable sits half-buried in the plate and the screw line stays below it. The plate width is checked against the seat plus two screw bosses before the outline is built.",
-    "Print it with the plate flat and the seat opening upward. The screws compress the plate against the wall; do not overtighten or the seat will close onto the cable.",
+    "Make it with the plate flat and the seat opening upward. The screws compress the plate against the wall; do not overtighten or the seat will close onto the cable.",
   ],
   header: "Saddle Clamp Designer - units: mm",
   fields: [
@@ -152,7 +152,7 @@ export const pipeSaddle: AnyDesign = defineDesign({
   ],
   notes: [
     "The strap slots are obround so one plate takes several strap widths and the band can pull straight down without binding on a corner. They sit outboard of the seat, which keeps the strap clear of the insulated pipe.",
-    "Print it flat with the seat up. A strap pulls the plate onto the pipe, so the plate needs to be stiff: six perimeters and a solid infill, not a thin shell.",
+    "Make it flat with the seat up. A strap pulls the plate onto the pipe, so the plate needs to be stiff: a solid wall and a solid section, not a thin shell.",
   ],
   header: "Pipe Saddle Designer - units: mm",
   fields: [
@@ -244,7 +244,7 @@ export const cableComb: AnyDesign = defineDesign({
   eyebrow: "Wire rake",
   blurb: "A slotted comb that fans a wire bundle into an even, tidy row.",
   lede: "A comb with real teeth and slots, used to separate and route the wires in a harness. The tooth width and the slot width are derived from the comb width and tooth count, so the pattern always closes exactly on both edges.",
-  use: "Separating and routing wires in a cable harness, a control panel or a printer build.",
+  use: "Separating and routing wires in a cable harness, a control panel or an equipment build.",
   notesTitle: "How the teeth divide the width",
   chips: [
     { label: "Width", value: "40 – 160 mm" },
@@ -253,7 +253,7 @@ export const cableComb: AnyDesign = defineDesign({
   ],
   notes: [
     "The slot count is one less than the tooth count, and the teeth take whatever width is left after the slots. Both ends are full teeth, so the comb has a straight edge to register against a connector or a tie point.",
-    "Print it with the comb flat and the teeth in the plane of the bed; a comb printed on edge has layer lines across every tooth root. Keep the teeth at least 2 mm wide or they will snap when a wire is pushed in.",
+    "Make it with the comb flat and the teeth in the plane of the part; a comb formed on edge has process marks across every tooth root. Keep the teeth at least 2 mm wide or they will snap when a wire is pushed in.",
   ],
   header: "Cable Comb Designer - units: mm",
   fields: [
@@ -353,7 +353,7 @@ export const featherboard: AnyDesign = defineDesign({
   ],
   notes: [
     "Each slot is an obround rotated to the feather angle, and the strip between two slots is the finger. The designer checks the slot's rotated envelope against the board and the pitch between slots, so no two cuts run together.",
-    "Print in PETG rather than PLA if the board lives in a cold workshop; PLA fingers crack after a few seasons. Print flat with four perimeters so each finger is solid across its width.",
+    "Make in a tough material rather than a rigid material if the board lives in a cold workshop; rigid-material fingers crack after a few seasons. Make flat with a solid wall so each finger is solid across its width.",
   ],
   header: "Featherboard Designer - units: mm",
   fields: [
@@ -454,7 +454,7 @@ export const holdDownClamp: AnyDesign = defineDesign({
   ],
   notes: [
     "The pivot hole is sized to the pin and the slot to the hold-down bolt. The slot is an obround, so the bolt can sit anywhere along the arm without binding, and its near end is kept clear of the pivot by a full wall.",
-    "Print the arm flat with the slot vertical through the thickness. A hold-down is loaded in bending, so orient the layers along the arm and use at least five perimeters.",
+    "Make the arm flat with the slot vertical through the thickness. A hold-down is loaded in bending, so orient the grain along the arm and use a substantial wall.",
   ],
   header: "Hold-Down Clamp Designer - units: mm",
   fields: [
@@ -546,7 +546,7 @@ export const eccentricClamp: AnyDesign = defineDesign({
   ],
   notes: [
     "A circle whose pivot is offset by e sweeps through a total lift of about 2e as it turns, which is enough to clamp a jig but not enough to jam it. The pivot and handle holes are checked against each other and against the rim with a real wall.",
-    "Print the disc flat with the holes vertical. The rim takes the clamping load, so use a high perimeter count and keep the disc at least 6 mm thick for a jig that is used every day.",
+    "Make the disc flat with the holes vertical. The rim takes the clamping load, so use a substantial wall and keep the disc at least 6 mm thick for a jig that is used every day.",
   ],
   header: "Eccentric Clamp Designer - units: mm",
   fields: [
@@ -629,17 +629,17 @@ export const zeroClearanceInsert: AnyDesign = defineDesign({
   use: "Replacing a wide saw throat plate to support thin stock and stop tear-out at the blade.",
   notesTitle: "How the blade slot is sized",
   chips: [
-    { label: "Disc Ø", value: "60 – 180 mm" },
+    { label: "Disc Ø", value: "60 – 1000 mm" },
     { label: "Slot", value: "2 – 6 mm" },
     { label: "Slot length", value: "30 – 120 mm" },
   ],
   notes: [
     "The slot is a narrow obround along the cut line, with its ends kept inside the disc by a real wall. The two screw holes sit off the slot axis, so the levelling screws cannot pull the plate into the blade.",
-    "Cut the slot in the printer only to a pilot width, fit the insert, then raise the running blade through it to cut the exact kerf. That last step is what makes the insert zero-clearance and is far safer than printing a guessed slot.",
+    "Cut the slot in the blank only to a pilot width, fit the insert, then raise the running blade through it to cut the exact kerf. That last step is what makes the insert zero-clearance and is far safer than making a guessed slot.",
   ],
   header: "Zero-Clearance Insert Designer - units: mm",
   fields: [
-    { key: "diameter", label: "Disc diameter", kind: "length", section: "Plate", default: "140", min: 60, max: 180 },
+    { key: "diameter", label: "Disc diameter", kind: "length", section: "Plate", default: "140", min: 60, max: 1000 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Plate", default: "5", min: 3, max: 10 },
     { key: "slotWidth", label: "Slot width", kind: "length", section: "Slot", default: "3", min: 2, max: 6 },
     { key: "slotLength", label: "Slot length", kind: "length", section: "Slot", default: "70", min: 30, max: 120 },
@@ -655,7 +655,7 @@ export const zeroClearanceInsert: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "diameter", "Disc diameter", p.diameterMm, 60, 180);
+    pushRange(errors, units, "diameter", "Disc diameter", p.diameterMm, 60, 1000);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 3, 10);
     pushRange(errors, units, "slotWidth", "Slot width", p.slotWidthMm, 2, 6);
     pushRange(errors, units, "slotLength", "Slot length", p.slotLengthMm, 30, 120);
@@ -725,7 +725,7 @@ export const deskCableClip: AnyDesign = defineDesign({
   ],
   notes: [
     "The seat is a circle and the mouth is a parallel-sided channel from the top edge into it. Because the mouth is narrower than the seat, the clip flexes once as the cable goes in and then holds it; the designer blocks a mouth wider than the cable.",
-    "Print in PETG for the flex. A clip printed in brittle PLA will snap at the mouth on the first cable, and the layer lines should run around the C rather than across it.",
+    "Make in a tough material for the flex. A clip made in a brittle material will snap at the mouth on the first cable, and the process marks should run around the C rather than across it.",
   ],
   header: "Desk Cable Clip Designer - units: mm",
   fields: [
@@ -830,7 +830,7 @@ export const hingeLeaf: AnyDesign = defineDesign({
   ],
   notes: [
     "The pivot sits at one end and the screws start beyond it, so the pin load and the screw load do not share the same hole. The screw row is checked for pitch and for a full wall to the rounded edge.",
-    "Print the leaf flat with the pivot bore vertical. A hinge leaf is loaded at the pivot, so keep the wall around the pivot at least one screw diameter and print at 100 percent infill around it.",
+    "Make the leaf flat with the pivot bore vertical. A hinge leaf is loaded at the pivot, so keep the wall around the pivot at least one screw diameter and make at solid around it.",
   ],
   header: "Hinge Leaf Designer - units: mm",
   fields: [
@@ -924,7 +924,7 @@ export const slottedShim: AnyDesign = defineDesign({
   ],
   notes: [
     "The slot opens through one short edge, which is what lets the shim slide in around a bolt. Its depth is checked against the plate length so a bridge of material always remains at the far end.",
-    "Print a set at 0.2, 0.4 and 0.8 mm, or use the thickness field to make one at the exact lift you need. Print them flat and measure the first one with calipers; first-layer squish changes a thin shim more than any other dimension.",
+    "Make a set at 0.2, 0.4 and 0.8 mm, or use the thickness field to make one at the exact lift you need. Make them flat and measure the first one with calipers; surface compression changes a thin shim more than any other dimension.",
   ],
   header: "Slotted Shim Designer - units: mm",
   fields: [
@@ -954,7 +954,7 @@ export const slottedShim: AnyDesign = defineDesign({
 
     if (p.slotWidthMm > p.widthMm - 10) errors.push({ field: "slotWidth", level: "error", message: "The slot leaves no side wall; narrow it." });
     if (p.slotDepthMm > p.lengthMm - 8) errors.push({ field: "slotDepth", level: "error", message: "The slot leaves no bridge at the far end; reduce its depth." });
-    if (p.thicknessMm < 1) warnings.push({ field: "thickness", level: "warning", message: "Under 1 mm the first layer is hard to control accurately." });
+    if (p.thicknessMm < 1) warnings.push({ field: "thickness", level: "warning", message: "Under 1 mm the thin section is hard to control accurately." });
     const bridge = p.lengthMm - p.slotDepthMm;
 
     return {

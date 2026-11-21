@@ -82,7 +82,7 @@ export default function SpecForm({
             value={values.outerDiameter}
             unit={unit}
             onChange={(value) => onChange("outerDiameter", value)}
-            hint={`Across the spike tips. ${LIMITS.outerDiameterMm.min}–${LIMITS.outerDiameterMm.max} mm fits the bed.`}
+            hint={`Across the spike tips. ${LIMITS.outerDiameterMm.min}–${LIMITS.outerDiameterMm.max} mm.`}
             error={errors.get("outerDiameter")}
           />
           <NumberField

@@ -44,7 +44,7 @@ export const thumbScrew: AnyDesign = defineDesign({
   ],
   notes: [
     "The profile runs down the shank, out across the head's underside and over a chamfered rim, so the seating face is a real flat annulus rather than a fillet. The chamfer is limited to half the head height so the rim cannot close on itself.",
-    "Print it with the shank vertical and the head at the top; the underside then needs no support. A printed thread will not hold a real load, so size the shank as a clearance fit and use a metal insert or a nut on the far side.",
+    "Make it with the shank vertical and the head at the top; the underside can be formed cleanly. A thread will not hold a real load, so size the shank as a clearance fit and use a metal insert or a nut on the far side.",
   ],
   header: "Thumb Screw Designer - units: mm",
   fields: [
@@ -130,7 +130,7 @@ export const thumbNut: AnyDesign = defineDesign({
   family: "fixings",
   eyebrow: "Hand nut",
   blurb: "A chamfered round nut that is turned by hand on a clamp rod.",
-  lede: "A round thumb nut with a straight bore and chamfered rims, sized so the outside can be gripped between finger and thumb. The wall between the bore and the outside is checked, because a printed nut fails there before the thread does.",
+  lede: "A round thumb nut with a straight bore and chamfered rims, sized so the outside can be gripped between finger and thumb. The wall between the bore and the outside is checked, because a nut fails there before the thread does.",
   use: "Tightening a clamp, a camera mount or a jig by hand where a spanner will not fit.",
   notesTitle: "How the wall is checked",
   chips: [
@@ -140,7 +140,7 @@ export const thumbNut: AnyDesign = defineDesign({
   ],
   notes: [
     "The bore is a straight through-hole, so the nut can be tapped, glued onto a threaded insert, or used as a plain spacer. Both rims are chamfered to remove the sharp edge that otherwise cuts into a hand.",
-    "Print the nut with the bore vertical and four perimeters. If it has to carry a real thread, tap it after printing or melt a metal nut into a hex pocket; a printed thread in PLA strips at very low torque.",
+    "Make the nut with the bore vertical and a solid wall. If it has to carry a real thread, tap it after making or melt a metal nut into a hex pocket; a thread in a rigid material strips at very low torque.",
   ],
   header: "Thumb Nut Designer - units: mm",
   fields: [
@@ -230,7 +230,7 @@ export const domeNut: AnyDesign = defineDesign({
   ],
   notes: [
     "The bore stops short of the dome, leaving a solid crown, and the dome is sampled as a quarter ellipse so the top is round rather than a cone. The remaining crown thickness is reported so you can see how much material is left above the stud.",
-    "Print with the open end down and the dome up; the bore needs no support and the dome closes cleanly. A cap nut is usually decorative, so two perimeters are enough unless it is also carrying a load.",
+    "Make it with the open end down and the dome up; the bore can be formed without a fixture and the dome closes cleanly. A cap nut is usually decorative, so a solid wall is enough unless it is also carrying a load.",
   ],
   header: "Dome Nut Designer - units: mm",
   fields: [
@@ -328,7 +328,7 @@ export const hoseBarb: AnyDesign = defineDesign({
   ],
   notes: [
     "Each barb is a ramp followed by a square shoulder, which is the shape that lets a hose slide on but catches when it is pulled. The ridge is kept small enough that the hose can still stretch over it, and the barbs are evenly spaced along the straight section.",
-    "Print the barb with its axis vertical and smooth the ridges lightly; layer seams on a barb act as a knife on the inside of a soft hose. A dip in hot water makes the hose easier to fit, and a clip is still worth adding above 1 bar.",
+    "Make the barb with its axis vertical and smooth the ridges lightly; process seams on a barb act as a knife on the inside of a soft hose. A dip in hot water makes the hose easier to fit, and a clip is still worth adding above 1 bar.",
   ],
   header: "Hose Barb Designer - units: mm",
   fields: [
@@ -430,7 +430,7 @@ export const barbedReducer: AnyDesign = defineDesign({
   ],
   notes: [
     "The shoulder between the two barbs is a straight taper, not a square step, which gives the hose something to slide over without tearing. The bore stays constant, and the wall at the small end is checked against the bore.",
-    "Print it vertically with the small end down. A reducer is pulled at both ends, so give it at least four perimeters and test it with the hoses before it goes into a line that matters.",
+    "Make it vertically with the small end down. A reducer is pulled at both ends, so give it a substantial wall and test it with the hoses before it goes into a line that matters.",
   ],
   header: "Barbed Reducer Designer - units: mm",
   fields: [
@@ -525,7 +525,7 @@ export const bulkheadFitting: AnyDesign = defineDesign({
   ],
   notes: [
     "The flange is at one end and the barb at the other, so the wall of the tank is clamped between the flange and a nut or a hose clip on the inside. The tube wall is reported, and the flange is checked to be wider than the tube by a real gasket land.",
-    "Print it with the flange down and the tube vertical. A bulkhead joint leaks at the flange face, so print the face solid, sand it flat on a sheet of glass and use a rubber or fibre washer rather than relying on the plastic alone.",
+    "Make it with the flange down and the tube vertical. A bulkhead joint leaks at the flange face, so make the face solid, sand it flat on a sheet of glass and use a rubber or fibre washer rather than relying on the plastic alone.",
   ],
   header: "Bulkhead Fitting Designer - units: mm",
   fields: [
@@ -625,7 +625,7 @@ export const cableGrommet: AnyDesign = defineDesign({
   ],
   notes: [
     "The groove width is the panel thickness and its diameter is chosen so the waist is a snug push fit. Both flanges are wider than the waist, which is what keeps the grommet in the hole instead of sliding through it.",
-    "Print it in a soft filament such as TPU if the cable moves; a rigid grommet still protects the edge but transmits every tug. Print with the bore vertical and flare the flanges in the slicer if your printer struggles with the overhang.",
+    "Make it in a flexible material if the cable moves; a rigid grommet still protects the edge but transmits every tug. Make it with the bore vertical and flare the flanges in the software if your process struggles with the undercut.",
   ],
   header: "Cable Grommet Designer - units: mm",
   fields: [
@@ -723,7 +723,7 @@ export const tubeAdapter: AnyDesign = defineDesign({
   ],
   notes: [
     "Each end is a plain cylinder, so it can be a push fit or glued into its tube, and the shoulder between them sets how far each tube goes on. The bore is a through-hole, which means the joint does not trap air or block a sample.",
-    "Print it vertically with the small end down and check both fits on short offcuts before gluing. A push fit in a printed sleeve relaxes over a few days, so use a smear of adhesive or a cross pin for anything that has to stay together.",
+    "Make it vertically with the small end down and check both fits on short offcuts before gluing. A push fit in a sleeve relaxes over a few days, so use a smear of adhesive or a cross pin for anything that has to stay together.",
   ],
   header: "Tube Adapter Designer - units: mm",
   fields: [
@@ -813,7 +813,7 @@ export const pipetteTip: AnyDesign = defineDesign({
   ],
   notes: [
     "The inner and outer cones share a taper, so the wall thickness stays even from the barrel to the orifice. The tip must be at least one wall thicker than the bore, which is checked before the profile is built.",
-    "Print at the finest layer height you can and orient the tip upward; a tip printed on its side has a seam across the orifice and drips from it. This is a transfer tip for water, dye or a rinse, not a sterile laboratory consumable.",
+    "Finish the tip as finely as you can and orient the tip upward; a tip formed on its side has a seam across the orifice and drips from it. This is a transfer tip for water, dye or a rinse, not a sterile laboratory consumable.",
   ],
   header: "Pipette Tip Designer - units: mm",
   fields: [
@@ -894,7 +894,7 @@ export const jarLid: AnyDesign = defineDesign({
   family: "vessels",
   eyebrow: "Push cap",
   blurb: "A push-fit lid with a sealing skirt and a solid top disc.",
-  lede: "A push-fit lid for a jar or a tin: the skirt clears the jar's outside diameter by a printing allowance and the top disc is thick enough to take a label or a small stack. It is a friction lid, so there is no thread to strip and no model-specific thread to match.",
+  lede: "A push-fit lid for a jar or a tin: the skirt clears the jar's outside diameter by a making allowance and the top disc is thick enough to take a label or a small stack. It is a friction lid, so there is no thread to strip and no model-specific thread to match.",
   use: "Covering a jar of screws, a jar of paint or a tin of mixed resin without a screw thread.",
   notesTitle: "How the skirt finds the jar",
   chips: [
@@ -904,7 +904,7 @@ export const jarLid: AnyDesign = defineDesign({
   ],
   notes: [
     "The inner skirt is the jar diameter plus a clearance allowance, so the lid fits over the rim instead of inside it. The wall and the top thickness are separate, which lets a wide lid stay stiff without becoming a solid block.",
-    "Print it with the top down and the skirt rising; the inside then needs no support. Measure the jar with calipers and add the clearance you actually need: printed holes come out undersize, and a lid that is too tight splits at the skirt.",
+    "Make it with the top down and the skirt rising; the inside can be formed without a fixture. Measure the jar with calipers and add the clearance you actually need: holes can come out undersize, and a lid that is too tight splits at the skirt.",
   ],
   header: "Jar Lid Designer - units: mm",
   fields: [

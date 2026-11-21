@@ -31,7 +31,7 @@ export const CAPABILITIES: Record<CapabilityId, CapabilityMeta> = {
     label: "Fit prototype",
     short: "Fit prototype",
     description:
-      "Intended for dimensional trial fits. Measure the mating part, calibrate your printer and test-print before relying on it.",
+      "Intended for dimensional trial fits. Measure the mating part, verify your process, and test a physical sample before relying on it.",
     tone: "border-amber-300 bg-amber-50 text-amber-900",
   },
   functional: {
@@ -45,7 +45,7 @@ export const CAPABILITIES: Record<CapabilityId, CapabilityMeta> = {
     label: "Not suitable for the named high-risk use",
     short: "High-risk use excluded",
     description:
-      "The shape can be printed and measured, but it must not be used for the named high-risk duty (pressure, flame, cutting, braking, torque, clinical or centrifugation).",
+      "The shape can be produced and measured, but it must not be used for the named high-risk duty (pressure, flame, cutting, braking, torque, clinical or centrifugation).",
     tone: "border-red-300 bg-red-50 text-red-900",
   },
 };
@@ -66,7 +66,7 @@ export interface DesignContract {
   notChecked: string[];
 }
 
-/** Checks the shared mesh inspector and build-volume test actually perform. */
+/** Checks the shared mesh inspector actually performs. */
 export const VALIDATION_CHECKS = [
   "Every edge is shared by exactly two consistently wound triangles",
   "One connected shell (no loose islands)",
@@ -74,26 +74,25 @@ export const VALIDATION_CHECKS = [
   "Zero-area cap slivers are counted and reported",
   "Euler characteristic is that of a closed orientable surface",
   "Signed volume is positive and finite",
-  "Overall envelope is compared with the 180 mm build cube",
 ] as const;
 
 const NOT_CHECKED = [
   "Triangle self-intersection and overlapping shells",
   "Minimum wall thickness over the whole surface",
-  "Print orientation, overhangs, supports and warping",
+  "Fabrication orientation, undercuts, fixturing and distortion",
   "Material strength, stiffness, fatigue, creep and wear",
-  "Fit, clearance and tolerance on real printed parts",
+  "Fit, clearance and tolerance on physical parts",
   "Chemical, heat, flame, food-contact or sterilisation safety",
   "Compliance with any published standard",
 ];
 
 const BASE_LIMITS = [
-  "Only the mesh topology and overall envelope are checked; fit, strength and safety are not verified.",
-  "Use the specification and a test print; do not treat the STL as a certified part.",
+  "Only the mesh topology and overall dimensions are checked; fit, strength and safety are not verified.",
+  "Use the specification and a physical test piece; do not treat the STL as a certified part.",
 ];
 
 const BASE_MATING = "Measure the actual mating part; no mate is included with this designer.";
-const BASE_FIT = "Nominal geometry only. No printer, material or tolerance calibration is applied.";
+const BASE_FIT = "Nominal geometry only. No process, material or tolerance calibration is applied.";
 const BASE_STANDARD = "No standard compliance is claimed or tested.";
 
 const ids = (list: string) => new Set(list.split(/\s+/).filter(Boolean));
@@ -149,7 +148,7 @@ function extraFor(id: string): Override {
       "Contact ratio, undercut, interference, backlash and tooth strength are not calculated.",
       id === "internal-gear"
         ? "Internal-gear interference limits and the compatible pinion range are not validated."
-        : "A successful mesh does not prove that a printed pair will run quietly or carry load.",
+        : "A successful mesh does not prove that a mating pair will run quietly or carry load.",
     );
     if (id === "helical-gear") {
       add("Handedness and axial thrust are not checked; a mating helical gear must be the opposite hand.");
@@ -185,7 +184,7 @@ function extraFor(id: string): Override {
   if (THREADS.has(id)) {
     override.capability = "fit";
     override.standard =
-      "Bores are plain clearance holes. No thread form, pitch, fit class or printed-thread allowance is implemented.";
+      "Bores are plain clearance holes. No thread form, pitch, fit class or process allowance is implemented.";
     override.mating =
       "The actual screw, insert or shaft. Measure it and test the bore; no hardware is included.";
     add("These are unthreaded bodies or plain-bore knobs, not working threaded fasteners.");
@@ -210,7 +209,7 @@ function extraFor(id: string): Override {
     override.capability = "unsafe";
     add(
       "Not for centrifugation, clinical, diagnostic, chemical-storage or sterilisation use.",
-      "Printed polymer is porous and cannot be assumed cleanable, sterile or chemically inert.",
+      "Polymer parts can be porous and cannot be assumed cleanable, sterile or chemically inert.",
     );
     if (id === "centrifuge-tube") {
       override.standard = "No centrifuge tube standard, wall strength or rotor fit is implemented.";
@@ -220,12 +219,12 @@ function extraFor(id: string): Override {
 
   if (FOOD.has(id)) {
     add(
-      "Not food-contact rated: layer lines harbour residue and no material migration, cleaning or heat test has been made.",
+      "Not food-contact rated: surface texture can harbour residue and no material migration, cleaning or heat test has been made.",
     );
   }
 
   if (HEAT.has(id)) {
-    add("Printed polymer may soften, deform or burn near a flame or hot bulb; never leave a flame unattended.");
+    add("Polymer parts may soften, deform or burn near a flame or hot bulb; never leave a flame unattended.");
   }
 
   if (TORQUE.has(id)) {
@@ -282,7 +281,7 @@ function extraFor(id: string): Override {
   }
 
   if (id === "t-slot-nut" || id === "dovetail-rail") {
-    add("The rail profile is nominal; measure your extrusion or rail and print a short test section.");
+    add("The rail profile is nominal; measure your extrusion or rail and make a short test section.");
   }
 
   if (id === "caster-wheel" || id === "dowel-pin" || id === "taper-pin" || id === "rivet") {

@@ -40,17 +40,17 @@ export const pipeReducer: AnyDesign = defineDesign({
   blurb: "A concentric reducer from a large pipe to a small one.",
   lede: "A conical tube that steps between two pipe sizes. Both outside diameters and the wall are entered directly, so the bore at each end is exact and the transition is a straight cone rather than a stepped adaptor.",
   chips: [
-    { label: "Large Ø", value: "20 – 180 mm" },
+    { label: "Large Ø", value: "20 – 1000 mm" },
     { label: "Small Ø", value: "10 – 120 mm" },
     { label: "Length", value: "10 – 120 mm" },
   ],
   notes: [
     "The profile is a quadrilateral: out along the large end, up the outer cone, in across the small end and back down the inner cone. Both ends are flat annuli, so it butts squarely against a pipe face.",
-    "For a printed reducer, slope the cone at no more than about 45° from the axis or the overhang needs support. If the size difference is large, make the reducer in two cones with a cylindrical collar between them.",
+    "For a reducer, slope the cone at no more than about 45° from the axis or the undercut needs a fixture. If the size difference is large, make the reducer in two cones with a cylindrical collar between them.",
   ],
   header: "Pipe Reducer Designer - units: mm",
   fields: [
-    { key: "largeDiameter", label: "Large diameter", kind: "length", section: "Reducer", default: "60", min: 20, max: 180 },
+    { key: "largeDiameter", label: "Large diameter", kind: "length", section: "Reducer", default: "60", min: 20, max: 1000 },
     { key: "smallDiameter", label: "Small diameter", kind: "length", section: "Reducer", default: "30", min: 10, max: 120 },
     { key: "length", label: "Length", kind: "length", section: "Reducer", default: "60", min: 10, max: 120 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Reducer", default: "3", min: 1, max: 10 },
@@ -64,7 +64,7 @@ export const pipeReducer: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "largeDiameter", "Large diameter", p.largeMm, 20, 180);
+    pushRange(errors, units, "largeDiameter", "Large diameter", p.largeMm, 20, 1000);
     pushRange(errors, units, "smallDiameter", "Small diameter", p.smallMm, 10, 120);
     pushRange(errors, units, "length", "Length", p.lengthMm, 10, 120);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 10);
@@ -76,7 +76,7 @@ export const pipeReducer: AnyDesign = defineDesign({
     checkWall(errors, units, "wall", "wall at the small end", smallR - p.wallMm);
     if (p.largeMm <= p.smallMm) errors.push({ field: "largeDiameter", level: "error", message: "The large end is not larger than the small end." });
     const slope = (Math.atan2(largeR - smallR, p.lengthMm) * 180) / Math.PI;
-    if (slope > 45) pushWarning(warnings, "length", "The cone is steeper than 45°; the overhang will need support.");
+    if (slope > 45) pushWarning(warnings, "length", "The cone is steeper than 45°; the undercut will need a fixture.");
 
     return {
       errors,
@@ -132,7 +132,7 @@ export const pipeCap: AnyDesign = defineDesign({
   ],
   notes: [
     "The cap's bore is the pipe diameter, and its outside is that bore plus two wall thicknesses. The top is a solid disc one wall thick, so the inside height is the depth minus the wall.",
-    "A push-fit cap holds by friction alone. Print it with the mouth down, measure the pipe, and add 0.3 mm to the bore for an easy fit or subtract 0.1 mm for a seal that needs a tap to seat.",
+    "A push-fit cap holds by friction alone. Make it with the mouth down, measure the pipe, and add 0.3 mm to the bore for an easy fit or subtract 0.1 mm for a seal that needs a tap to seat.",
   ],
   header: "Pipe Cap Designer - units: mm",
   fields: [
@@ -334,7 +334,7 @@ export const deLavalNozzle: AnyDesign = defineDesign({
   fields: [
     { key: "inletDiameter", label: "Inlet diameter", kind: "length", section: "Nozzle", default: "50", min: 8, max: 160 },
     { key: "throatDiameter", label: "Throat diameter", kind: "length", section: "Nozzle", default: "20", min: 3, max: 60 },
-    { key: "exitDiameter", label: "Exit diameter", kind: "length", section: "Nozzle", default: "60", min: 8, max: 180 },
+    { key: "exitDiameter", label: "Exit diameter", kind: "length", section: "Nozzle", default: "60", min: 8, max: 1000 },
     { key: "convergingLength", label: "Converging length", kind: "length", section: "Contour", default: "40", min: 8, max: 100 },
     { key: "divergingLength", label: "Diverging length", kind: "length", section: "Contour", default: "80", min: 8, max: 140 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Nozzle", default: "3", min: 1, max: 10 },
@@ -352,7 +352,7 @@ export const deLavalNozzle: AnyDesign = defineDesign({
     const warnings: DesignIssue[] = [];
     pushRange(errors, units, "inletDiameter", "Inlet diameter", p.inletMm, 8, 160);
     pushRange(errors, units, "throatDiameter", "Throat diameter", p.throatMm, 3, 60);
-    pushRange(errors, units, "exitDiameter", "Exit diameter", p.exitMm, 8, 180);
+    pushRange(errors, units, "exitDiameter", "Exit diameter", p.exitMm, 8, 1000);
     pushRange(errors, units, "convergingLength", "Converging length", p.convergingMm, 8, 100);
     pushRange(errors, units, "divergingLength", "Diverging length", p.divergingMm, 8, 140);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 10);
@@ -365,7 +365,7 @@ export const deLavalNozzle: AnyDesign = defineDesign({
       errors.push({ field: "throatDiameter", level: "error", message: "The throat must be smaller than both ends." });
     }
     const expansion = (p.exitMm / p.throatMm) ** 2;
-    if (expansion > 12) pushWarning(warnings, "exitDiameter", "An expansion ratio above 12 is hard to print and rarely useful with air.");
+    if (expansion > 12) pushWarning(warnings, "exitDiameter", "An expansion ratio above 12 is hard to make and rarely useful with air.");
 
     return {
       errors,
@@ -437,7 +437,7 @@ export const noseCone: AnyDesign = defineDesign({
   ],
   notes: [
     "The ogive radius is `ρ = (R² + L²)/2R`, and the profile is `r(x) = √(ρ² − (L − x)²) + R − ρ`. At the base r = R and at the tip r = 0, so the arc meets the body tangentially instead of leaving a corner.",
-    "The socket lets the nose slip over a body tube. Keep its wall at least three perimeters, and remember that a tangent ogive is stable only when the centre of pressure sits behind the centre of gravity — check that before launching anything.",
+    "The socket lets the nose slip over a body tube. Keep its wall substantial, and remember that a tangent ogive is stable only when the centre of pressure sits behind the centre of gravity — check that before launching anything.",
   ],
   header: "Nose Cone Designer - units: mm",
   fields: [
@@ -539,17 +539,17 @@ export const torus: AnyDesign = defineDesign({
   blurb: "A ring with a true circular cross-section.",
   lede: "A donut is the simplest swept solid: a circle revolved around an axis. Set the overall diameter and the tube diameter and the torus is generated with an exactly circular section — useful as a bumper, an O-ring groove former or a roller.",
   chips: [
-    { label: "Overall Ø", value: "20 – 180 mm" },
+    { label: "Overall Ø", value: "20 – 1000 mm" },
     { label: "Tube Ø", value: "2 – 60 mm" },
     { label: "Volume", value: "2π²Rr²" },
   ],
   notes: [
     "The section circle is centred at R = (overall − tube)/2 and has radius r = tube/2. Its volume is 2π²Rr² and its surface area is 4π²Rr, so the readout can be checked against the drawing without a mesh measurement.",
-    "A torus printed flat needs support under its inner overhang; printed on edge it needs none but the layer lines cross the ring. If it is a seal, print it flat and sand the inside face.",
+    "A torus made flat needs a fixture under its inner recess; made on edge it needs none, but the process marks cross the ring. If it is a seal, make it flat and sand the inside face.",
   ],
   header: "Torus Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Overall diameter", kind: "length", section: "Torus", default: "80", min: 20, max: 180 },
+    { key: "outerDiameter", label: "Overall diameter", kind: "length", section: "Torus", default: "80", min: 20, max: 1000 },
     { key: "tubeDiameter", label: "Tube diameter", kind: "length", section: "Torus", default: "20", min: 2, max: 60 },
   ],
   parse: (raw) => ({
@@ -559,7 +559,7 @@ export const torus: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Overall diameter", p.outerMm, 20, 180);
+    pushRange(errors, units, "outerDiameter", "Overall diameter", p.outerMm, 20, 1000);
     pushRange(errors, units, "tubeDiameter", "Tube diameter", p.tubeMm, 2, 60);
     if (errors.length > 0) return emptyResult(errors, warnings);
 
@@ -614,16 +614,16 @@ export const vBeltPulley: AnyDesign = defineDesign({
   lede: "The grooves are true V cuts at the belt's included angle, spaced on the entered pitch and sunk to the entered depth. That wedge is what gives a V-belt its grip, so the angle and depth matter more than the outside diameter.",
   chips: [
     { label: "Grooves", value: "1 – 4" },
-    { label: "Outside Ø", value: "30 – 180 mm" },
+    { label: "Outside Ø", value: "30 – 1000 mm" },
     { label: "Belt angle", value: "30 – 45°" },
   ],
   notes: [
     "Each groove is a trapezoid: its top width is `2·depth·tan(angle/2)` and its flanks run straight to a blunt root. The outside diameter is across the land between grooves and the pitch diameter sits about half a groove depth below it.",
-    "Print a pulley with the grooves vertical if you can, so the belt loads the layer lines along the flank instead of peeling them apart. A 0.2 mm clearance on the belt width keeps a printed pulley from grabbing.",
+    "Make a pulley with the grooves vertical if you can, so the belt loads the process marks along the flank instead of peeling them apart. A 0.2 mm clearance on the belt width keeps a pulley from grabbing.",
   ],
   header: "V-Belt Pulley Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outside diameter", kind: "length", section: "Pulley", default: "90", min: 30, max: 180 },
+    { key: "outerDiameter", label: "Outside diameter", kind: "length", section: "Pulley", default: "90", min: 30, max: 1000 },
     { key: "grooves", label: "Grooves", kind: "count", section: "Groove", default: "1", min: 1, max: 4 },
     { key: "grooveDepth", label: "Groove depth", kind: "length", section: "Groove", default: "12", min: 2, max: 30 },
     { key: "grooveAngle", label: "Included angle", kind: "number", section: "Groove", default: "38", min: 30, max: 45 },
@@ -643,7 +643,7 @@ export const vBeltPulley: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outside diameter", p.outerMm, 30, 180);
+    pushRange(errors, units, "outerDiameter", "Outside diameter", p.outerMm, 30, 1000);
     pushInteger(errors, "grooves", "Grooves", p.grooves, 1, 4);
     pushRange(errors, units, "grooveDepth", "Groove depth", p.depthMm, 2, 30);
     pushRange(errors, units, "grooveAngle", "Included angle", p.angleDeg, 30, 45, false);
@@ -660,7 +660,6 @@ export const vBeltPulley: AnyDesign = defineDesign({
     checkWall(errors, units, "bore", "rim at the groove root", rootR - p.boreMm / 2);
     if (halfTop * 2 >= p.pitchMm) errors.push({ field: "groovePitch", level: "error", message: "Adjacent grooves overlap at the rim." });
     if (p.depthMm >= outerR * 0.7) errors.push({ field: "grooveDepth", level: "error", message: "The groove reaches past the axis." });
-    if (width > 180) errors.push({ field: "grooves", level: "error", message: "The pulley is wider than the 180 mm bed." });
 
     return {
       errors,
@@ -721,15 +720,15 @@ export const roundBeltPulley: AnyDesign = defineDesign({
   chips: [
     { label: "Belt Ø", value: "2 – 20 mm" },
     { label: "Grooves", value: "1 – 3" },
-    { label: "Outside Ø", value: "20 – 180 mm" },
+    { label: "Outside Ø", value: "20 – 1000 mm" },
   ],
   notes: [
     "The groove is a true semicircle centred on the outside diameter, so it cuts exactly one belt radius into the rim. That gives the belt full contact around half its section instead of pinching it in a V.",
-    "Round belting stretches, so a centre distance that can be adjusted is worth more than a precise groove. Print the pulley with a flat on the hub or a grub-screw boss if it has to transmit real torque.",
+    "Round belting stretches, so a centre distance that can be adjusted is worth more than a precise groove. Make the pulley with a flat on the hub or a grub-screw boss if it has to transmit real torque.",
   ],
   header: "Round Belt Pulley Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outside diameter", kind: "length", section: "Pulley", default: "80", min: 20, max: 180 },
+    { key: "outerDiameter", label: "Outside diameter", kind: "length", section: "Pulley", default: "80", min: 20, max: 1000 },
     { key: "beltDiameter", label: "Belt diameter", kind: "length", section: "Groove", default: "8", min: 2, max: 20 },
     { key: "grooves", label: "Grooves", kind: "count", section: "Groove", default: "1", min: 1, max: 3 },
     { key: "groovePitch", label: "Groove pitch", kind: "length", section: "Groove", default: "14", min: 5, max: 60 },
@@ -747,7 +746,7 @@ export const roundBeltPulley: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outside diameter", p.outerMm, 20, 180);
+    pushRange(errors, units, "outerDiameter", "Outside diameter", p.outerMm, 20, 1000);
     pushRange(errors, units, "beltDiameter", "Belt diameter", p.beltMm, 2, 20);
     pushInteger(errors, "grooves", "Grooves", p.grooves, 1, 3);
     pushRange(errors, units, "groovePitch", "Groove pitch", p.pitchMm, 5, 60);
@@ -819,7 +818,7 @@ export const steppedPulley: AnyDesign = defineDesign({
   lede: "Stepped pulleys change speed by moving the belt from one sheave to the next. Each step has its own diameter and width, all on one through bore, so the part is a single turned solid rather than a stack of separate wheels.",
   chips: [
     { label: "Steps", value: "2 / 3 / 4" },
-    { label: "Largest Ø", value: "10 – 180 mm" },
+    { label: "Largest Ø", value: "10 – 1000 mm" },
     { label: "Step width", value: "3 – 60 mm" },
   ],
   notes: [
@@ -833,13 +832,13 @@ export const steppedPulley: AnyDesign = defineDesign({
       { value: "3", label: "3 steps" },
       { value: "4", label: "4 steps" },
     ] },
-    { key: "diameter1", label: "Step 1 Ø", kind: "length", section: "Steps", default: "40", min: 10, max: 180 },
+    { key: "diameter1", label: "Step 1 Ø", kind: "length", section: "Steps", default: "40", min: 10, max: 1000 },
     { key: "width1", label: "Step 1 width", kind: "length", section: "Steps", default: "12", min: 3, max: 60 },
-    { key: "diameter2", label: "Step 2 Ø", kind: "length", section: "Steps", default: "55", min: 10, max: 180 },
+    { key: "diameter2", label: "Step 2 Ø", kind: "length", section: "Steps", default: "55", min: 10, max: 1000 },
     { key: "width2", label: "Step 2 width", kind: "length", section: "Steps", default: "12", min: 3, max: 60 },
-    { key: "diameter3", label: "Step 3 Ø", kind: "length", section: "Steps", default: "70", min: 10, max: 180, visible: (v) => Number(v.steps) >= 3 },
+    { key: "diameter3", label: "Step 3 Ø", kind: "length", section: "Steps", default: "70", min: 10, max: 1000, visible: (v) => Number(v.steps) >= 3 },
     { key: "width3", label: "Step 3 width", kind: "length", section: "Steps", default: "12", min: 3, max: 60, visible: (v) => Number(v.steps) >= 3 },
-    { key: "diameter4", label: "Step 4 Ø", kind: "length", section: "Steps", default: "85", min: 10, max: 180, visible: (v) => Number(v.steps) >= 4 },
+    { key: "diameter4", label: "Step 4 Ø", kind: "length", section: "Steps", default: "85", min: 10, max: 1000, visible: (v) => Number(v.steps) >= 4 },
     { key: "width4", label: "Step 4 width", kind: "length", section: "Steps", default: "12", min: 3, max: 60, visible: (v) => Number(v.steps) >= 4 },
     { key: "bore", label: "Bore", kind: "length", section: "Pulley", default: "12", min: 1, max: 100 },
   ],
@@ -863,7 +862,7 @@ export const steppedPulley: AnyDesign = defineDesign({
     const count = Math.max(2, Math.min(4, Math.round(p.steps)));
     const dias = [p.d1, p.d2, p.d3, p.d4].slice(0, count);
     const widths = [p.w1, p.w2, p.w3, p.w4].slice(0, count);
-    dias.forEach((d, i) => pushRange(errors, units, `diameter${i + 1}`, `Step ${i + 1} diameter`, d, 10, 180));
+    dias.forEach((d, i) => pushRange(errors, units, `diameter${i + 1}`, `Step ${i + 1} diameter`, d, 10, 1000));
     widths.forEach((w, i) => pushRange(errors, units, `width${i + 1}`, `Step ${i + 1} width`, w, 3, 60));
     if (errors.length > 0) return emptyResult(errors, warnings);
 
@@ -929,17 +928,17 @@ export const flywheel: AnyDesign = defineDesign({
   blurb: "A rim-weighted wheel with a thin web and a wide hub.",
   lede: "Mass at the rim is what stores energy, so the flywheel is a thick rim, a thin web and a hub wide enough to key onto a shaft. All four sections are independent, and the profile is a single closed section revolved about the bore.",
   chips: [
-    { label: "Rim Ø", value: "40 – 180 mm" },
+    { label: "Rim Ø", value: "40 – 1000 mm" },
     { label: "Rim width", value: "4 – 60 mm" },
     { label: "Web", value: "1 – 20 mm" },
   ],
   notes: [
     "The cross-section walks from the bore out through the hub, along the web, down into the rim and back around the other side. That makes the web and rim one continuous shell with no joint, and the bore runs straight through the hub.",
-    "Energy rises with the square of the diameter but only linearly with mass, so a larger rim beats a heavier web. Balance the part before running it fast: a printed flywheel is never symmetric enough to spin hard without vibration.",
+    "Energy rises with the square of the diameter but only linearly with mass, so a larger rim beats a heavier web. Balance the part before running it fast: a flywheel is never symmetric enough to spin hard without vibration.",
   ],
   header: "Flywheel Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Rim diameter", kind: "length", section: "Rim", default: "120", min: 40, max: 180 },
+    { key: "outerDiameter", label: "Rim diameter", kind: "length", section: "Rim", default: "120", min: 40, max: 1000 },
     { key: "rimWidth", label: "Rim radial width", kind: "length", section: "Rim", default: "14", min: 4, max: 60 },
     { key: "width", label: "Rim axial width", kind: "length", section: "Rim", default: "20", min: 5, max: 60 },
     { key: "webThickness", label: "Web thickness", kind: "length", section: "Web", default: "5", min: 1, max: 20 },
@@ -959,7 +958,7 @@ export const flywheel: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Rim diameter", p.outerMm, 40, 180);
+    pushRange(errors, units, "outerDiameter", "Rim diameter", p.outerMm, 40, 1000);
     pushRange(errors, units, "rimWidth", "Rim radial width", p.rimWidthMm, 4, 60);
     pushRange(errors, units, "width", "Rim axial width", p.widthMm, 5, 60);
     pushRange(errors, units, "webThickness", "Web thickness", p.webMm, 1, 20);
@@ -992,7 +991,7 @@ export const flywheel: AnyDesign = defineDesign({
         { label: "Web", value: measure(p.webMm, units), source: "input" },
         { label: "Hub Ø", value: measure(p.hubMm, units), source: "input" },
         { label: "Bore", value: measure(p.boreMm, units), source: "input" },
-        { label: "Mass estimate", value: `${round(estimate * 1.24, 0)} g PLA`, source: "calc" },
+        { label: "Mass estimate", value: `${round(estimate * 1.24, 0)} g (assumed density)`, source: "calc" },
       ],
       preview: previewOf(
         `${measure(p.outerMm, units)} rim · ${measure(p.widthMm, units)} wide`,
@@ -1048,17 +1047,17 @@ export const hemisphereShell: AnyDesign = defineDesign({
   blurb: "A hollow dome with a true hemispherical wall.",
   lede: "A half sphere with a constant wall, open at the equator. Set the outside diameter and wall and the dome is generated from the sphere, so it is round in every section rather than a stack of rings.",
   chips: [
-    { label: "Outer Ø", value: "20 – 180 mm" },
+    { label: "Outer Ø", value: "20 – 1000 mm" },
     { label: "Wall", value: "1 – 20 mm" },
     { label: "Height", value: "outer radius" },
   ],
   notes: [
     "The outer surface is a quarter circle from the equator to the pole, revolved about the axis; the inner surface is the same arc at radius R − wall. The flat rim between them closes the shell, and the pole is a single vertex rather than a ring of tiny facets.",
-    "A dome printed open-side down needs support for the whole inner surface. Printed as a cap on a support column, the outer surface stays clean; either way, keep the wall thick enough that the top layers do not pill.",
+    "A dome made open-side down needs a fixture for the whole inner surface. Made as a cap on a support column, the outer surface stays clean; either way, keep the wall thick enough that the outer surface does not pill.",
   ],
   header: "Hemisphere Shell Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Dome", default: "100", min: 20, max: 180 },
+    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Dome", default: "100", min: 20, max: 1000 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Dome", default: "3", min: 1, max: 20 },
   ],
   parse: (raw) => ({
@@ -1068,7 +1067,7 @@ export const hemisphereShell: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerMm, 20, 180);
+    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerMm, 20, 1000);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 20);
     if (errors.length > 0) return emptyResult(errors, warnings);
 

@@ -139,7 +139,7 @@ export const eggCup: AnyDesign = defineDesign({
   ],
   notes: [
     "The cup is a straight taper with a flat floor, and the foot is a cone under it. Both are part of one closed profile, so the cup is hollow and the foot is solid in a single turn.",
-    "A 44 mm cup suits a medium egg; a large egg wants about 48 mm. A filament sold for food contact is not a guarantee after printing, so line the cup with a paper case or peel the egg before it goes in.",
+    "A 44 mm cup suits a medium egg; a large egg wants about 48 mm. A material rated for food contact is not a guarantee after forming, so line the cup with a paper case or peel the egg before it goes in.",
   ],
   header: "Egg Cup Designer - units: mm",
   fields: [
@@ -231,7 +231,7 @@ export const honeyDipper: AnyDesign = defineDesign({
   ],
   notes: [
     "The head radius follows a raised cosine in the axial direction, so each groove is a smooth valley rather than a square notch. Groove depth and count are independent of the head length.",
-    "A dipper printed with the handle vertical has its grooves across the layers and will trap honey in the seams. Print it horizontally if your printer can bridge the head.",
+    "A dipper formed with the handle vertical has its grooves running across the part and will trap honey in the seams. Form it horizontally so the handle runs along its length.",
   ],
   header: "Honey Dipper Designer - units: mm",
   fields: [
@@ -327,7 +327,7 @@ export const spinningTop: AnyDesign = defineDesign({
   ],
   notes: [
     "The cone, disc and stem are one profile. The point is a true cone from the rim of the disc to the axis, so the top spins on a single contact point rather than a flat face.",
-    "A top spins best when its mass is in the disc and its point is hard. Print it in the strongest filament you have and sand the point smooth.",
+    "A top spins best when its mass is in the disc and its point is hard. Make it in the strongest material you have and sand the point smooth.",
   ],
   header: "Spinning Top Designer - units: mm",
   fields: [
@@ -414,7 +414,7 @@ export const bottleStopper: AnyDesign = defineDesign({
   ],
   notes: [
     "The plug is a cone from the small end to the large end, so it wedges into the neck instead of relying on a straight fit. The shoulder above it is wider than the neck and the knob is wider again.",
-    "Print a stopper in TPU if you want a seal, or in PLA with a cork gasket if the bottle is going to be stored on its side. A rigid printed plug leaks unless the neck is very round.",
+    "Make a stopper in a flexible material if you want a seal, or in a rigid material with a cork gasket if the bottle is going to be stored on its side. A rigid plug leaks unless the neck is very round.",
   ],
   header: "Bottle Stopper Designer - units: mm",
   fields: [
@@ -504,7 +504,7 @@ export const taperedPlug: AnyDesign = defineDesign({
   ],
   notes: [
     "The plug is a truncated cone with a short flange, so it can be pressed in until the flange stops it. Both diameters are entered directly rather than as an angle, which is how a hole is actually measured.",
-    "A printed taper holds by friction alone. If it has to stay in, drill a cross hole and pin it, or add a grub screw through the flange.",
+    "A taper holds by friction alone. If it has to stay in, drill a cross hole and pin it, or add a grub screw through the flange.",
   ],
   header: "Tapered Plug Designer - units: mm",
   fields: [
@@ -587,17 +587,17 @@ export const petBowl: AnyDesign = defineDesign({
   blurb: "A flared bowl with a heavy foot and a wide rim.",
   lede: "A bowl with a flared wall and a flat foot, shallow enough for a pet and heavy enough not to slide across a floor.",
   chips: [
-    { label: "Top Ø", value: "60 – 180 mm" },
+    { label: "Top Ø", value: "60 – 1000 mm" },
     { label: "Height", value: "20 – 90 mm" },
     { label: "Wall", value: "1.5 – 8 mm" },
   ],
   notes: [
     "The outer wall is a sine flare from the foot to the rim and the inner wall is the same curve offset by the wall thickness, so the bowl thickens at the foot and thins at the rim. The base is a solid disc under the floor.",
-    "A printed bowl slides on a hard floor. Print a ring of TPU under the foot, or glue a silicone O-ring into a groove — the foot recess in this profile can serve as that groove.",
+    "A bowl slides on a hard floor. Make a ring of a flexible material under the foot, or glue a silicone O-ring into a groove — the foot recess in this profile can serve as that groove.",
   ],
   header: "Pet Bowl Designer - units: mm",
   fields: [
-    { key: "top", label: "Top diameter", kind: "length", section: "Bowl", default: "140", min: 60, max: 180 },
+    { key: "top", label: "Top diameter", kind: "length", section: "Bowl", default: "140", min: 60, max: 1000 },
     { key: "height", label: "Height", kind: "length", section: "Bowl", default: "45", min: 20, max: 90 },
     { key: "foot", label: "Foot diameter", kind: "length", section: "Bowl", default: "80", min: 20, max: 140 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Bowl", default: "4", min: 1.5, max: 8 },
@@ -615,7 +615,7 @@ export const petBowl: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "top", "Top diameter", p.topMm, 60, 180);
+    pushRange(errors, units, "top", "Top diameter", p.topMm, 60, 1000);
     pushRange(errors, units, "height", "Height", p.heightMm, 20, 90);
     pushRange(errors, units, "foot", "Foot diameter", p.footMm, 20, 140);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1.5, 8);
@@ -705,7 +705,7 @@ export const planterPot: AnyDesign = defineDesign({
   blurb: "A tapered pot with a real drainage hole.",
   lede: "A tapered pot whose floor is an annulus around a true drainage hole — the hole is part of the revolved profile, not a drill operation.",
   chips: [
-    { label: "Top Ø", value: "40 – 180 mm" },
+    { label: "Top Ø", value: "40 – 1000 mm" },
     { label: "Height", value: "30 – 170 mm" },
     { label: "Drain", value: "3 – 30 mm" },
   ],
@@ -715,7 +715,7 @@ export const planterPot: AnyDesign = defineDesign({
   ],
   header: "Planter Pot Designer - units: mm",
   fields: [
-    { key: "top", label: "Top diameter", kind: "length", section: "Pot", default: "120", min: 40, max: 180 },
+    { key: "top", label: "Top diameter", kind: "length", section: "Pot", default: "120", min: 40, max: 1000 },
     { key: "bottom", label: "Base diameter", kind: "length", section: "Pot", default: "90", min: 20, max: 160 },
     { key: "height", label: "Height", kind: "length", section: "Pot", default: "100", min: 30, max: 170 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Pot", default: "3", min: 1.5, max: 8 },
@@ -733,7 +733,7 @@ export const planterPot: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "top", "Top diameter", p.topMm, 40, 180);
+    pushRange(errors, units, "top", "Top diameter", p.topMm, 40, 1000);
     pushRange(errors, units, "bottom", "Base diameter", p.bottomMm, 20, 160);
     pushRange(errors, units, "height", "Height", p.heightMm, 30, 170);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1.5, 8);
@@ -814,7 +814,7 @@ export const wineGlass: AnyDesign = defineDesign({
   ],
   notes: [
     "The bowl is a sine flare from the stem to the rim and the inner surface is the same curve offset by the wall, so the glass thins naturally towards the lip. The stem is solid and the foot is a flat disc.",
-    "A printed wine glass is a demonstration of the profile, not a vessel for hot liquid. Print it in clear PETG, and keep the wall above 1.2 mm or it will crack at the stem junction.",
+    "A wine glass is a demonstration of the profile, not a vessel for hot liquid. Make it in a clear, tough material, and keep the wall above 1.2 mm or it will crack at the stem junction.",
   ],
   header: "Wine Glass Designer - units: mm",
   fields: [
@@ -925,7 +925,7 @@ export const goblet: AnyDesign = defineDesign({
   ],
   notes: [
     "The cup is a truncated cone inside and out, with a floor thick enough to be turned flat. The stem is a separate straight section below it and the foot is a disc, all in one profile.",
-    "Print the goblet upright with a brim: the foot needs a wide first layer, and a 2 mm wall is about as thin as a printed vessel stays watertight.",
+    "Make the goblet upright with a wide base: the foot needs a wide base, and a 2 mm wall is about as thin as a vessel stays watertight.",
   ],
   header: "Goblet Designer - units: mm",
   fields: [

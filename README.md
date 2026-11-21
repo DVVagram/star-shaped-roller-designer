@@ -1,9 +1,9 @@
 # Parametric Wheel Works
 
-One hundred and forty-six parametric designers for **3D-printable parts**, in one
-static site: the original four wheels and rotors, ninety-six gears, pulleys,
-fixings, vessels, ducts and mechanisms, and fifty more workshop fixtures, turned
-fittings and household forms.
+One hundred and forty-six parametric designers for **editable mechanical and
+household parts**, in one static site: the original four wheels and rotors,
+ninety-six gears, pulleys, fixings, vessels, ducts and mechanisms, and fifty more
+workshop fixtures, turned fittings and household forms.
 
 | Designer     | What it makes                                                        |
 | ------------ | -------------------------------------------------------------------- |
@@ -16,7 +16,8 @@ Every designer renders a live three.js preview of the same indexed mesh it
 measures, reports the closed-shell volume, and exports a binary STL. Coordinates
 are millimetres by convention; STL itself carries no units, material or
 tolerance data. Invalid or non-manifold configurations block the download
-instead of producing a broken file.
+instead of producing a broken file. There is no assumed build area: the model is
+not rejected because an overall dimension is large.
 
 ## Capability, not a certificate
 
@@ -25,8 +26,8 @@ move air or survive heat. Every catalogue card and designer page therefore
 carries a capability label:
 
 - **Shape / display model** — editable geometry with no verified duty.
-- **Fit prototype** — measure the mating part, calibrate the printer and
-  test-print before relying on a dimension.
+- **Fit prototype** — measure the mating part, verify the intended process and
+  make a physical test piece before relying on a dimension.
 - **Functional candidate** — only after the named fit and load checks are made
   and recorded. No designer currently qualifies; none is labelled functional.
 - **Not suitable for the named high-risk use** — pressure, flame, cutting,
@@ -39,9 +40,8 @@ downloadable specification. `docs/CAPABILITY.md` records the evidence behind the
 labels, and `docs/DESIGN-AUDIT.md` is generated from the registry with every
 designer's capability, standard, mate and first limitation. The four original
 builders also download a specification and a dimension sheet. Exporting a fit
-prototype is allowed only after the mesh passes the
-topology and envelope checks; that is still not permission to treat it as a
-certified part.
+prototype is allowed only after the mesh passes the topology checks; that is
+still not permission to treat it as a certified part.
 
 Everything runs in the browser: no CAD kernel, no server, no account, no uploads.
 
@@ -133,8 +133,8 @@ marked built.
 
 Every new designer is a `defineDesign()` module. One field list drives the form,
 the unit conversion, the millimetre parameters, the validation copy, the readout,
-the preview and the STL file name, so the drawn part, the printed numbers and the
-exported file cannot disagree about what was asked for.
+the preview and the STL file name, so the drawn part, the measured numbers and
+the exported file cannot disagree about what was asked for.
 
 ---
 
@@ -170,8 +170,8 @@ For the prism extruder:
 `inspectMesh()` then verifies the result: every directed edge must cancel against
 its reverse, there must be a single connected shell, and no repeated faces or
 faces with repeated vertex indices. Earcut's hole bridges can leave zero-area cap
-slivers; those are counted and reported rather than hidden, and slicers normally
-skip them. It accepts any closed orientable surface — `χ = 2` for a plain solid, `0`
+slivers; those are counted and reported rather than hidden, and most importers
+ignore them. It accepts any closed orientable surface — `χ = 2` for a plain solid, `0`
 for a tube, `−2` for a plate with two holes — and reports the genus instead of
 assuming every part has a bore. Only then is a volume reported or an STL offered.
 The volume is the divergence-theorem volume of that closed mesh.
@@ -228,7 +228,7 @@ src/
   App.tsx                    suite shell: header, hash router, catalog, footer
   components/
     Catalog.tsx              the one hundred and forty-six cards, grouped by family
-    DesignerPage.tsx         hero + builder slot + explainer shared by every page
+    DesignerPage.tsx         compact title + builder first, explainer below
     DesignScaffold.tsx       two-column builder: inputs, measurements, preview, export
     GenericDesigner.tsx      schema-driven form used by all one hundred and forty-six new designs
     DesignMark.tsx           one family glyph per catalog card
@@ -285,23 +285,25 @@ scripts/
   straight radial root and no fillet. **Splines** are straight-sided rather than
   involute. **Knurls** are modelled as a lobed outline, not a cut diamond.
 - **Threads are not modelled.** Nuts, knobs and adapters are bored to the
-  entered diameter, so a printed M8 nut needs the bore sized for the material and
-  the printer, not a real thread form.
+  entered diameter, so an M8 nut needs the bore sized for the material and the
+  process, not a real thread form.
 - **Ratchet wheels** have asymmetric teeth with a root fillet but no separate
   pawl. **Geneva wheels** have the slots and the concave locking arc, but not the
   driver pin. **Cams** are radial-lift discs with no roller follower.
 - **Flywheels** are rim, web and hub only: no lightening holes, keyway or
-  balancing marks. The mass estimate assumes PLA at 1.24 g/cm³.
+  balancing marks. The mass estimate assumes a density of 1.24 g/cm³; set the
+  real density for your material.
 - **Springs** are a circular wire swept on a true helix with square-cut ends; the
-  rate uses G = 3.5 GPa for PLA and assumes the coils do not touch.
+  rate uses an illustrative G = 3.5 GPa and assumes the coils do not touch;
+  substitute the shear modulus of the material you will use.
 - **Vessels** are solids of revolution, so handles, spouts that leave the axis
   and non-circular rims are out of scope. A funnel's spout is concentric.
-- Printability checks describe geometry only. Layer adhesion, wall count and
-  material still decide whether a print survives.
+- Fabrication checks describe geometry only. Process choice, material and wall
+  thickness still decide whether a part survives.
 - **No designer is functionally certified.** Gears are not validated against a
   mating gear, sprockets against a chain, threads are absent, springs use an
   illustrative modulus, and vessels are not pressure-, heat- or food-rated. The
   capability labels and `docs/CAPABILITY.md` are part of the product, not a
   footnote.
-- **Fit is never guaranteed.** Measure the real mating part and print a coupon;
-  the app applies no printer, material or tolerance calibration.
+- **Fit is never guaranteed.** Measure the real mating part and make a test
+  piece; the app applies no process, material or tolerance calibration.

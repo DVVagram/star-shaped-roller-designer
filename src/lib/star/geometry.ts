@@ -19,14 +19,11 @@
 export const MM_PER_INCH = 25.4;
 export const TWO_PI = Math.PI * 2;
 
-/** Bambu Lab A1 Mini build volume, matching the other designers in this family. */
-export const BUILD_VOLUME_MM = { x: 180, y: 180, z: 180 } as const;
-
 /** Minimum radial wall left between the centre hole and the valley floor. */
 export const MIN_WALL_MM = 1.6;
-/** Smallest flat land the app calls printable. */
+/** Smallest flat land the app models as a distinct feature. */
 export const MIN_FEATURE_MM = 0.8;
-/** Shortest flank, measured along the flank, that still prints cleanly. */
+/** Shortest flank, measured along the flank, that still forms a distinct edge. */
 export const MIN_FLANK_MM = 0.75;
 /** A spike needs at least this fraction of its height available as base width. */
 export const BASE_TO_DEPTH_RATIO = 0.45;
@@ -34,7 +31,7 @@ export const BASE_TO_DEPTH_RATIO = 0.45;
 export const MIN_SPIKE_HEIGHT_MM = 0.5;
 
 export const LIMITS = {
-  outerDiameterMm: { min: 20, max: 180 },
+  outerDiameterMm: { min: 20, max: 1000 },
   thicknessMm: { min: 1, max: 60 },
   spikeCount: { min: 3, max: 96 },
   spikeDepthMm: { min: 0.5, max: 80 },
@@ -42,7 +39,7 @@ export const LIMITS = {
   valleyWidthMm: { min: 0, max: 30 },
   taperMm: { min: 0, max: 40 },
   boreMm: { min: 0.8, max: 120 },
-  hubDiameterMm: { min: 3, max: 170 },
+  hubDiameterMm: { min: 3, max: 1000 },
   hubHeightMm: { min: 0.4, max: 60 },
 } as const;
 
@@ -355,7 +352,7 @@ export function evaluateSpikeCount(
       return { ok: false, limitedBy: "spike spacing" };
     }
     // A flap's sides are parallel, so what matters is how far it reaches out of
-    // the core and whether the flap itself is thick enough to print.
+    // the core and whether the flap itself is thick enough to make.
     const baseX = Math.sqrt(valleyRadius * valleyRadius - halfWidth * halfWidth);
     const tipX = Math.sqrt(tipRadius * tipRadius - halfWidth * halfWidth);
     if (tipX - baseX < MIN_FLANK_MM) {
@@ -442,7 +439,6 @@ export interface DerivedStar {
   thicknessMm: number;
   taperMm: number;
   totalHeightMm: number;
-  fitsBuildVolume: boolean;
   feasible: boolean;
   limitingFactor: string | null;
   maxSpikeCount: number;
@@ -503,9 +499,6 @@ export function deriveStar(spec: StarSpec): DerivedStar {
     thicknessMm: spec.thicknessMm,
     taperMm: Math.max(0, spec.taperMm),
     totalHeightMm,
-    fitsBuildVolume:
-      spec.outerDiameterMm <= BUILD_VOLUME_MM.x + 1e-9 &&
-      totalHeightMm <= BUILD_VOLUME_MM.z + 1e-9,
     feasible: evaluation.ok,
     limitingFactor: evaluation.limitedBy,
     maxSpikeCount: auto.count,
@@ -708,7 +701,7 @@ export function validateStar(
         level: "error",
         message: `Flaps narrower than ${unitShown(
           2 * MIN_FEATURE_MM,
-        )} will not print; widen the tip width or pick another spike shape.`,
+        )} will not make; widen the tip width or pick another spike shape.`,
       });
     }
 
@@ -770,21 +763,6 @@ export function validateStar(
       }
     }
 
-    if (!derived.fitsBuildVolume) {
-      const widthBlocked = specFull.outerDiameterMm > BUILD_VOLUME_MM.x + 1e-9;
-      errors.push({
-        field: widthBlocked ? "outerDiameter" : "thickness",
-        level: "error",
-        message: widthBlocked
-          ? `A ${unitShown(
-              specFull.outerDiameterMm,
-            )} wheel does not fit the 180 × 180 × 180 mm build volume.`
-          : `${unitShown(
-              derived.totalHeightMm,
-            )} tall (wheel plus hub) does not fit the 180 × 180 × 180 mm build volume.`,
-      });
-    }
-
     // ------------------------------------------------------------- warnings
     const effectiveTipWidth = derived.tipLandMm;
     if (specFull.spikeShape !== "sharp") {
@@ -795,7 +773,7 @@ export function validateStar(
           message: `Tips are ${formatNumber(
             mmToUnit(effectiveTipWidth, unit),
             2,
-          )} ${unit} wide — thin tips chip off printed parts.`,
+          )} ${unit} wide — thin tips are fragile in handling.`,
         });
       }
     }
@@ -815,7 +793,7 @@ export function validateStar(
         field: "valleyWidth",
         level: "warning",
         message:
-          "Narrow valleys are stress risers and hard to print cleanly; 2 mm or more is safer.",
+          "Narrow valleys are stress risers and hard to form cleanly; 2 mm or more is safer.",
       });
     }
 
@@ -823,7 +801,7 @@ export function validateStar(
       warnings.push({
         field: "spikeCount",
         level: "warning",
-        message: `${specFull.spikeCount} spikes means small features — use a 0.4 mm nozzle and slow the outer walls down.`,
+        message: `${specFull.spikeCount} spikes means small features — check that your process can hold the tip and valley widths.`,
       });
     }
 
@@ -831,7 +809,7 @@ export function validateStar(
       warnings.push({
         field: "thickness",
         level: "warning",
-        message: "Under 2 mm thick this roller flexes and may warp.",
+        message: "Under 2 mm thick this roller flexes and may distort under load.",
       });
     }
 

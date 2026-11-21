@@ -10,8 +10,8 @@ forty-six from `docs/DESIGNERS.md` the catalogue now holds ninety-six designs.
 Every candidate was judged on the same four rules as the first list:
 
 1. the geometry follows exactly from a handful of numbers, with a closed-form
-   check the app can print next to the preview;
-2. the result is one closed shell that prints without support in at least one
+   check the app can verify next to the preview;
+2. the result is one closed shell that can be made without a fixture in at least one
    orientation;
 3. the part is recognisable and useful on its own, not a fragment of a larger
    assembly;

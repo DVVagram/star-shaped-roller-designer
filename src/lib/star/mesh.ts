@@ -45,7 +45,7 @@ function capFaces(outer: Point2D[], holes: Point2D[][]): Face[] {
 }
 
 /**
- * Builds the printable solid as one indexed triangle mesh.
+ * Builds the solid as one indexed triangle mesh.
  *
  * The roller is a star prism with a hole: both flat faces are triangulated with
  * the same earcut implementation three.js uses, so the cap boundaries are the

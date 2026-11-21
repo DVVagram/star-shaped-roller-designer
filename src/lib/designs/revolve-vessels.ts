@@ -55,19 +55,19 @@ export const funnel: AnyDesign = defineDesign({
   blurb: "A conical funnel with a straight spout and a real wall thickness.",
   lede: "The cone runs from the rim down to a spout, and the inner surface is the same cone offset by the wall. Set the rim, spout and height and the funnel's capacity follows from the geometry rather than from a guess.",
   chips: [
-    { label: "Rim Ø", value: "30 – 180 mm" },
+    { label: "Rim Ø", value: "30 – 1000 mm" },
     { label: "Spout Ø", value: "3 – 40 mm" },
     { label: "Wall", value: "1 – 8 mm" },
   ],
   notes: [
     "Both the outer and inner cone are straight lines through the same apex angle, with a constant horizontal offset of one wall thickness. The spout is a straight tube below the cone and the rim is a flat annular face, so the shell closes without a separate lip.",
-    "A printed funnel pours better with a small air gap beside the spout. If it glugs, cut a shallow notch in the inner rim or use a wider spout — a 6 mm bore is about the practical minimum for water.",
+    "A funnel pours better with a small air gap beside the spout. If it glugs, cut a shallow notch in the inner rim or use a wider spout — a 6 mm bore is about the practical minimum for water.",
   ],
   header: "Funnel Designer - units: mm",
   fields: [
-    { key: "rimDiameter", label: "Rim diameter", kind: "length", section: "Funnel", default: "120", min: 30, max: 180 },
+    { key: "rimDiameter", label: "Rim diameter", kind: "length", section: "Funnel", default: "120", min: 30, max: 1000 },
     { key: "spoutDiameter", label: "Spout bore", kind: "length", section: "Spout", default: "20", min: 3, max: 40 },
-    { key: "height", label: "Overall height", kind: "length", section: "Funnel", default: "100", min: 25, max: 180 },
+    { key: "height", label: "Overall height", kind: "length", section: "Funnel", default: "100", min: 25, max: 1000 },
     { key: "spoutLength", label: "Spout length", kind: "length", section: "Spout", default: "20", min: 3, max: 80 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Funnel", default: "2.5", min: 1, max: 8 },
   ],
@@ -81,9 +81,9 @@ export const funnel: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "rimDiameter", "Rim diameter", p.rimMm, 30, 180);
+    pushRange(errors, units, "rimDiameter", "Rim diameter", p.rimMm, 30, 1000);
     pushRange(errors, units, "spoutDiameter", "Spout bore", p.spoutMm, 3, 40);
-    pushRange(errors, units, "height", "Overall height", p.heightMm, 25, 180);
+    pushRange(errors, units, "height", "Overall height", p.heightMm, 25, 1000);
     pushRange(errors, units, "spoutLength", "Spout length", p.spoutLengthMm, 3, 80);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
     if (errors.length > 0) return emptyResult(errors, warnings);
@@ -153,19 +153,19 @@ export const vase: AnyDesign = defineDesign({
   blurb: "A hollow vase whose belly and taper are both parametric.",
   lede: "A straight taper plus a sine belly gives a thrown-looking profile without any hand-drawn curves. Set the rim, base, height, wall and belly, and the inner wall follows the outer one exactly, leaving a real floor at the bottom.",
   chips: [
-    { label: "Height", value: "40 – 180 mm" },
+    { label: "Height", value: "40 – 1000 mm" },
     { label: "Rim Ø", value: "20 – 160 mm" },
     { label: "Belly", value: "0 – 40 mm" },
   ],
   notes: [
     "The outer radius is `base/2 + (rim/2 − base/2)u + belly·sin(πu)`, and the inner radius is that minus the wall. The floor is flat at the entered thickness, so the capacity can be integrated exactly from the inner profile.",
-    "Print a vase in spiral-vase mode with a 1.2 mm wall and three or four solid bottom layers. A wider belly holds more but tips more easily; keep the base at least a third of the rim for stability.",
+    "Make a vase with a 1.2 mm wall and three or four solid bottom sections. A wider belly holds more but tips more easily; keep the base at least a third of the rim for stability.",
   ],
   header: "Vase Designer - units: mm",
   fields: [
     { key: "rimDiameter", label: "Rim diameter", kind: "length", section: "Vase", default: "90", min: 20, max: 160 },
     { key: "baseDiameter", label: "Base diameter", kind: "length", section: "Vase", default: "60", min: 16, max: 140 },
-    { key: "height", label: "Height", kind: "length", section: "Vase", default: "120", min: 40, max: 180 },
+    { key: "height", label: "Height", kind: "length", section: "Vase", default: "120", min: 40, max: 1000 },
     { key: "belly", label: "Belly swell", kind: "length", section: "Vase", default: "10", min: 0, max: 40, hint: "Extra radius at mid-height." },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Vase", default: "2.5", min: 1, max: 8 },
     { key: "floor", label: "Floor thickness", kind: "length", section: "Vase", default: "4", min: 1.5, max: 20 },
@@ -183,7 +183,7 @@ export const vase: AnyDesign = defineDesign({
     const warnings: DesignIssue[] = [];
     pushRange(errors, units, "rimDiameter", "Rim diameter", p.rimMm, 20, 160);
     pushRange(errors, units, "baseDiameter", "Base diameter", p.baseMm, 16, 140);
-    pushRange(errors, units, "height", "Height", p.heightMm, 40, 180);
+    pushRange(errors, units, "height", "Height", p.heightMm, 40, 1000);
     pushRange(errors, units, "belly", "Belly swell", p.bellyMm, 0, 40);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
     pushRange(errors, units, "floor", "Floor thickness", p.floorMm, 1.5, 20);
@@ -197,7 +197,7 @@ export const vase: AnyDesign = defineDesign({
     if (p.floorMm >= p.heightMm * 0.5) {
       errors.push({ field: "floor", level: "error", message: "The floor is thicker than half the vase." });
     }
-    if (p.wallMm < 1.2) pushWarning(warnings, "wall", "Under 1.2 mm a printed wall leaks between layers.");
+    if (p.wallMm < 1.2) pushWarning(warnings, "wall", "Under 1.2 mm a wall can leak through its thickness.");
 
     const innerAt = (u: number) => Math.max(0, outerAt(u) - p.wallMm);
     const floorU = p.floorMm / p.heightMm;
@@ -269,18 +269,18 @@ export const cup: AnyDesign = defineDesign({
   lede: "A simple truncated cone, hollowed with a constant wall and a flat floor. Because the taper is linear the capacity, rim wall and stack height are all closed-form numbers, and the readout reports the volume in millilitres.",
   chips: [
     { label: "Top Ø", value: "30 – 140 mm" },
-    { label: "Height", value: "30 – 180 mm" },
+    { label: "Height", value: "30 – 1000 mm" },
     { label: "Capacity", value: "ml" },
   ],
   notes: [
     "The outer wall is a straight line from the base radius to the rim radius; the inner wall is the same line offset inward by the wall. The floor closes the bottom at the entered thickness, so the cavity is a frustum minus that floor.",
-    "Print a cup upright with three or four perimeters and no cooling fan for the first few layers. A 4 mm floor keeps the base flat; a 1.2 mm wall is enough for a mug that only holds cold drinks.",
+    "Make a cup upright with a substantial wall. A 4 mm floor keeps the base flat; a 1.2 mm wall is enough for a mug that only holds cold drinks.",
   ],
   header: "Tapered Cup Designer - units: mm",
   fields: [
     { key: "topDiameter", label: "Top diameter", kind: "length", section: "Cup", default: "80", min: 30, max: 140 },
     { key: "bottomDiameter", label: "Base diameter", kind: "length", section: "Cup", default: "60", min: 20, max: 130 },
-    { key: "height", label: "Height", kind: "length", section: "Cup", default: "90", min: 30, max: 180 },
+    { key: "height", label: "Height", kind: "length", section: "Cup", default: "90", min: 30, max: 1000 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Cup", default: "2.5", min: 1, max: 8 },
     { key: "floor", label: "Floor thickness", kind: "length", section: "Cup", default: "3", min: 1.5, max: 20 },
   ],
@@ -296,7 +296,7 @@ export const cup: AnyDesign = defineDesign({
     const warnings: DesignIssue[] = [];
     pushRange(errors, units, "topDiameter", "Top diameter", p.topMm, 30, 140);
     pushRange(errors, units, "bottomDiameter", "Base diameter", p.bottomMm, 20, 130);
-    pushRange(errors, units, "height", "Height", p.heightMm, 30, 180);
+    pushRange(errors, units, "height", "Height", p.heightMm, 30, 1000);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
     pushRange(errors, units, "floor", "Floor thickness", p.floorMm, 1.5, 20);
     if (errors.length > 0) return emptyResult(errors, warnings);
@@ -369,19 +369,19 @@ export const bowl: AnyDesign = defineDesign({
   family: "vessels",
   eyebrow: "Curved wall",
   blurb: "A shallow bowl with a flat foot and a sine-curved wall.",
-  lede: "The wall leaves a flat foot and curves out to the rim on a quarter sine, which is stable to print and comfortable to hold. The cavity follows the same curve inside, and the readout gives its capacity and the wall angle at the rim.",
+  lede: "The wall leaves a flat foot and curves out to the rim on a quarter sine, which is stable to make and comfortable to hold. The cavity follows the same curve inside, and the readout gives its capacity and the wall angle at the rim.",
   chips: [
-    { label: "Rim Ø", value: "40 – 180 mm" },
+    { label: "Rim Ø", value: "40 – 1000 mm" },
     { label: "Height", value: "20 – 100 mm" },
     { label: "Capacity", value: "ml" },
   ],
   notes: [
     "The outer radius is `foot/2 + (rim/2 − foot/2)·sin(πu/2)`, so it leaves the foot vertically and reaches the rim horizontally. The inner radius is one wall inside it, and the floor is flat across the foot.",
-    "A bowl printed upright needs a chamfer on the foot or a brim, because the first layers carry the whole footprint. If the wall angle at the rim is under about 40° from vertical, the overhang starts to need support.",
+    "A bowl made upright needs a chamfer on the foot or a wide base, because the first stages carry the whole footprint. If the wall angle at the rim is under about 40° from vertical, forming it starts to need a fixture.",
   ],
   header: "Bowl Designer - units: mm",
   fields: [
-    { key: "rimDiameter", label: "Rim diameter", kind: "length", section: "Bowl", default: "140", min: 40, max: 180 },
+    { key: "rimDiameter", label: "Rim diameter", kind: "length", section: "Bowl", default: "140", min: 40, max: 1000 },
     { key: "footDiameter", label: "Foot diameter", kind: "length", section: "Bowl", default: "50", min: 15, max: 120 },
     { key: "height", label: "Height", kind: "length", section: "Bowl", default: "60", min: 20, max: 100 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Bowl", default: "3", min: 1, max: 8 },
@@ -397,7 +397,7 @@ export const bowl: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "rimDiameter", "Rim diameter", p.rimMm, 40, 180);
+    pushRange(errors, units, "rimDiameter", "Rim diameter", p.rimMm, 40, 1000);
     pushRange(errors, units, "footDiameter", "Foot diameter", p.footMm, 15, 120);
     pushRange(errors, units, "height", "Height", p.heightMm, 20, 100);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
@@ -481,19 +481,19 @@ export const bottle: AnyDesign = defineDesign({
   blurb: "A hollow bottle with a smooth shoulder and a straight neck.",
   lede: "The body is a cylinder, the shoulder blends from body to neck on a smoothstep, and the neck runs straight to the rim. Everything is hollow with a real wall and floor, and the capacity is integrated from the inner profile.",
   chips: [
-    { label: "Height", value: "60 – 180 mm" },
+    { label: "Height", value: "60 – 1000 mm" },
     { label: "Body Ø", value: "20 – 140 mm" },
     { label: "Neck Ø", value: "8 – 60 mm" },
   ],
   notes: [
-    "The shoulder uses a smoothstep rather than a radius, so it leaves the body and enters the neck with zero slope. That is what keeps the wall from creasing at the two transitions and lets a spiral print run continuously through them.",
-    "A printed bottle is not pressure-tight unless the wall is at least three perimeters and the floor is solid. For a screw cap, model the thread separately — this body has a plain neck sized for a push-fit stopper.",
+    "The shoulder uses a smoothstep rather than a radius, so it leaves the body and enters the neck with zero slope. That is what keeps the wall from creasing at the two transitions and lets a spiral make run continuously through them.",
+    "A bottle is not pressure-tight unless it has a substantial wall and a solid floor. For a screw cap, model the thread separately — this body has a plain neck sized for a push-fit stopper.",
   ],
   header: "Bottle Designer - units: mm",
   fields: [
     { key: "bodyDiameter", label: "Body diameter", kind: "length", section: "Bottle", default: "70", min: 20, max: 140 },
     { key: "neckDiameter", label: "Neck diameter", kind: "length", section: "Neck", default: "24", min: 8, max: 60 },
-    { key: "height", label: "Overall height", kind: "length", section: "Bottle", default: "170", min: 60, max: 180 },
+    { key: "height", label: "Overall height", kind: "length", section: "Bottle", default: "170", min: 60, max: 1000 },
     { key: "neckHeight", label: "Neck height", kind: "length", section: "Neck", default: "30", min: 8, max: 80 },
     { key: "shoulderHeight", label: "Shoulder height", kind: "length", section: "Bottle", default: "35", min: 8, max: 80 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Bottle", default: "2.2", min: 1, max: 8 },
@@ -513,7 +513,7 @@ export const bottle: AnyDesign = defineDesign({
     const warnings: DesignIssue[] = [];
     pushRange(errors, units, "bodyDiameter", "Body diameter", p.bodyMm, 20, 140);
     pushRange(errors, units, "neckDiameter", "Neck diameter", p.neckMm, 8, 60);
-    pushRange(errors, units, "height", "Overall height", p.heightMm, 60, 180);
+    pushRange(errors, units, "height", "Overall height", p.heightMm, 60, 1000);
     pushRange(errors, units, "neckHeight", "Neck height", p.neckHeightMm, 8, 80);
     pushRange(errors, units, "shoulderHeight", "Shoulder height", p.shoulderMm, 8, 80);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
@@ -611,17 +611,17 @@ export const bell: AnyDesign = defineDesign({
   blurb: "A flared bell with a solid crown and a hollow skirt.",
   lede: "The outer wall follows a squared flare from a narrow crown down to a wide lip; the inside is one wall inboard with a solid crown above it. Set the lip and crown diameters and the flare is defined without any freehand curve.",
   chips: [
-    { label: "Lip Ø", value: "30 – 180 mm" },
+    { label: "Lip Ø", value: "30 – 1000 mm" },
     { label: "Height", value: "20 – 120 mm" },
     { label: "Crown", value: "8 – 80 mm" },
   ],
   notes: [
     "The radius is `crown/2 + (lip/2 − crown/2)(1 − u)²`, so the flare is steep at the lip and flat at the crown. The inner surface is offset by the wall and stops at the crown thickness, leaving a solid disc over the cavity.",
-    "A bell rings because its wall is thin and its lip is free. Print it with the lip down and a wide brim; supports inside the cavity will change the tone and are hard to remove.",
+    "A bell rings because its wall is thin and its lip is free. Make it with the lip down and a wide base; anything left inside the cavity will change the tone and are hard to remove.",
   ],
   header: "Bell Designer - units: mm",
   fields: [
-    { key: "lipDiameter", label: "Lip diameter", kind: "length", section: "Bell", default: "90", min: 30, max: 180 },
+    { key: "lipDiameter", label: "Lip diameter", kind: "length", section: "Bell", default: "90", min: 30, max: 1000 },
     { key: "crownDiameter", label: "Crown diameter", kind: "length", section: "Bell", default: "30", min: 8, max: 80 },
     { key: "height", label: "Height", kind: "length", section: "Bell", default: "80", min: 20, max: 120 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Bell", default: "3", min: 1, max: 8 },
@@ -637,7 +637,7 @@ export const bell: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "lipDiameter", "Lip diameter", p.lipMm, 30, 180);
+    pushRange(errors, units, "lipDiameter", "Lip diameter", p.lipMm, 30, 1000);
     pushRange(errors, units, "crownDiameter", "Crown diameter", p.crownMm, 8, 80);
     pushRange(errors, units, "height", "Height", p.heightMm, 20, 120);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
@@ -707,17 +707,17 @@ export const lampShade: AnyDesign = defineDesign({
   blurb: "A truncated-cone shade with a real wall and open ends.",
   lede: "A straight cone shell, open at both ends, with the wall thickness measured radially. Set the two diameters and the height and the shade's slope, wall and surface area are fixed; the mesh is a true conical tube.",
   chips: [
-    { label: "Bottom Ø", value: "40 – 180 mm" },
+    { label: "Bottom Ø", value: "40 – 1000 mm" },
     { label: "Top Ø", value: "20 – 160 mm" },
     { label: "Height", value: "30 – 160 mm" },
   ],
   notes: [
     "The profile is a closed quadrilateral in the radius–height plane: up the outside, across the top rim, down the inside and across the bottom rim. Revolving it gives a tube with two open ends, so the shell has no cap to trap heat.",
-    "Keep at least 25 mm between a printed shade and the bulb. PLA softens around 60 °C, so use PETG or a low-power LED, and never put a printed shade on a halogen lamp.",
+    "Keep at least 25 mm between a shade and the bulb. a rigid material softens around 60 °C, so use a tough material or a low-power LED, and never put a shade on a halogen lamp.",
   ],
   header: "Lamp Shade Designer - units: mm",
   fields: [
-    { key: "bottomDiameter", label: "Bottom diameter", kind: "length", section: "Shade", default: "160", min: 40, max: 180 },
+    { key: "bottomDiameter", label: "Bottom diameter", kind: "length", section: "Shade", default: "160", min: 40, max: 1000 },
     { key: "topDiameter", label: "Top diameter", kind: "length", section: "Shade", default: "60", min: 20, max: 160 },
     { key: "height", label: "Height", kind: "length", section: "Shade", default: "120", min: 30, max: 160 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Shade", default: "2", min: 1, max: 8 },
@@ -731,7 +731,7 @@ export const lampShade: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "bottomDiameter", "Bottom diameter", p.bottomMm, 40, 180);
+    pushRange(errors, units, "bottomDiameter", "Bottom diameter", p.bottomMm, 40, 1000);
     pushRange(errors, units, "topDiameter", "Top diameter", p.topMm, 20, 160);
     pushRange(errors, units, "height", "Height", p.heightMm, 30, 160);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
@@ -795,17 +795,17 @@ export const parabolicDish: AnyDesign = defineDesign({
   blurb: "A true paraboloid shell with its focal length reported.",
   lede: "A real paraboloid, generated from z = r²/4f rather than from a circular arc. Set the rim diameter and the focal length and the depth, f/D ratio and focal point follow exactly — useful for a reflector, a lamp or a sound dish.",
   chips: [
-    { label: "Rim Ø", value: "40 – 180 mm" },
+    { label: "Rim Ø", value: "40 – 1000 mm" },
     { label: "Focal length", value: "10 – 160 mm" },
     { label: "Wall", value: "1 – 8 mm" },
   ],
   notes: [
     "The surface is sampled from `z = r²/(4f)`, so its focus sits exactly f above the vertex. The inner surface is the same paraboloid offset down by the wall, and the rim face closes the shell between them.",
-    "Print the dish face-up with the convex side on the bed if you want the reflective surface clean; the support marks then stay on the back. A printed dish is never optically smooth — it is a light or sound collector, not a telescope mirror.",
+    "Make the dish face-up with the convex side down if you want the reflective surface clean; the fixture marks then stay on the back. A dish is never optically smooth — it is a light or sound collector, not a telescope mirror.",
   ],
   header: "Parabolic Dish Designer - units: mm",
   fields: [
-    { key: "diameter", label: "Rim diameter", kind: "length", section: "Dish", default: "120", min: 40, max: 180 },
+    { key: "diameter", label: "Rim diameter", kind: "length", section: "Dish", default: "120", min: 40, max: 1000 },
     { key: "focalLength", label: "Focal length", kind: "length", section: "Dish", default: "60", min: 10, max: 160 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Dish", default: "3", min: 1, max: 8 },
   ],
@@ -817,7 +817,7 @@ export const parabolicDish: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "diameter", "Rim diameter", p.diameterMm, 40, 180);
+    pushRange(errors, units, "diameter", "Rim diameter", p.diameterMm, 40, 1000);
     pushRange(errors, units, "focalLength", "Focal length", p.focalMm, 10, 160);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
     if (errors.length > 0) return emptyResult(errors, warnings);
@@ -826,7 +826,7 @@ export const parabolicDish: AnyDesign = defineDesign({
     const depth = (radius * radius) / (4 * p.focalMm);
     checkSize(errors, units, "diameter", p.diameterMm, depth);
     if (depth < p.wallMm) errors.push({ field: "focalLength", level: "error", message: "The dish is shallower than its wall — shorten the focal length or use a thinner wall." });
-    if (depth > p.diameterMm) pushWarning(warnings, "focalLength", "A very deep dish is hard to print without support.");
+    if (depth > p.diameterMm) pushWarning(warnings, "focalLength", "A very deep dish is hard to make without a fixture.");
 
     return {
       errors,
@@ -875,23 +875,23 @@ export const parabolicDish: AnyDesign = defineDesign({
 
 export const spool: AnyDesign = defineDesign({
   id: "spool",
-  name: "Filament spool",
+  name: "Cable spool",
   family: "vessels",
   eyebrow: "Flanges and barrel",
-  blurb: "A reusable spool with a wide barrel and two retaining flanges.",
+  blurb: "A reusable wire or cable spool with a wide barrel and two retaining flanges.",
   lede: "Two flanges and a narrow barrel with a through bore. Set the barrel and flange diameters, the overall width and the flange thickness, and the winding width follows — the spool is a single revolved shell.",
   chips: [
     { label: "Barrel Ø", value: "20 – 140 mm" },
-    { label: "Flange Ø", value: "40 – 180 mm" },
+    { label: "Flange Ø", value: "40 – 1000 mm" },
     { label: "Width", value: "10 – 100 mm" },
   ],
   notes: [
     "The cross-section is a rotated C: along the bore, out across the flange, in to the barrel, along the barrel, out to the second flange and back to the bore. Revolving it gives one closed shell with a continuous bore, so no separate hub is needed.",
-    "Keep the barrel at least 25 mm wider than the bore for a stiff core, and make the flanges thick enough that they do not dish when the filament pulls tight. A 5 mm flange is a good starting point.",
+    "Keep the barrel at least 25 mm wider than the bore for a stiff core, and make the flanges thick enough that they do not dish when the material pulls tight. A 5 mm flange is a good starting point.",
   ],
-  header: "Filament Spool Designer - units: mm",
+  header: "Cable Spool Designer - units: mm",
   fields: [
-    { key: "flangeDiameter", label: "Flange diameter", kind: "length", section: "Spool", default: "70", min: 40, max: 180 },
+    { key: "flangeDiameter", label: "Flange diameter", kind: "length", section: "Spool", default: "70", min: 40, max: 1000 },
     { key: "barrelDiameter", label: "Barrel diameter", kind: "length", section: "Spool", default: "40", min: 20, max: 140 },
     { key: "width", label: "Overall width", kind: "length", section: "Spool", default: "50", min: 10, max: 100 },
     { key: "flangeThickness", label: "Flange thickness", kind: "length", section: "Spool", default: "5", min: 2, max: 20 },
@@ -907,7 +907,7 @@ export const spool: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "flangeDiameter", "Flange diameter", p.flangeMm, 40, 180);
+    pushRange(errors, units, "flangeDiameter", "Flange diameter", p.flangeMm, 40, 1000);
     pushRange(errors, units, "barrelDiameter", "Barrel diameter", p.barrelMm, 20, 140);
     pushRange(errors, units, "width", "Overall width", p.widthMm, 10, 100);
     pushRange(errors, units, "flangeThickness", "Flange thickness", p.flangeThicknessMm, 2, 20);
@@ -978,16 +978,16 @@ export const flangedBushing: AnyDesign = defineDesign({
   lede: "A cylindrical sleeve with a collar at one end. The flange sets the axial position and spreads the load, while the sleeve takes the shaft; both diameters, the bore and the lengths are independent.",
   chips: [
     { label: "Sleeve Ø", value: "6 – 120 mm" },
-    { label: "Flange Ø", value: "10 – 180 mm" },
+    { label: "Flange Ø", value: "10 – 1000 mm" },
     { label: "Bore", value: "2 – 100 mm" },
   ],
   notes: [
     "The cross-section runs from the bore out across the flange, down the sleeve outside and back across the far end, so the bore is one continuous cylinder from face to face. That makes the bushing a single shell with no joint at the flange.",
-    "A printed bushing is a wear part, not a bearing. Give it 0.2–0.3 mm of running clearance and a drop of grease; if it runs hot, the shaft needs a real bronze bush instead.",
+    "A bushing is a wear part, not a bearing. Give it 0.2–0.3 mm of running clearance and a drop of grease; if it runs hot, the shaft needs a real bronze bush instead.",
   ],
   header: "Flanged Bushing Designer - units: mm",
   fields: [
-    { key: "flangeDiameter", label: "Flange diameter", kind: "length", section: "Bushing", default: "30", min: 10, max: 180 },
+    { key: "flangeDiameter", label: "Flange diameter", kind: "length", section: "Bushing", default: "30", min: 10, max: 1000 },
     { key: "flangeThickness", label: "Flange thickness", kind: "length", section: "Bushing", default: "4", min: 1.5, max: 20 },
     { key: "sleeveDiameter", label: "Sleeve diameter", kind: "length", section: "Bushing", default: "18", min: 6, max: 120 },
     { key: "length", label: "Overall length", kind: "length", section: "Bushing", default: "25", min: 5, max: 120 },
@@ -1003,7 +1003,7 @@ export const flangedBushing: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "flangeDiameter", "Flange diameter", p.flangeMm, 10, 180);
+    pushRange(errors, units, "flangeDiameter", "Flange diameter", p.flangeMm, 10, 1000);
     pushRange(errors, units, "flangeThickness", "Flange thickness", p.flangeThicknessMm, 1.5, 20);
     pushRange(errors, units, "sleeveDiameter", "Sleeve diameter", p.sleeveMm, 6, 120);
     pushRange(errors, units, "length", "Overall length", p.lengthMm, 5, 120);
@@ -1068,17 +1068,17 @@ export const gasket: AnyDesign = defineDesign({
   blurb: "A rectangular-section sealing ring with exact diameters.",
   lede: "A flat annulus for a face seal, sized by its outer and inner diameters and its compressed thickness. Both circles are generated at the entered size, so the seal lands on the flange face instead of being approximated.",
   chips: [
-    { label: "Outer Ø", value: "10 – 180 mm" },
+    { label: "Outer Ø", value: "10 – 1000 mm" },
     { label: "Inner Ø", value: "5 – 160 mm" },
     { label: "Thickness", value: "0.5 – 10 mm" },
   ],
   notes: [
     "The cross-section is a rectangle, so the seal has parallel faces and a constant radial width. That is the right shape for a confined gasket: it compresses in thickness rather than extruding sideways.",
-    "Print a gasket in a soft material (TPU if you have it) at 100 % infill. For a water seal, give it a thin coat of grease and compress it by about 20 % of its free thickness.",
+    "Make a gasket in a soft material (a flexible material if you have it) at solid. For a water seal, give it a thin coat of grease and compress it by about 20 % of its free thickness.",
   ],
   header: "Gasket Ring Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Gasket", default: "40", min: 10, max: 180 },
+    { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Gasket", default: "40", min: 10, max: 1000 },
     { key: "innerDiameter", label: "Inner diameter", kind: "length", section: "Gasket", default: "30", min: 5, max: 160 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Gasket", default: "2", min: 0.5, max: 10 },
   ],
@@ -1090,7 +1090,7 @@ export const gasket: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerMm, 10, 180);
+    pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerMm, 10, 1000);
     pushRange(errors, units, "innerDiameter", "Inner diameter", p.innerMm, 5, 160);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 0.5, 10);
     if (errors.length > 0) return emptyResult(errors, warnings);

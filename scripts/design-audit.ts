@@ -17,7 +17,7 @@ const lines = [
   "# Designer audit",
   "",
   "Generated from the registry, so it cannot drift from the catalogue. Capability",
-  "labels describe verified scope, not printability. See `docs/CAPABILITY.md` for the",
+  "labels describe verified scope, not fitness. See `docs/CAPABILITY.md` for the",
   "checks actually performed and the evidence matrix.",
   "",
   `Designers: **${DESIGNS.length}**`,

@@ -131,7 +131,7 @@ export const linkPlate: AnyDesign = defineDesign({
   family: "fixings",
   eyebrow: "Two pins",
   blurb: "A dog-bone plate that joins two pins at a fixed centre distance.",
-  lede: "A stadium plate with two equal bores at an exact centre distance — the flat link of a printed linkage, a chain substitute or a pair of rods.",
+  lede: "A stadium plate with two equal bores at an exact centre distance — the flat link of a linkage, a chain substitute or a pair of rods.",
   chips: [
     { label: "Pitch", value: "8 – 150 mm" },
     { label: "Bore", value: "2 – 30 mm" },
@@ -139,7 +139,7 @@ export const linkPlate: AnyDesign = defineDesign({
   ],
   notes: [
     "The outline is a stadium of the plate width, so the overall length is the pin pitch plus the plate width, and the ends are true semicircles around each pin. Both bores are the same size and sit on the pin centres.",
-    "A printed link is weakest across the pin holes. Keep at least one bore diameter of material outside each hole and press a metal pin or a screw through it.",
+    "A link is weakest across the pin holes. Keep at least one bore diameter of material outside each hole and press a metal pin or a screw through it.",
   ],
   header: "Link Plate Designer - units: mm",
   fields: [
@@ -223,7 +223,7 @@ export const drillGuide: AnyDesign = defineDesign({
   ],
   notes: [
     "Every hole is a straight through-bore, so the guide only works if the block is thick enough: a guide hole needs about one diameter of length to hold a bit square. The block is sized from the hole count and pitch rather than the other way round.",
-    "Drill slowly and clear the chips — a printed guide will melt if the bit runs hot. Use it for wood and plastics, not for metal.",
+    "Drill slowly and clear the chips — a guide will melt if the bit runs hot. Use it for wood and plastics, not for metal.",
   ],
   header: "Drill Guide Designer - units: mm",
   fields: [
@@ -317,7 +317,7 @@ export const keytag: AnyDesign = defineDesign({
   ],
   notes: [
     "The ring hole sits on the centre line at the rounded end, with a full hole diameter of material around it. The tag is a true stadium, so the end is a semicircle rather than a clipped corner.",
-    "Print it flat in a tough filament. A tag printed in PLA snaps at the ring hole after a few months of pocket wear.",
+    "Make it flat in a tough material. A tag made in a rigid material snaps at the ring hole after a few months of pocket wear.",
   ],
   header: "Key Tag Designer - units: mm",
   fields: [
@@ -396,7 +396,7 @@ export const plantLabel: AnyDesign = defineDesign({
   ],
   notes: [
     "The outline is one closed polygon: a rectangular writing plate and a triangular point, with no separate parts to snap off. The point length is measured from the bottom of the plate.",
-    "A label printed flat with the point in the bed plane is strongest along the stake. Use PETG outdoors; PLA goes brittle in sunlight and frost.",
+    "A label made flat with the point in the base plane is strongest along the stake. Use a tough material outdoors; a rigid material goes brittle in sunlight and frost.",
   ],
   header: "Plant Label Designer - units: mm",
   fields: [
@@ -488,7 +488,7 @@ export const gussetPlate: AnyDesign = defineDesign({
     { label: "Thickness", value: "2 – 16 mm" },
   ],
   notes: [
-    "The triangle is right-angled with equal legs, and the holes sit on a square inset from both legs so a screwdriver clears the corner. The outline is a plain triangle, so the plate is flat and prints without support.",
+    "The triangle is right-angled with equal legs, and the holes sit on a square inset from both legs so a screwdriver clears the corner. The outline is a plain triangle, so the plate is flat and can be formed without a fixture.",
     "A flat gusset only braces one plane. For a three-dimensional corner, use two plates at 90° or a folded bracket.",
   ],
   header: "Gusset Plate Designer - units: mm",
@@ -708,7 +708,7 @@ export const switchPlate: AnyDesign = defineDesign({
   ],
   notes: [
     "The opening is a rounded rectangle with its own corner radius, so a switch or a gauge drops in without a sharp corner to crack. It is a through-hole like any other, cut from the same cap as the plate.",
-    "Measure the device, not the old plate: printed plates shrink about 0.2 %, and a switch that rubs its opening will not sit flat.",
+    "Measure the device, not the old plate: formed plates can shrink about 0.2 %, and a switch that rubs its opening will not sit flat.",
   ],
   header: "Switch Plate Designer - units: mm",
   fields: [
@@ -807,7 +807,7 @@ export const tensionerPlate: AnyDesign = defineDesign({
   ],
   notes: [
     "The slot starts after the pivot with a real web between them, and the arm is a stadium so it can swing without a corner catching. Slot travel is the slot length, not its overall length.",
-    "Print the arm in the plane of its swing so the slot walls take the bolt load along the layers, not across them.",
+    "Make the arm in the plane of its swing so the slot walls take the bolt load along the grain, not across them.",
   ],
   header: "Tensioner Plate Designer - units: mm",
   fields: [

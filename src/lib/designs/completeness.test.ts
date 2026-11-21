@@ -52,8 +52,8 @@ describe("designer catalogue: completeness", () => {
         if (text.length < 70) note(id, `note is only ${text.length} characters: "${text.slice(0, 40)}…"`);
         remember(seen.note, text, id);
       }
-      if (!design.notes.some((text) => /print|PLA|PETG|layer|infill|support|slic/i.test(text))) {
-        note(id, "notes never say how to make or print the part");
+      if (!design.notes.some((text) => /make|form|machine|finish|fit|material|fixture|grain|orient|cut|bore|turn|mould|assemble/i.test(text))) {
+        note(id, "notes never say how to make or fit the part");
       }
       remember(seen.title, design.notesTitle, id);
 
@@ -183,5 +183,39 @@ describe("designer catalogue: completeness", () => {
     }
 
     expect(problems, problems.join("\n")).toEqual([]);
+  });
+
+  it("makes no build-area or 3D-printer assumptions", () => {
+    const banned = /\b(print(?:er|ed|ing)?|slicer|filament|pla|petg|tpu|asa|infill|brim|layer|build volume|print bed)\b/i;
+    const offenders: string[] = [];
+
+    for (const design of DESIGNS) {
+      const copy = [
+        design.name,
+        design.blurb,
+        design.lede,
+        design.use,
+        design.notesTitle,
+        ...design.notes,
+        ...design.chips.flatMap((chip) => [chip.label, chip.value]),
+        design.contract.intendedUse,
+        design.contract.standard,
+        design.contract.mating,
+        design.contract.fitAllowance,
+        ...design.contract.limitations,
+        ...design.contract.notChecked,
+      ];
+      for (const text of copy) {
+        if (banned.test(text)) offenders.push(`${design.id}: "${text}"`);
+      }
+
+      for (const field of design.fields) {
+        if (field.kind === "length" && (field.min === 180 || field.max === 180)) {
+          offenders.push(`${design.id}.${field.key}: still ranged to 180 mm`);
+        }
+      }
+    }
+
+    expect(offenders, offenders.join("\n")).toEqual([]);
   });
 });

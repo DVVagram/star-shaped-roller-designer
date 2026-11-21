@@ -24,8 +24,6 @@ import type { AnyDesign, RawValues } from "./types";
 
 export const LIBRARY_VERSION = "1.0";
 
-export const BUILD_VOLUME_MM = 180;
-
 export interface ArtifactRecord {
   id: string;
   name: string;
@@ -35,15 +33,6 @@ export interface ArtifactRecord {
   warnings: string[];
   errors: { field: string; message: string }[];
   mesh: Mesh | null;
-}
-
-export function envelopeFits(mesh: { boundingBox: { min: number[]; max: number[] } }): boolean {
-  for (let axis = 0; axis < 3; axis += 1) {
-    if (mesh.boundingBox.max[axis] - mesh.boundingBox.min[axis] > BUILD_VOLUME_MM + 1e-6) {
-      return false;
-    }
-  }
-  return true;
 }
 
 function entered(fieldKind: string, raw: RawValues, key: string): string {
@@ -61,7 +50,7 @@ export function renderRecordSpecification(
 ): string {
   const { contract } = record;
   const unitNote =
-    "All internal geometry is in millimetres. STL is unitless: set the slicer to millimetres and verify scale and orientation.";
+    "All internal geometry is in millimetres. STL is unitless: import at millimetre scale and verify orientation.";
   const generatedAt = options.generatedAt ?? new Date();
   const lines: string[] = [];
 
@@ -112,9 +101,6 @@ export function renderRecordSpecification(
     lines.push(`- Volume: ${formatNumber(report.volumeMm3 / 1000, 3)} cm³`);
     lines.push(
       `- Bounding box: ${formatNumber(mesh.boundingBox.max[0] - mesh.boundingBox.min[0], 2)} × ${formatNumber(mesh.boundingBox.max[1] - mesh.boundingBox.min[1], 2)} × ${formatNumber(mesh.boundingBox.max[2] - mesh.boundingBox.min[2], 2)} mm`,
-    );
-    lines.push(
-      `- Build volume (${BUILD_VOLUME_MM} mm cube): ${envelopeFits(mesh) ? "fits" : "does not fit"}`,
     );
   }
   lines.push("");

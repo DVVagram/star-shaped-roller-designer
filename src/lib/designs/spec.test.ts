@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { buildDrawingSvg, drawingFileName } from "./drawing";
 import { designById, DESIGNS } from "./index";
 import {
-  BUILD_VOLUME_MM,
   buildSpecification,
   LIBRARY_VERSION,
   specificationFileName,
@@ -65,7 +64,7 @@ describe("downloadable specification", () => {
       expect(text).toContain("LIMITATIONS");
       expect(text).toContain("NOT CHECKED");
       expect(text).toContain("STL is unitless");
-      expect(text).toContain(`${BUILD_VOLUME_MM} mm cube`);
+      expect(text).not.toMatch(/build volume|printer|slicer|print bed/i);
       for (const field of design.fields) expect(text).toContain(field.key);
       for (const item of design.contract.limitations) expect(text).toContain(item);
       for (const issue of design.derive(raw).readout) expect(text).toContain(issue.label);
@@ -87,6 +86,24 @@ describe("downloadable specification", () => {
     expect(text).toContain("Not suitable for the named high-risk use");
     expect(text).toContain("Do not spin this part in a centrifuge");
     expect(text).toContain("NOT CHECKED");
+  });
+
+  it("accepts a model larger than 180 mm without a build-area limit", () => {
+    const design = sample("index-plate");
+    const raw = rawFor(design);
+    raw.values.outerDiameter = "300";
+    raw.values.holeCircle = "170";
+
+    const result = design.derive(raw);
+    expect(result.errors).toEqual([]);
+
+    const mesh = design.build(raw);
+    const widthMm = mesh.boundingBox.max[0] - mesh.boundingBox.min[0];
+    expect(widthMm).toBeGreaterThan(299);
+
+    const text = buildSpecification(design, raw);
+    expect(text).not.toMatch(/build volume|does not fit|printer/i);
+    expect(text).toContain("Bounding box");
   });
 
   it("covers every designer without throwing", () => {

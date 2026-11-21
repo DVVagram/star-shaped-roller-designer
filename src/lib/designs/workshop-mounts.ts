@@ -54,7 +54,7 @@ export const routerTemplate: AnyDesign = defineDesign({
   ],
   notes: [
     "The opening is a rounded rectangle with a real corner radius, so the bushing can follow it without catching. Each screw is placed outside the opening by a bushing-sized margin, which is checked before the plate is built.",
-    "Print the template at 100 percent infill and check it against the bushing with a test cut in scrap. A template that flexes by half a millimetre cuts a recess that is a millimetre oversize on both sides.",
+    "Make the template at solid and check it against the bushing with a test cut in scrap. A template that flexes by half a millimetre cuts a recess that is a millimetre oversize on both sides.",
   ],
   header: "Router Template Designer - units: mm",
   fields: [
@@ -144,17 +144,17 @@ export const fanMount: AnyDesign = defineDesign({
   use: "Adapting a standard fan to a cabinet, a duct or a panel with a different opening.",
   notesTitle: "How the fan opening clears the blades",
   chips: [
-    { label: "Plate", value: "40 – 180 mm" },
+    { label: "Plate", value: "40 – 1000 mm" },
     { label: "Opening", value: "20 – 170 mm" },
     { label: "Fan pitch", value: "20 – 160 mm" },
   ],
   notes: [
     "The opening is a circle and the four screws are placed on a square pitch, not a circle, because that is how a fan frame is drilled. The designer checks the opening against the screw line and keeps the plate outside the screws.",
-    "Print it from a stiff filament and keep the plate at least 4 mm thick; a thin adapter bows into the blade tips when the screws are tightened. Deburr the opening so the blade tips cannot catch on a layer seam.",
+    "Make it from a stiff material and keep the plate at least 4 mm thick; a thin adapter bows into the blade tips when the screws are tightened. Deburr the opening so the blade tips cannot catch on a process seam.",
   ],
   header: "Fan Mount Designer - units: mm",
   fields: [
-    { key: "plate", label: "Plate size", kind: "length", section: "Plate", default: "120", min: 40, max: 180 },
+    { key: "plate", label: "Plate size", kind: "length", section: "Plate", default: "120", min: 40, max: 1000 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Plate", default: "4", min: 2.5, max: 10 },
     { key: "opening", label: "Fan opening", kind: "length", section: "Opening", default: "110", min: 20, max: 170 },
     { key: "pitch", label: "Fan hole pitch", kind: "length", section: "Screws", default: "105", min: 20, max: 160 },
@@ -170,7 +170,7 @@ export const fanMount: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "plate", "Plate size", p.plateMm, 40, 180);
+    pushRange(errors, units, "plate", "Plate size", p.plateMm, 40, 1000);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2.5, 10);
     pushRange(errors, units, "opening", "Fan opening", p.openingMm, 20, 170);
     pushRange(errors, units, "pitch", "Fan hole pitch", p.pitchMm, 20, 160);
@@ -237,7 +237,7 @@ export const trivet: AnyDesign = defineDesign({
   ],
   notes: [
     "The slots run parallel and are spaced by a fixed pitch, so the bars between them are all the same width and expand evenly. The plate is checked to keep a solid rim all round, which is what stops a hot pan from collapsing the edge.",
-    "Print it in a heat-tolerant filament such as PETG or ASA, not PLA, which softens near a hob. Four perimeters and a solid top give the bars enough body to take a heavy pan.",
+    "Make it in a heat-tolerant material that will not soften near a hob. A substantial wall and a solid top give the bars enough body to take a heavy pan.",
   ],
   header: "Trivet Designer - units: mm",
   fields: [
@@ -329,7 +329,7 @@ export const bellCrank: AnyDesign = defineDesign({
   ],
   notes: [
     "The holes sit on the bisectors of an equilateral plate, so all three have the same wall to the edge and the pivot is equidistant from the two link pins. The designer checks the hole spacing, which is the triangle side less the two hole margins.",
-    "Print the plate flat with the holes vertical and press a metal pin or a bolt through the pivot. Printed holes wear oval under a rocking load, so ream the pivot and use a bushing if the linkage runs often.",
+    "Make the plate flat with the holes vertical and press a metal pin or a bolt through the pivot. Finished holes wear oval under a rocking load, so ream the pivot and use a bushing if the linkage runs often.",
   ],
   header: "Bell Crank Designer - units: mm",
   fields: [
@@ -420,7 +420,7 @@ export const hexStandoff: AnyDesign = defineDesign({
   ],
   notes: [
     "The outline is a regular hexagon and the across-flats size is converted to the circumradius the plot needs, so the spanner size on the readout is the size you actually measure. The bore is concentric and the wall is checked all round.",
-    "Print a standoff upright with the bore vertical; supports inside the bore are easier to clean out than an oval hole is to fix. Use four perimeters and do not overtighten a screw into a printed spacer, because the layers split before the screw strips.",
+    "Make a standoff upright with the bore vertical; a fixture inside the bore is easier to clean out than an oval hole is to fix. Use a solid wall and do not overtighten a screw into a spacer, because the material splits before the screw strips.",
   ],
   header: "Hex Standoff Designer - units: mm",
   fields: [
@@ -507,7 +507,7 @@ export const sandingDrum: AnyDesign = defineDesign({
   ],
   notes: [
     "The bore is a straight through-hole sized to the arbor, and the wall between the bore and the drum face is reported directly. Both rims are chamfered, which is what lets a rubber sleeve or an abrasive band start without tearing.",
-    "Print the drum with the bore vertical and at 100 percent infill; a sanding drum is squeezed by its sleeve and a hollow one will collapse. Check the bore against the arbor with a test fit before gluing the abrasive on.",
+    "Make the drum with the bore vertical and at solid; a sanding drum is squeezed by its sleeve and a hollow one will collapse. Check the bore against the arbor with a test fit before gluing the abrasive on.",
   ],
   header: "Sanding Drum Designer - units: mm",
   fields: [

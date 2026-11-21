@@ -11,11 +11,7 @@ import { CAPABILITIES } from "@/lib/designs/contracts";
 import { downloadText } from "@/lib/kit/download";
 import { formatNumber } from "@/lib/kit/units";
 import { buildDrawingSvg, drawingFileName } from "@/lib/designs/drawing";
-import {
-  buildSpecification,
-  envelopeFits,
-  specificationFileName,
-} from "@/lib/designs/spec";
+import { buildSpecification, specificationFileName } from "@/lib/designs/spec";
 import type { AnyDesign, FieldDef } from "@/lib/designs/types";
 
 import DesignScaffold from "./DesignScaffold";
@@ -98,8 +94,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
   const visible = design.fields.filter((field) => field.visible?.(values) ?? true);
   const sections = Array.from(new Set(visible.map((field) => field.section)));
 
-  const fitsBuildVolume = Boolean(mesh && envelopeFits(mesh));
-  const watertight = Boolean(valid && report?.ok && fitsBuildVolume);
+  const watertight = Boolean(valid && report?.ok);
   const volumeCm3 = report?.ok ? report.volumeMm3 / 1000 : Number.NaN;
   const fileBytes = mesh ? stlByteLength(mesh) : 0;
   const fieldLabel = (key: string) =>
@@ -115,10 +110,6 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
       setExportError(
         "The generated solid is not a single watertight shell, so it was not exported.",
       );
-      return;
-    }
-    if (!fitsBuildVolume) {
-      setExportError("The generated part does not fit the 180 mm build cube, so it was not exported.");
       return;
     }
     try {
@@ -258,12 +249,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
           ))}
         </div>
       }
-      general={[
-        ...generalErrors,
-        ...(report?.ok && !fitsBuildVolume
-          ? ["The part exceeds the 180 mm build cube. Reduce an overall dimension before exporting."]
-          : []),
-      ]}
+      general={generalErrors}
       warnings={result.warnings.map((issue) => `${fieldLabel(issue.field)}: ${issue.message}`)}
       errorCount={result.errors.length}
       validationOk={valid}
@@ -288,7 +274,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
         limitation: design.contract.limitations[0],
         disabled: !watertight,
         note: valid
-          ? `${report && report.zeroAreaFaces > 0 ? `${report.zeroAreaFaces} zero-area cap face${report.zeroAreaFaces === 1 ? "" : "s"} from hole bridging are reported; slicers normally skip them. ` : ""}Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your slicer.`
+          ? `${report && report.zeroAreaFaces > 0 ? `${report.zeroAreaFaces} zero-area cap face${report.zeroAreaFaces === 1 ? "" : "s"} from hole bridging are reported; most importers ignore them. ` : ""}Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your software.`
           : "Export is disabled while the configuration has errors.",
         volume: Number.isFinite(volumeCm3) ? `${formatNumber(volumeCm3, 2)} cm³` : "—",
         triangles: report ? formatNumber(report.triangleCount, 0) : "—",

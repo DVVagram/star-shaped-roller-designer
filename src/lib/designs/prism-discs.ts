@@ -68,17 +68,17 @@ export const brakeRotor: AnyDesign = defineDesign({
   blurb: "A vented-look rotor blank with a bolt circle and a ring of drillings.",
   lede: "A disc with a centre bore, a mounting bolt circle and a ring of cooling holes, sized like a small motorcycle or kart rotor.",
   chips: [
-    { label: "Rotor Ø", value: "40 – 180 mm" },
+    { label: "Rotor Ø", value: "40 – 1000 mm" },
     { label: "Holes", value: "0 – 36" },
     { label: "Bolt circle", value: "12 – 140 mm" },
   ],
   notes: [
     "The cooling holes are evenly spaced on their own pitch circle, so the pattern is symmetric and the disc stays balanced. The mounting bolt circle is a separate pattern inside it, and every hole is a through-hole in the same cap triangulation as the rim.",
-    "A printed rotor is a demonstration part, not a brake: PLA loses stiffness well below brake temperatures. Use it for a go-kart mock-up or a display, and never on a vehicle that has to stop.",
+    "A rotor is a demonstration part, not a brake: a rigid material loses stiffness well below brake temperatures. Use it for a go-kart mock-up or a display, and never on a vehicle that has to stop.",
   ],
   header: "Brake Rotor Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Rotor diameter", kind: "length", section: "Rotor", default: "160", min: 40, max: 180 },
+    { key: "outerDiameter", label: "Rotor diameter", kind: "length", section: "Rotor", default: "160", min: 40, max: 1000 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Rotor", default: "6", min: 2, max: 20 },
     { key: "bore", label: "Centre bore", kind: "length", section: "Rotor", default: "30", min: 6, max: 100 },
     { key: "boltCircle", label: "Bolt circle", kind: "length", section: "Mounting", default: "60", min: 12, max: 140 },
@@ -102,7 +102,7 @@ export const brakeRotor: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Rotor diameter", p.outerMm, 40, 180);
+    pushRange(errors, units, "outerDiameter", "Rotor diameter", p.outerMm, 40, 1000);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2, 20);
     pushRange(errors, units, "bore", "Centre bore", p.boreMm, 6, 100);
     pushRange(errors, units, "boltCircle", "Bolt circle", p.pcdMm, 12, 140);
@@ -171,16 +171,16 @@ export const indexPlate: AnyDesign = defineDesign({
   lede: "A dividing plate with a ring of identical detent holes on a pitch circle, used to index a fixture or a rotary table by equal steps.",
   chips: [
     { label: "Holes", value: "2 – 72" },
-    { label: "Plate Ø", value: "40 – 180 mm" },
+    { label: "Plate Ø", value: "40 – 1000 mm" },
     { label: "Hole", value: "2 – 16 mm" },
   ],
   notes: [
     "The holes are placed by angle, so the last one closes exactly on the first and the step is 360° divided by the count. The index angle is reported directly, which is the number the fixture uses.",
-    "A printed detent hole wears oval. If the plate is a working dividing plate, press a metal bush into each hole or use it only for light indexing.",
+    "A detent hole wears oval. If the plate is a working dividing plate, press a metal bush into each hole or use it only for light indexing.",
   ],
   header: "Index Plate Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Plate diameter", kind: "length", section: "Plate", default: "120", min: 40, max: 180 },
+    { key: "outerDiameter", label: "Plate diameter", kind: "length", section: "Plate", default: "120", min: 40, max: 1000 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Plate", default: "8", min: 2, max: 20 },
     { key: "bore", label: "Centre bore", kind: "length", section: "Plate", default: "10", min: 3, max: 60 },
     { key: "holes", label: "Detent holes", kind: "count", section: "Detents", default: "12", min: 2, max: 72 },
@@ -198,7 +198,7 @@ export const indexPlate: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Plate diameter", p.outerMm, 40, 180);
+    pushRange(errors, units, "outerDiameter", "Plate diameter", p.outerMm, 40, 1000);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2, 20);
     pushRange(errors, units, "bore", "Centre bore", p.boreMm, 3, 60);
     pushInteger(errors, "holes", "Detent holes", p.holes, 2, 72);
@@ -473,7 +473,7 @@ export const precisionSpacer: AnyDesign = defineDesign({
   ],
   notes: [
     "The bore is a plain through-hole and the outside is chamfered with four stacked outlines, so the ring seats without a burr rolling under the part it spaces. The wall is reported directly.",
-    "A spacer only sets a height if both faces are parallel. Print it on a flat face with the bore vertical, and skim the faces if the stack has to be exact.",
+    "A spacer only sets a height if both faces are parallel. Make it on a flat face with the bore vertical, and skim the faces if the stack has to be exact.",
   ],
   header: "Precision Spacer Designer - units: mm",
   fields: [
@@ -547,7 +547,7 @@ export const fanGrille: AnyDesign = defineDesign({
   blurb: "A round grille with concentric rings of holes.",
   lede: "A disc grille with two or three concentric rings of holes and a centre boss opening, sized to cover a fan without blocking its flow.",
   chips: [
-    { label: "Grille Ø", value: "30 – 180 mm" },
+    { label: "Grille Ø", value: "30 – 1000 mm" },
     { label: "Rings", value: "1 – 4" },
     { label: "Holes", value: "2 – 14 mm" },
   ],
@@ -557,7 +557,7 @@ export const fanGrille: AnyDesign = defineDesign({
   ],
   header: "Fan Grille Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Grille diameter", kind: "length", section: "Grille", default: "80", min: 30, max: 180 },
+    { key: "outerDiameter", label: "Grille diameter", kind: "length", section: "Grille", default: "80", min: 30, max: 1000 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Grille", default: "3", min: 1.5, max: 10 },
     { key: "centre", label: "Centre opening", kind: "length", section: "Grille", default: "20", min: 0, max: 80 },
     { key: "rings", label: "Hole rings", kind: "count", section: "Pattern", default: "3", min: 1, max: 4 },
@@ -579,7 +579,7 @@ export const fanGrille: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Grille diameter", p.outerMm, 30, 180);
+    pushRange(errors, units, "outerDiameter", "Grille diameter", p.outerMm, 30, 1000);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 1.5, 10);
     pushRange(errors, units, "centre", "Centre opening", p.centreMm, 0, 80);
     pushInteger(errors, "rings", "Hole rings", p.rings, 1, 4);
@@ -655,17 +655,17 @@ export const bafflePlate: AnyDesign = defineDesign({
   blurb: "A bored disc with a ring of transfer holes.",
   lede: "A disc that sits inside a tube or a pot: one centre bore and a ring of transfer holes, so flow passes through a known open area instead of around the plate.",
   chips: [
-    { label: "Disc Ø", value: "30 – 180 mm" },
+    { label: "Disc Ø", value: "30 – 1000 mm" },
     { label: "Holes", value: "0 – 24" },
     { label: "Bore", value: "2 – 60 mm" },
   ],
   notes: [
     "The centre bore and the ring of holes are both through-holes in one plate, and the rim is left plain so the plate can be a push fit in a tube. The open area is reported as a percentage of the disc.",
-    "A printed baffle in a hot vessel will creep. If it has to hold position, add a groove for an O-ring or trap it between two shoulders.",
+    "A baffle in a hot vessel will creep. If it has to hold position, add a groove for an O-ring or trap it between two shoulders.",
   ],
   header: "Baffle Plate Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Disc diameter", kind: "length", section: "Plate", default: "140", min: 30, max: 180 },
+    { key: "outerDiameter", label: "Disc diameter", kind: "length", section: "Plate", default: "140", min: 30, max: 1000 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Plate", default: "4", min: 1.5, max: 16 },
     { key: "bore", label: "Centre bore", kind: "length", section: "Plate", default: "12", min: 2, max: 60 },
     { key: "holes", label: "Transfer holes", kind: "count", section: "Holes", default: "6", min: 0, max: 24 },
@@ -683,7 +683,7 @@ export const bafflePlate: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Disc diameter", p.outerMm, 30, 180);
+    pushRange(errors, units, "outerDiameter", "Disc diameter", p.outerMm, 30, 1000);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 1.5, 16);
     pushRange(errors, units, "bore", "Centre bore", p.boreMm, 2, 60);
     pushInteger(errors, "holes", "Transfer holes", p.holes, 0, 24);
@@ -750,7 +750,7 @@ export const dovetailRail: AnyDesign = defineDesign({
   ],
   notes: [
     "The rail is a single prism whose cross-section is the dovetail, extruded along its length, so the angled flanks are planar and the section is constant. The flank angle follows from the base and top widths and the height.",
-    "A printed dovetail needs clearance: leave 0.2–0.3 mm between the rail and the carriage, or the first layer squish will seize the slide.",
+    "A dovetail needs clearance: leave 0.2–0.3 mm between the rail and the carriage, or the surface compression will seize the slide.",
   ],
   header: "Dovetail Rail Designer - units: mm",
   fields: [
@@ -860,7 +860,7 @@ export const sinkStrainer: AnyDesign = defineDesign({
   ],
   notes: [
     "The grid is computed to fit inside the plate with a solid rim, so no hole is clipped by the edge. The centre opening takes the waste fitting and the rim is wide enough to sit on a recessed seat.",
-    "A strainer works by open area, not hole count: the designer reports the open percentage so you can compare two patterns before printing.",
+    "A strainer works by open area, not hole count: the designer reports the open percentage so you can compare two patterns before making.",
   ],
   header: "Sink Strainer Designer - units: mm",
   fields: [
@@ -952,7 +952,7 @@ export const mountingRing: AnyDesign = defineDesign({
   blurb: "A bored ring with a ring of clamp bolts.",
   lede: "A flat ring that clamps a flange, a lens or a boot: a large bore, a ring of bolts outside it and a land wide enough to seal.",
   chips: [
-    { label: "Outside Ø", value: "20 – 180 mm" },
+    { label: "Outside Ø", value: "20 – 1000 mm" },
     { label: "Bore", value: "10 – 160 mm" },
     { label: "Bolts", value: "2 – 12" },
   ],
@@ -962,7 +962,7 @@ export const mountingRing: AnyDesign = defineDesign({
   ],
   header: "Mounting Ring Designer - units: mm",
   fields: [
-    { key: "outerDiameter", label: "Outside diameter", kind: "length", section: "Ring", default: "90", min: 20, max: 180 },
+    { key: "outerDiameter", label: "Outside diameter", kind: "length", section: "Ring", default: "90", min: 20, max: 1000 },
     { key: "bore", label: "Bore", kind: "length", section: "Ring", default: "60", min: 10, max: 160 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Ring", default: "8", min: 2, max: 20 },
     { key: "bolts", label: "Bolts", kind: "count", section: "Bolts", default: "6", min: 2, max: 12 },
@@ -980,7 +980,7 @@ export const mountingRing: AnyDesign = defineDesign({
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
     const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outerDiameter", "Outside diameter", p.outerMm, 20, 180);
+    pushRange(errors, units, "outerDiameter", "Outside diameter", p.outerMm, 20, 1000);
     pushRange(errors, units, "bore", "Bore", p.boreMm, 10, 160);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2, 20);
     pushInteger(errors, "bolts", "Bolts", p.bolts, 2, 12);

@@ -52,7 +52,7 @@ export const squareFlange: AnyDesign = defineDesign({
   ],
   notes: [
     "The bolt circle is the diameter through the hole centres and the corner radius is a real round on the outline, so the plate is not a rectangle with sharp corners. The bore and every bolt hole are through-holes cut from the same cap triangulation as the outline.",
-    "Keep at least 2 mm between a bolt hole and the bore, and at least one bolt diameter from the edge. A printed flange creeps under bolt preload, so torque it gently and use washers.",
+    "Keep at least 2 mm between a bolt hole and the bore, and at least one bolt diameter from the edge. A flange can creep under bolt preload, so torque it gently and use washers.",
   ],
   header: "Square Flange Designer - units: mm",
   fields: [
@@ -228,7 +228,7 @@ export const bearingPlate: AnyDesign = defineDesign({
   ],
   notes: [
     "The bearing bore is a plain through-hole, not a shouldered pocket, so the bearing needs a retaining ring or a second plate to stop it walking. The four mounting holes are on a square pitch, which is the usual 608 bracket pattern.",
-    "Print the plate with the bore vertical and drill or ream it to size; a printed bore comes out about 0.15 mm under nominal.",
+    "Make the plate with the bore vertical and drill or ream it to size; a bored hole comes out about 0.15 mm under nominal.",
   ],
   header: "Bearing Plate Designer - units: mm",
   fields: [
@@ -323,7 +323,7 @@ export const nemaPlate: AnyDesign = defineDesign({
   ],
   notes: [
     "The 31 mm square and 3.4 mm holes are the NEMA 17 face pattern; the centre opening clears the 22 mm boss. All five holes are cut through the same plate, so the pattern is exact and the plate stays closed.",
-    "Print the plate flat and bolt the motor on with washers: a printed plate compresses under the screw heads and the motor will not sit square if the holes are countersunk by hand.",
+    "Make the plate flat and bolt the motor on with washers: a plate can compress under the screw heads and the motor will not sit square if the holes are countersunk by hand.",
   ],
   header: "NEMA 17 Plate Designer - units: mm",
   fields: [
@@ -416,7 +416,7 @@ export const tSlotNut: AnyDesign = defineDesign({
   ],
   notes: [
     "The body is a rounded rectangle sized to the slot width and long enough to bridge the slot opening. Both faces are chamfered with four stacked outlines, so the nut rocks into the slot instead of shaving a burr off the extrusion.",
-    "This is a drop-in nut, not a spring-loaded one: hold it in the slot with a finger until the first thread bites. Print it with the bore vertical for the strongest thread land.",
+    "This is a drop-in nut, not a spring-loaded one: hold it in the slot with a finger until the first thread bites. Make it with the bore vertical for the strongest thread land.",
   ],
   header: "T-Slot Nut Designer - units: mm",
   fields: [
@@ -587,7 +587,7 @@ export const couplingNut: AnyDesign = defineDesign({
   ],
   notes: [
     "The hexagon is sized across flats and the bore runs straight through, so the nut can be turned onto either stud. The chamfer at each end is a real 45° break, not a rounded edge.",
-    "A printed coupling nut carries load in the layer direction of its walls. If the joint matters, make it longer than the stud engagement and pin it.",
+    "A coupling nut carries load along its walls. If the joint matters, make it longer than the stud engagement and pin it.",
   ],
   header: "Coupling Nut Designer - units: mm",
   fields: [
@@ -668,7 +668,7 @@ export const crossKnob: AnyDesign = defineDesign({
   ],
   notes: [
     "Each lobe owns one pitch of the outline and the radius rises and falls smoothly across it. A four-lobe knob is the size a hand can spin; more lobes give a finer grip but less leverage.",
-    "Print it face down with the bore vertical. The bore is a plain through-hole, so size it for the screw or the threaded insert you plan to fit.",
+    "Make it face down with the bore vertical. The bore is a plain through-hole, so size it for the screw or the threaded insert you plan to fit.",
   ],
   header: "Cross Knob Designer - units: mm",
   fields: [
@@ -759,7 +759,7 @@ export const pointerKnob: AnyDesign = defineDesign({
   ],
   notes: [
     "The pointer is a tab tangent to the body circle, joined by two short straight sides, so the outline stays a single closed curve with no re-entrant corner. Its width is set independently of its reach.",
-    "A pointer knob only reads correctly if it cannot slip on the shaft. Add a flat or a grub screw to the shaft, or print the bore undersized and ream it to a press fit.",
+    "A pointer knob only reads correctly if it cannot slip on the shaft. Add a flat or a grub screw to the shaft, or make the bore undersized and ream it to a press fit.",
   ],
   header: "Pointer Knob Designer - units: mm",
   fields: [
@@ -848,7 +848,7 @@ export const pivotBracket: AnyDesign = defineDesign({
   ],
   notes: [
     "The three holes are cut from one plate, with the pivot on the centre line and the mounting holes symmetric about it. Rounded corners keep the plate from splitting at a screw corner.",
-    "A printed pivot wears quickly. Bush it with a short length of tube, or make the pivot bore 0.2 mm oversize and use a metal pin.",
+    "A pivot wears quickly. Bush it with a short length of tube, or make the pivot bore 0.2 mm oversize and use a metal pin.",
   ],
   header: "Pivot Bracket Designer - units: mm",
   fields: [

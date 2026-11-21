@@ -139,7 +139,7 @@ describe("legacy designer records", () => {
     expect(spec).toContain("Spikes: 24");
     expect(spec).toContain("Spike land is narrow.");
     expect(spec).toContain("MESH CHECKS PERFORMED");
-    expect(spec).toContain("Build volume (180 mm cube): fits");
+    expect(spec).not.toMatch(/build volume|printer|slicer|print bed/i);
     expect(spec).toContain("STL is unitless");
     expect(spec).not.toMatch(/NaN|Infinity/);
 

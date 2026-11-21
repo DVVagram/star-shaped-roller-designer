@@ -44,7 +44,7 @@ export const portafilterFunnel: AnyDesign = defineDesign({
   ],
   notes: [
     "The bottom diameter matches the basket and the top is wider, with the wall held constant along the taper. Because the ring is open at both ends, the grounds fall through and the tamper is not obstructed.",
-    "Print it in PETG if it will touch the coffee, and smooth the inside with a light sand or a flame pass. Printed polymer is not food-contact rated, and a paper filter keeps the coffee off the plastic. A funnel that is a loose fit still works; one that is too tight will jam in the basket when coffee gets behind it.",
+    "Make it in a tough material if it will touch the coffee, and smooth the inside with a light sand or a flame polish. Polymer is not food-contact rated, and a paper filter keeps the coffee off the plastic. A funnel that is a loose fit still works; one that is too tight will jam in the basket when coffee gets behind it.",
   ],
   header: "Portafilter Funnel Designer - units: mm",
   fields: [
@@ -132,7 +132,7 @@ export const biscuitCutter: AnyDesign = defineDesign({
   ],
   notes: [
     "The bevel is cut on the outside, so the thin land is at the bottom and the ring widens as it rises. The land width is the bevel less the wall, and the designer keeps it positive so the edge is a land rather than a knife point that folds over.",
-    "Print it in PETG and print the bevel upward; the cutting edge then comes off the bed cleanly. A printed cutter is not dishwasher safe, and a warm ring will deform, so wash it by hand and use a paper case between dough and plastic.",
+    "Make it in a tough material and make the bevel upward; the cutting edge then comes off the surface cleanly. A cutter is not dishwasher safe, and a warm ring will deform, so wash it by hand and use a paper case between dough and plastic.",
   ],
   header: "Biscuit Cutter Designer - units: mm",
   fields: [
@@ -222,7 +222,7 @@ export const alignmentPin: AnyDesign = defineDesign({
   ],
   notes: [
     "Both ends get the same chamfer, so the pin can go in either way round and neither end has a sharp rim to catch in a hole. The chamfer is limited to less than half the length, which guarantees a full-diameter shank between them.",
-    "Print the pin on its side if you need the best dimensional accuracy, or upright with a brim if the chamfer matters more. For a press fit, drill the hole 0.1 mm undersize and freeze the pin before pressing it.",
+    "Make the pin on its side if you need the best dimensional accuracy, or upright with a wide base if the chamfer matters more. For a press fit, drill the hole 0.1 mm undersize and freeze the pin before pressing it.",
   ],
   header: "Alignment Pin Designer - units: mm",
   fields: [
@@ -307,7 +307,7 @@ export const taperPin: AnyDesign = defineDesign({
   ],
   notes: [
     "The profile is a trapezoid, so the pin is a true frustum with no step at either end. The included angle is reported directly; a self-locking pin needs a shallow angle, so a large difference over a short pin is flagged as a wedge that will loosen.",
-    "Print the pin along its axis for the best taper and ream the hole to match a test pin. A printed taper is best used with a little adhesive or a cross pin; driving it hard into metal will crush the layers.",
+    "Make the pin along its axis for the best taper and ream the hole to match a test pin. A taper is best used with a little adhesive or a cross pin; driving it hard into metal will crush the material.",
   ],
   header: "Taper Pin Designer - units: mm",
   fields: [
@@ -388,7 +388,7 @@ export const eyelet: AnyDesign = defineDesign({
   ],
   notes: [
     "The tube is open through the middle, and the two flanges sit outside the material, so the eyelet is clamped rather than glued. The wall is checked at both the tube and the flange, and the flange must be wider than the tube by a real land.",
-    "Print a strip of eyelets on a raft and press them with a warm soldering iron or a doming punch. A printed eyelet is a light-duty liner, not a replacement for a metal grommet in a load-bearing tarp.",
+    "Make a strip of eyelets and press them with a warm soldering iron or a doming punch. An eyelet is a light-duty liner, not a replacement for a metal grommet in a load-bearing tarp.",
   ],
   header: "Eyelet Designer - units: mm",
   fields: [
@@ -484,7 +484,7 @@ export const rivet: AnyDesign = defineDesign({
   ],
   notes: [
     "The head is a flat disc and the shank is a plain cylinder, so the rivet can be set with a hammer and a backing block. The overall length includes the head, and the tail length is what remains for forming the second head.",
-    "Print the rivet on its side for strength across the shank. A printed rivet is best set warm and slowly; a cold hammer blow splits the layers instead of spreading the tail.",
+    "Make the rivet on its side for strength across the shank. A rivet is best set warm and slowly; a cold hammer blow splits the material instead of spreading the tail.",
   ],
   header: "Rivet Designer - units: mm",
   fields: [
@@ -564,7 +564,7 @@ export const bellowsBoot: AnyDesign = defineDesign({
   family: "motion",
   eyebrow: "Dust sleeve",
   blurb: "A corrugated sleeve that stretches over a sliding shaft.",
-  lede: "A bellows boot built from a straight bore and a corrugated outside profile. The convolutions let the sleeve extend and compress without opening a gap, and the wall between the bore and the valleys is reported so the boot can be printed thin enough to flex.",
+  lede: "A bellows boot built from a straight bore and a corrugated outside profile. The convolutions let the sleeve extend and compress without opening a gap, and the wall between the bore and the valleys is reported so the boot can be made thin enough to flex.",
   use: "Keeping dust and swarf off a sliding shaft, a lead screw or a shock absorber.",
   notesTitle: "How the convolutions are counted",
   chips: [
@@ -574,7 +574,7 @@ export const bellowsBoot: AnyDesign = defineDesign({
   ],
   notes: [
     "The outside follows a raised cosine, so each convolution meets the next with zero slope and the wall does not thin at a crease. The bore stays straight, which means the boot seals on a round shaft all the way along.",
-    "Print it in TPU if it has to move; rigid PLA bellows crack at the second convolution. Print with the axis vertical and thin walls, and leave the boot slightly compressed when it is fitted so it has travel in both directions.",
+    "Make it in a flexible material if it has to move; rigid a rigid material bellows crack at the second convolution. Make it with the axis vertical and thin walls, and leave the boot slightly compressed when it is fitted so it has travel in both directions.",
   ],
   header: "Bellows Boot Designer - units: mm",
   fields: [
@@ -606,7 +606,7 @@ export const bellowsBoot: AnyDesign = defineDesign({
     checkWall(errors, units, "wall", "boot wall", p.wallMm);
     if (p.depthMm >= base * 0.8) errors.push({ field: "depth", level: "error", message: "The convolution depth is too large for the bore; the boot pinches itself." });
     const count = Math.max(3, Math.round(p.convolutions));
-    if (p.lengthMm / count < 4) errors.push({ field: "convolutions", level: "error", message: "The convolutions are packed too tightly to print." });
+    if (p.lengthMm / count < 4) errors.push({ field: "convolutions", level: "error", message: "The convolutions are packed too tightly to make." });
     if (p.wallMm > 2.5) warnings.push({ field: "wall", level: "warning", message: "A wall over 2.5 mm makes a stiff boot that will not extend." });
 
     return {
@@ -661,7 +661,7 @@ export const suctionCup: AnyDesign = defineDesign({
   family: "motion",
   eyebrow: "Vacuum cup",
   blurb: "A cup with a concave underside and a stem for a light hold.",
-  lede: "A suction cup with a real concave underside: the rim touches the surface first and the centre is recessed, so pressing the cup pushes the air out and the rim seals. The stem is a separate diameter, so the cup can be held in a printed arm.",
+  lede: "A suction cup with a real concave underside: the rim touches the surface first and the centre is recessed, so pressing the cup pushes the air out and the rim seals. The stem is a separate diameter, so the cup can be held in a arm.",
   use: "Holding a small sign, a phone back or a light ornament to a clean glass or tile surface.",
   notesTitle: "How the concave face seals",
   chips: [
@@ -670,8 +670,8 @@ export const suctionCup: AnyDesign = defineDesign({
     { label: "Stem", value: "4 – 20 mm" },
   ],
   notes: [
-    "The underside is sampled as a curve from the recessed centre to the rim, so the rim is the only part that touches at first. The stem is narrower than the cup, which lets it pass through a hole in a printed bracket.",
-    "Print it in TPU or a soft filament; rigid PLA makes a cup that will not conform to a slightly uneven surface. Clean both the cup and the glass, and wet the rim slightly before pressing it down.",
+    "The underside is sampled as a curve from the recessed centre to the rim, so the rim is the only part that touches at first. The stem is narrower than the cup, which lets it pass through a hole in a bracket.",
+    "Make it in a flexible material or a soft material; rigid a rigid material makes a cup that will not conform to a slightly uneven surface. Clean both the cup and the glass, and wet the rim slightly before pressing it down.",
   ],
   header: "Suction Cup Designer - units: mm",
   fields: [
@@ -764,7 +764,7 @@ export const bearingCap: AnyDesign = defineDesign({
   ],
   notes: [
     "The spigot is the housing bore and the flange is wider, so the cap seats at a fixed depth. The cavity inside the cap clears the shaft end, and the wall between the cavity and the spigot is checked so the cap does not collapse when it is pressed in.",
-    "Print the cap with the flange down and the open side up; the cavity then needs no support. A cap is a dust shield, not a seal: add a smear of grease or an O-ring in the housing if the bearing has to keep water out.",
+    "Make the cap with the flange down and the open side up; the cavity then needs no support. A cap is a dust shield, not a seal: add a smear of grease or an O-ring in the housing if the bearing has to keep water out.",
   ],
   header: "Bearing Cap Designer - units: mm",
   fields: [
@@ -855,7 +855,7 @@ export const yoYo: AnyDesign = defineDesign({
   eyebrow: "String disc",
   blurb: "A grooved disc body with an axle bore and real rim mass.",
   lede: "A yo-yo body turned as one disc with a V groove around its middle and a bore for the axle. The rim is deliberately heavy and the groove is where the string sits, so the proportions are the play: wide rims sleep longer, deep grooves hold more string.",
-  use: "A printable fixed-axle yo-yo for a string, a workshop toy or a physics demonstration.",
+  use: "A fixed-axle yo-yo for a string, a workshop toy or a physics demonstration.",
   notesTitle: "How the rim and groove are balanced",
   chips: [
     { label: "Diameter", value: "40 – 120 mm" },
@@ -864,7 +864,7 @@ export const yoYo: AnyDesign = defineDesign({
   ],
   notes: [
     "The groove is a V cut into the outer rim at mid-width, and the bore is a straight axle hole through the centre. The rim thickness below the groove is reported, because a groove that is too deep leaves a thin web that flexes at speed.",
-    "Print it in two halves with the groove outward if your printer cannot bridge the bore, then glue the halves on a metal axle. Balance it on a finger before the first throw; an unbalanced printed yo-yo wobbles badly and cracks at the axle.",
+    "Make it in two halves with the groove outward if your process cannot bridge the bore, then glue the halves on a metal axle. Balance it on a finger before the first throw; an unbalanced yo-yo wobbles badly and cracks at the axle.",
   ],
   header: "Yo-Yo Designer - units: mm",
   fields: [
