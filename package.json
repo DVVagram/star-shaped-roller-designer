@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Parametric designer library with a live 3D preview and STL export.",
+  "description": "193 parametric designers for parts and lettering, with live 3D previews and STL, specification and drawing export.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

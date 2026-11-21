@@ -56,7 +56,7 @@ export function renderRecordSpecification(
   const generatedAt = options.generatedAt ?? new Date();
   const lines: string[] = [];
 
-  lines.push(`PARAMETRIC WHEEL WORKS — SPECIFICATION`);
+  lines.push(`PARAMETRIC WORKS — SPECIFICATION`);
   lines.push(`Design: ${record.name}`);
   lines.push(`Design ID: ${record.id}`);
   lines.push(`Library version: ${LIBRARY_VERSION}`);

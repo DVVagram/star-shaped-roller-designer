@@ -1,23 +1,34 @@
-# Parametric Wheel Works
+# Parametric Works
 
-One hundred and ninety-six parametric designers for **editable mechanical and
-household parts**, in one static site: the original four wheels and rotors,
-ninety-six gears, pulleys, fixings, vessels, ducts and mechanisms, and fifty more
-workshop fixtures, turned fittings and household forms.
+One hundred and ninety-three parametric designers for **editable mechanical,
+workshop, household and lettered parts**, in one static site: the original four
+wheels and rotors, plus 189 schema-driven designers across gears and drives,
+plates and fixings, vessels and fluid, motion, and text and lettering.
 
-| Designer     | What it makes                                                        |
-| ------------ | -------------------------------------------------------------------- |
-| **Star roller** | Star-spiked drive wheels; the spike count auto-fits the dimensions |
-| **Sprocket**    | Roller-chain sprockets with seats cut to the chain's pitch circle  |
-| **Impeller**    | Axial fan rotors: swept, leaned blades on a bored hub              |
-| **Propeller**   | Pitched props whose blade angle is derived from the advance per rev |
+| Family             | Designers | What it covers                                                    |
+| ------------------ | --------- | ----------------------------------------------------------------- |
+| **Wheels & rotors** | 4         | Star roller, axial impeller, propeller and a fan mount plate      |
+| **Gears & drives**  | 25        | Spur, internal, helical and rack teeth, pulleys, sprocket, cams    |
+| **Plates & fixings** | 87       | Plates, brackets, clamps, mounts, fasteners, knobs and spacers     |
+| **Vessels & fluid** | 60        | Cups, bowls, funnels, ducts, shells, labware and pipe fittings      |
+| **Motion**          | 16        | Springs, pistons, rolling elements and small mechanisms             |
+| **Text & lettering** | 1        | One lettered plate: signs, tags, name plates, stamps and tiles       |
 
 Every designer renders a live three.js preview of the same indexed mesh it
-measures, reports the closed-shell volume, and exports a binary STL. Coordinates
-are millimetres by convention; STL itself carries no units, material or
-tolerance data. Invalid or non-manifold configurations block the download
-instead of producing a broken file. There is no assumed build area: the model is
-not rejected because an overall dimension is large.
+measures, reports the closed-shell volume, and exports a binary STL,
+specification and dimension sheet (separately or together as one ZIP).
+Coordinates are millimetres by convention; STL itself carries no units,
+material or tolerance data. Invalid or non-manifold configurations block the
+download instead of producing a broken file. There is no assumed build area:
+the model is not rejected because an overall dimension is large.
+
+Each designer keeps its current setup in the address bar (`?config=…`), restores
+the last local edit on that browser, and offers Standard, Compact and Oversize
+starting points where the design validates them. **Copy link** carries the same
+setup to another tab. The header switcher searches the whole catalogue, and
+every designer links to its paired and related pages.
+
+Everything runs in the browser: no CAD kernel, no server, no account, no uploads.
 
 ## Capability, not a certificate
 
@@ -42,18 +53,6 @@ designer's capability, standard, mate and first limitation. The four original
 builders also download a specification and a dimension sheet. Exporting a fit
 prototype is allowed only after the mesh passes the topology checks; that is
 still not permission to treat it as a certified part.
-
-Each designer keeps its current setup in the address bar (`?config=…`), restores
-the last local edit on that browser, and offers Standard, Compact and Oversize
-starting points where the design validates them. **Copy link** carries the same
-setup to another tab. The export panel downloads the STL, specification and
-dimension sheet separately or together as one ZIP. The header switcher searches
-all two hundred and forty-six designers, and every designer links to its paired
-and related pages.
-
-Everything runs in the browser: no CAD kernel, no server, no account, no uploads.
-
----
 
 ## The original four
 
@@ -95,64 +94,34 @@ The same rotor core with pitch as the input: the blade angle at 70 % radius is
 changes. Blade count, root and tip chord, tip rounding and edge rounding, blade
 drop, sweep and the shaft bore.
 
----
+## The schema-driven catalogue
 
-## The forty-six
+The other 189 designers are `defineDesign()` modules. One field list drives the
+form, the unit conversion, the millimetre parameters, the validation copy, the
+readout, the preview and the STL file name, so the drawn part, the measured
+numbers and the exported file cannot disagree about what was asked for.
 
-| Family | Designers |
-| --- | --- |
-| **Gears and drives** | Spur gear, internal ring gear, helical gear, rack, timing pulley, V-belt pulley, round-belt pulley, stepped pulley, flywheel |
-| **Wheels and rotors** | Ratchet wheel, Geneva wheel, disc cam, eccentric wheel, saw blade, handwheel, torus, chain link |
-| **Plates and fixings** | Wing nut, hex nut, washer, star knob, knurled knob, flange, mounting plate, splined hub, flanged bushing |
-| **Vessels and fluid** | Funnel, vase, cup, bowl, bottle, bell, lamp shade, spool, gasket, hemisphere shell, parabolic dish, de Laval nozzle, nose cone, pipe reducer, pipe cap, hose adapter, pipe elbow |
-| **Motion** | Compression spring |
+`docs/DESIGNERS.md`, `docs/DESIGNERS-2.md`, `docs/DESIGNERS-3.md` and
+`docs/DESIGNERS-1000.md` hold the candidate lists and the batch notes they came
+from. `docs/DESIGN-AUDIT.md` is generated from the live registry and always
+matches the catalogue.
 
-`docs/DESIGNERS.md` lists the 344 candidates these were chosen from, with the
-forty-six marked.
-
-## The fifty
-
-| Family | Designers |
-| --- | --- |
-| **Plates and brackets** | Square flange, oval flange, bearing plate, NEMA 17 plate, pivot bracket, slot bracket, link plate, gusset plate, switch plate, tensioner plate, keyhole plate, drill guide |
-| **Fasteners and knobs** | T-slot nut, square nut, coupling nut, cross knob, pointer knob |
-| **Discs and grilles** | Brake rotor, index plate, vent grille, perforated plate, precision spacer, fan grille, baffle plate, sink strainer, mounting ring |
-| **Vessels and household** | Candlestick, egg cup, honey dipper, spinning top, bottle stopper, tapered plug, pet bowl, planter pot, wine glass, goblet |
-| **Labware and fluid** | Test tube, centrifuge tube, Erlenmeyer flask, O-ring plug, caulking nozzle |
-| **Motion and small parts** | Piston, golf tee, dowel pin, furniture foot, caster wheel |
-| **Workshop** | Dovetail rail |
-| **Garden and cable** | Key tag, plant label, cable tie mount |
-
-`docs/DESIGNERS-2.md` lists the 320 candidates these fifty were chosen from.
-
-## The third fifty
-
-| Family | Designers |
-| --- | --- |
-| **Brackets and hooks** | Corner bracket, flat brace, T bracket, cross brace, french cleat, phone stand, door wedge, wall hook, pegboard hook, door strike |
-| **Clamps and workholding** | Saddle clamp, pipe saddle, cable comb, featherboard, hold-down clamp, eccentric clamp, zero-clearance insert, desk cable clip, hinge leaf, slotted shim |
-| **Mounts and turning** | Router template, fan mount plate, trivet, bell crank, hex standoff, sanding drum |
-| **Barbed and turned fittings** | Thumb screw, thumb nut, dome nut, hose barb, barbed reducer, bulkhead fitting, cable grommet, tube adapter, pipette tip, jar lid |
-| **Cutters and pins** | Portafilter funnel, biscuit cutter, alignment pin, taper pin, eyelet, rivet, bellows boot, suction cup, bearing cap, yo-yo |
-| **Household forms** | Incense holder, plant saucer, tea light cup, centering cone |
-
-`docs/DESIGNERS-1000.md` lists one thousand numbered candidates, with these fifty
-marked built.
-
-Every new designer is a `defineDesign()` module. One field list drives the form,
-the unit conversion, the millimetre parameters, the validation copy, the readout,
-the preview and the STL file name, so the drawn part, the measured numbers and
-the exported file cannot disagree about what was asked for.
-
----
+The single text designer is **Lettered plate**: one plate with a rectangle,
+rounded-end, round or square outline, a hang hole, two corner screw holes or no
+holes, and four bundled typefaces — Sans, Sans bold, Serif and Mono. Only
+uppercase A–Z, digits, space and `. , ' & ! ? + -` are accepted, matching the
+subset glyphs that ship. Width is computed from advance widths with no kerning.
+Lettering is normal by default; choosing **Mirrored for stamping** flips the
+glyphs so a stamp or embosser prints them the right way round.
 
 ## Shared geometry
 
-All internal lengths are millimetres. Three kernels cover the new library: a
+All internal lengths are millimetres. Four builders cover the library: a
 multi-hole prism extruder (stacked outlines with optional twisted rings), a solid
-of revolution from a closed `(r, z)` profile, and a swept tube that carries a
-circular or annular section along a helix or a bend. The original four still use
-the plain stack-of-outlines extruder.
+of revolution from a closed `(r, z)` profile, a swept tube that carries a
+circular or annular section along a helix or a bend, and a letter extruder that
+turns font outlines into solid glyph bodies. The original four still use the
+plain stack-of-outlines extruder.
 
 For the prism extruder:
 
@@ -174,15 +143,19 @@ For the prism extruder:
   the profile winding if the points were listed clockwise.
 - The sweep builder caps both ends of the tube with the section it swept, so a
   spring or an elbow is closed by construction rather than by stitching.
+- The letter builder extrudes each glyph outline into its own closed body; the
+  plate and the glyph bodies are combined into one mesh without booleans.
 
 `inspectMesh()` then verifies the result: every directed edge must cancel against
-its reverse, there must be a single connected shell, and no repeated faces or
-faces with repeated vertex indices. Earcut's hole bridges can leave zero-area cap
-slivers; those are counted and reported rather than hidden, and most importers
-ignore them. It accepts any closed orientable surface — `χ = 2` for a plain solid, `0`
-for a tube, `−2` for a plate with two holes — and reports the genus instead of
-assuming every part has a bore. Only then is a volume reported or an STL offered.
-The volume is the divergence-theorem volume of that closed mesh.
+its reverse, no face may repeat, and no face may repeat a vertex index. It accepts
+one or more closed shells: a plain solid has `χ = 2`, a tube `0`, a plate with two
+holes `−2`, and a plate plus one closed body per glyph is accepted up to
+`χ = 2 × bodies`. That is why a lettered plate is reported as a multi-body part,
+with every body watertight on its own. Only then is a volume reported or an STL
+offered. The volume is the divergence-theorem volume of the closed mesh.
+
+Earcut's hole bridges can leave zero-area cap slivers; those are counted and
+reported rather than hidden, and most importers ignore them.
 
 ### How the shapes are generated
 
@@ -192,8 +165,9 @@ The volume is the divergence-theorem volume of that closed mesh.
   larger roller or finer pitch consumes the flank until the teeth collide.
 - **Rotor**: the passage between blades is `pitch · r − chord(r)`; lean is limited
   to `0.55 · pitch · R` so a blade top cannot reach its neighbour.
-
----
+- **Text**: advance widths are summed to get the line width; the glyph outlines
+  are extruded to the letter relief, optionally mirrored, and placed on the plate
+  within the entered margin.
 
 ## Stack
 
@@ -201,13 +175,11 @@ The volume is the divergence-theorem volume of that closed mesh.
 | -------- | -------------------------------------------------------- |
 | App      | Vite, React 19, TypeScript, Tailwind CSS 4               |
 | 3D       | three.js + OrbitControls                                 |
-| Geometry | In-repo profiles + one deterministic indexed-mesh extruder |
-| Export   | Binary STL writer (no dependency)                        |
+| Geometry | In-repo profiles, extruders, revolution, sweep and lettering |
+| Export   | Binary STL, specification and dimension sheet, ZIP writer |
 | Tests    | Vitest — geometry, designer, contract, spec and copy tests |
 
 No database, no API keys and no environment variables.
-
----
 
 ## Local development
 
@@ -224,10 +196,8 @@ npm test           # Vitest
 ```
 
 `npm run build` emits a static site in `dist/`. Routes are hash-based: `#/` is the
-catalogue, `#/<designer-id>` opens any of the two hundred and forty-six (for example `#/spur-gear` or
-`#/sprocket`), so any static host works with no rewrite rules.
-
----
+catalogue, `#/<designer-id>` opens any of the 193 pages (for example `#/spur-gear`
+or `#/sprocket`), so any static host works with no rewrite rules.
 
 ## Project structure
 
@@ -235,12 +205,12 @@ catalogue, `#/<designer-id>` opens any of the two hundred and forty-six (for exa
 src/
   App.tsx                    suite shell: header, hash router, catalog, footer
   components/
-    Catalog.tsx              the two hundred and forty-six cards, grouped by family
+    Catalog.tsx              the 193 cards, grouped by family
     DesignerPage.tsx         compact title + builder first, explainer below, related cards
     DesignerSearch.tsx       searchable designer combobox in the header
     DesignerTools.tsx        presets, copy-link, issue summary and sticky export bar
     DesignScaffold.tsx       two-column builder: inputs, measurements, preview, export
-    GenericDesigner.tsx      schema-driven form used by all two hundred and forty-six new designs
+    GenericDesigner.tsx      schema-driven form used by all 189 new designs
     DesignMark.tsx           one family glyph per catalog card
     MeshPreview.tsx          three.js canvas (WebGL fallback, reset view)
     SprocketBuilder.tsx      sprocket form, validation, readout, STL
@@ -248,20 +218,23 @@ src/
     PropellerBuilder.tsx     propeller form…
     fields.tsx               number field, segmented control, option cards, presets, toggle
     useUnitValues.ts         form state with mm/in conversion
+  assets/fonts/              four subset typefaces for the text designers
   lib/
     kit/units.ts             units, formatting, outlines, validation helpers
     kit/solid.ts             extruder, mesh inspector, binary STL writer
     kit/prism.ts             multi-hole prism kernel (twisted rings supported)
     kit/revolve.ts           solid-of-revolution kernel and profile builder
     kit/sweep.ts             helical-tube and swept-annulus kernels
-    designs/types.ts         field schema, defineDesign(), validation helpers
-    designs/presets.ts       validated Compact/Standard/Oversize starting points
     kit/design-link.ts       versioned URL/config, local restore and clipboard
     kit/zip.ts               store-only ZIP writer for the three export files
+    designs/types.ts         field schema, defineDesign(), validation helpers
+    designs/presets.ts       validated Compact/Standard/Oversize starting points
     designs/geometry.ts      involute gears, ratchet, Geneva, cams, wrench profiles
     designs/prism-*.ts       the prism designs (gears, parts, hardware, plates, discs)
-    designs/revolve-*.ts     the revolved designs (vessels, mechanical, household, parts)
-    designs/motion-designs.ts  spring and pipe elbow
+    designs/revolve-*.ts     the revolved designs (vessels, fittings, household, workshop)
+    designs/motion-designs.ts  springs and motion parts
+    designs/text-kit.ts      font parsing, letter extrusion and mirroring
+    designs/text-products.ts the single lettered-plate designer
     designs/index.ts         the registry and id lookup
     designs/contracts.ts     capability, standard, mate and limitation declarations
     designs/legacy.ts        contracts and input labels for the original four
@@ -277,8 +250,6 @@ src/
 scripts/
   design-audit.ts          regenerates docs/DESIGN-AUDIT.md from the registry
 ```
-
----
 
 ## Limits
 
@@ -311,6 +282,10 @@ scripts/
   substitute the shear modulus of the material you will use.
 - **Vessels** are solids of revolution, so handles, spouts that leave the axis
   and non-circular rims are out of scope. A funnel's spout is concentric.
+- **Lettering** is limited to the bundled glyph set, has no kerning, and is
+  uppercase only. A lettered plate is one STL containing several closed bodies,
+  so some slicers will treat the letters and plate as one object; the mirrored
+  variants are geometry, not a font feature.
 - Fabrication checks describe geometry only. Process choice, material and wall
   thickness still decide whether a part survives.
 - **No designer is functionally certified.** Gears are not validated against a

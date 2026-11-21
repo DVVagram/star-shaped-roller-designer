@@ -791,100 +791,6 @@ export const switchPlate: AnyDesign = defineDesign({
   fileName: (p) => `switch-plate-${R(p.widthMm, 0)}x${R(p.heightMm, 0)}.stl`,
 });
 
-/* --------------------------------------------------------- tensioner plate */
-
-export const tensionerPlate: AnyDesign = defineDesign({
-  id: "tensioner-plate",
-  name: "Tensioner plate",
-  family: "fixings",
-  eyebrow: "Pivot and slot",
-  blurb: "A link with a pivot hole and a long locking slot.",
-  lede: "The arm of a belt or chain tensioner: one pivot hole, one long slot, and enough length between them to take up real slack.",
-  chips: [
-    { label: "Length", value: "40 – 170 mm" },
-    { label: "Slot", value: "10 – 100 mm" },
-    { label: "Pivot", value: "3 – 30 mm" },
-  ],
-  notes: [
-    "The slot starts after the pivot with a real web between them, and the arm is a stadium so it can swing without a corner catching. Slot travel is the slot length, not its overall length.",
-    "Make the arm in the plane of its swing so the slot walls take the bolt load along the grain, not across them.",
-  ],
-  header: "Tensioner Plate Designer - units: mm",
-  fields: [
-    { key: "length", label: "Overall length", kind: "length", section: "Arm", default: "90", min: 40, max: 170 },
-    { key: "width", label: "Arm width", kind: "length", section: "Arm", default: "26", min: 12, max: 60 },
-    { key: "thickness", label: "Thickness", kind: "length", section: "Arm", default: "8", min: 3, max: 16 },
-    { key: "pivot", label: "Pivot bore", kind: "length", section: "Holes", default: "8", min: 3, max: 30 },
-    { key: "slotLength", label: "Slot travel", kind: "length", section: "Holes", default: "40", min: 10, max: 100 },
-    { key: "slotWidth", label: "Slot width", kind: "length", section: "Holes", default: "9", min: 3, max: 20 },
-  ],
-  parse: (raw) => ({
-    lengthMm: rawLength(raw, "length"),
-    widthMm: rawLength(raw, "width"),
-    thicknessMm: rawLength(raw, "thickness"),
-    pivotMm: rawLength(raw, "pivot"),
-    slotLengthMm: rawLength(raw, "slotLength"),
-    slotWidthMm: rawLength(raw, "slotWidth"),
-  }),
-  derive: (p, units) => {
-    const errors: DesignIssue[] = [];
-    const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "length", "Overall length", p.lengthMm, 40, 170);
-    pushRange(errors, units, "width", "Arm width", p.widthMm, 12, 60);
-    pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 3, 16);
-    pushRange(errors, units, "pivot", "Pivot bore", p.pivotMm, 3, 30);
-    pushRange(errors, units, "slotLength", "Slot travel", p.slotLengthMm, 10, 100);
-    pushRange(errors, units, "slotWidth", "Slot width", p.slotWidthMm, 3, 20);
-    if (errors.length > 0) return emptyResult(errors, warnings);
-
-    const endR = p.widthMm / 2;
-    const pivotX = -p.lengthMm / 2 + endR;
-    const slotX = p.lengthMm / 2 - endR - p.slotLengthMm / 2 - p.slotWidthMm / 2;
-    checkSize(errors, units, "length", p.lengthMm, p.thicknessMm);
-    checkWall(errors, units, "pivot", "arm around the pivot", endR - p.pivotMm / 2);
-    if (p.slotWidthMm >= p.widthMm - 2) errors.push({ field: "slotWidth", level: "error", message: "The slot is as wide as the arm." });
-    if (slotX - p.slotLengthMm / 2 - p.slotWidthMm / 2 <= pivotX + p.pivotMm / 2) errors.push({ field: "slotLength", level: "error", message: "The slot reaches the pivot hole." });
-
-    return {
-      errors,
-      warnings,
-      readout: [
-        { label: "Overall length", value: U(p.lengthMm, units), source: "input" },
-        { label: "Pivot bore", value: U(p.pivotMm, units), source: "input" },
-        { label: "Slot travel", value: U(p.slotLengthMm, units), source: "input" },
-        { label: "Slot width", value: U(p.slotWidthMm, units), source: "input" },
-        { label: "Pivot to slot", value: U(slotX - pivotX, units), source: "calc" },
-        { label: "Thickness", value: U(p.thicknessMm, units), source: "input" },
-      ],
-      preview: previewOf(
-        `${U(p.lengthMm, units)} arm · ${U(p.slotLengthMm, units)} travel`,
-        `TP${R(p.lengthMm, 0)}-${R(p.slotLengthMm, 0)}`,
-        p.lengthMm,
-        p.thicknessMm,
-        [
-          { label: "Length", value: U(p.lengthMm, units) },
-          { label: "Travel", value: U(p.slotLengthMm, units) },
-          { label: "Pivot", value: U(p.pivotMm, units) },
-        ],
-      ),
-    };
-  },
-  build: (p) => {
-    const endR = p.widthMm / 2;
-    const pivotX = -p.lengthMm / 2 + endR;
-    const slotX = p.lengthMm / 2 - endR - p.slotLengthMm / 2 - p.slotWidthMm / 2;
-    return buildPrism({
-      rings: [obround(0, 0, p.lengthMm - p.widthMm, p.widthMm, 0), obround(0, 0, p.lengthMm - p.widthMm, p.widthMm, 0)],
-      holes: [
-        circleAt(pivotX, 0, p.pivotMm / 2),
-        obround(slotX, 0, p.slotLengthMm, p.slotWidthMm, 0),
-      ],
-      thicknessMm: p.thicknessMm,
-    });
-  },
-  fileName: (p) => `tensioner-plate-${R(p.lengthMm, 0)}-${R(p.slotLengthMm, 0)}.stl`,
-});
-
 /* ------------------------------------------------------------ cable mount */
 
 export const cableMount: AnyDesign = defineDesign({
@@ -983,6 +889,5 @@ export const prismPlates: AnyDesign[] = [
   gussetPlate,
   keyholePlate,
   switchPlate,
-  tensionerPlate,
   cableMount,
 ];

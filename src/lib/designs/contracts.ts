@@ -107,7 +107,7 @@ const PRESSURE = ids(`pipe-reducer pipe-cap pipe-elbow hose-adapter hose-barb ba
 const LAB = ids(`test-tube centrifuge-tube erlenmeyer-flask pipette-tip vial-cap
   septum-cap`);
 const FOOD = ids(`cup bowl bottle egg-cup honey-dipper pet-bowl wine-glass goblet
-  funnel portafilter-funnel biscuit-cutter plant-saucer jar-lid tumbler shot-glass
+  funnel portafilter-funnel biscuit-cutter plant-saucer jar-lid tumbler
   measuring-cup`);
 const HEAT = ids(`candlestick tea-light-cup lamp-shade incense-holder trivet votive-holder`);
 const TORQUE = ids(`open-end-wrench box-wrench`);
@@ -117,12 +117,12 @@ const DECORATIVE = ids(`vase bell parabolic-dish spinning-top yo-yo torus pet-ta
   fan-grille perforated-plate baffle-plate`);
 const LOAD = ids(`wall-hook pegboard-hook door-strike hinge-leaf mounting-plate
   bearing-plate nema-plate pivot-bracket slot-bracket link-plate gusset-plate
-  switch-plate tensioner-plate keyhole-plate drill-guide cable-mount corner-bracket
+  switch-plate keyhole-plate drill-guide cable-mount corner-bracket
   flat-brace t-bracket cross-brace french-cleat door-wedge saddle-clamp pipe-saddle
   featherboard hold-down-clamp eccentric-clamp hinge-leaf zero-clearance-insert
   router-template fan-mount bell-crank bearing-cap`);
 const SHAFT = ids(`flanged-bushing bearing-cap bearing-plate caster-wheel handwheel
-  eccentric-wheel splined-hub flywheel sprocket chain-link plain-bushing flanged-sleeve
+  eccentric-wheel splined-hub flywheel sprocket chain-link flanged-sleeve
   idler-wheel guide-roller crowned-roller bobbin-flange`);
 const CUTTING = ids(`biscuit-cutter router-template drill-guide zero-clearance-insert
   sanding-drum saw-blade`);

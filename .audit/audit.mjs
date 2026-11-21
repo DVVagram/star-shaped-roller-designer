@@ -393,9 +393,12 @@ await navigate(`${BASE}/#/centrifuge-tube`);
 await waitFor("Boolean(document.querySelector('#capability'))");
 // A restored scroll position can leave the export panel in view, which hides
 // the sticky bar by design. Start at the top, then wait for the observer.
-await evaluate("window.scrollTo(0, 0)");
-await waitFor("Boolean(document.querySelector('[aria-label=\"Export actions\"]'))", 5000);
-await sleep(500);
+await evaluate("window.scrollTo(0, 1); window.scrollTo(0, 0)");
+await waitFor(
+  "(() => { const bar = document.querySelector('[aria-label=\"Export actions\"]'); return Boolean(bar) && bar.getBoundingClientRect().height > 40 && (bar.textContent || '').includes('Ready to export'); })()",
+  5000,
+);
+await sleep(150);
 const mobileDesigner = await evaluate(`(() => {
   const capability = document.querySelector('#capability');
   const fields = [...document.querySelectorAll('input, select')];
@@ -416,7 +419,10 @@ const mobileDesigner = await evaluate(`(() => {
     drawing: buttons.some((b) => /Dimension sheet/.test(b.textContent || '')),
     skip: buttons.some((b) => /Skip to content/.test(b.textContent || '')),
     focus: document.activeElement?.tagName === 'H1',
-    sticky: document.querySelector('[aria-label="Export actions"]')?.innerText || '',
+    sticky:
+      document.querySelector('[aria-label="Export actions"]')?.textContent || '',
+    stickyHeight:
+      document.querySelector('[aria-label="Export actions"]')?.getBoundingClientRect().height || 0,
   };
 })()`);
 check(
@@ -435,7 +441,8 @@ check(
     mobileDesigner.skip &&
     mobileDesigner.focus &&
     /Ready to export/.test(mobileDesigner.sticky) &&
-    /Download STL/.test(mobileDesigner.sticky),
+    /Download STL/.test(mobileDesigner.sticky) &&
+    mobileDesigner.stickyHeight > 40,
   JSON.stringify(mobileDesigner),
 );
 

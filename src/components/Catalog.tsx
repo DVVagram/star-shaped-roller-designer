@@ -63,7 +63,7 @@ export default function Catalog({ entries }: { entries: CatalogEntry[] }) {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
-              Parametric Wheel Works · the full library
+              Parametric Works · the full library
             </p>
             <h1 className="mt-4 max-w-2xl text-[2.6rem] font-semibold leading-[1.03] tracking-tight sm:text-6xl">
               {entries.length} parts,
@@ -71,9 +71,10 @@ export default function Catalog({ entries }: { entries: CatalogEntry[] }) {
               built to measure.
             </h1>
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted">
-              Gears, pulleys, plates, vessels, springs, labware and workshop fixtures — each
-              generated from the numbers you type. Every card states its capability: a checked
-              shape, a fit prototype or a high-risk use the physical part must not serve.
+              Wheels, gears, plates, vessels, springs, labware, workshop fixtures and custom
+              lettering — each generated from the numbers you type. Every card states its
+              capability: a topology-checked shape, a fit prototype, or a high-risk use the
+              physical part must not serve.
             </p>
           </div>
 

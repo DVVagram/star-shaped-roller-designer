@@ -204,91 +204,6 @@ export const biscuitCutter: AnyDesign = defineDesign({
   fileName: (p) => `biscuit-cutter-${R(p.diameterMm, 0)}-${R(p.heightMm, 0)}.stl`,
 });
 
-/* --------------------------------------------------------------- alignment pin */
-
-export const alignmentPin: AnyDesign = defineDesign({
-  id: "alignment-pin",
-  name: "Alignment pin",
-  family: "fixings",
-  eyebrow: "Chamfered pin",
-  blurb: "A straight pin with a lead-in chamfer at both ends.",
-  lede: "A dowel-style alignment pin with a chamfer at each end: the chamfer starts the pin square in the hole and protects the edge from mushrooming. The shank is a plain cylinder, so the pin can be a slip or press fit depending on the hole you drill.",
-  use: "Lining up two fixture plates or two halves of a mould that are taken apart often.",
-  notesTitle: "Why both ends are chamfered",
-  chips: [
-    { label: "Diameter", value: "4 – 30 mm" },
-    { label: "Length", value: "10 – 100 mm" },
-    { label: "Chamfer", value: "0.5 – 3 mm" },
-  ],
-  notes: [
-    "Both ends get the same chamfer, so the pin can go in either way round and neither end has a sharp rim to catch in a hole. The chamfer is limited to less than half the length, which guarantees a full-diameter shank between them.",
-    "Make the pin on its side if you need the best dimensional accuracy, or upright with a wide base if the chamfer matters more. For a press fit, drill the hole 0.1 mm undersize and freeze the pin before pressing it.",
-  ],
-  header: "Alignment Pin Designer - units: mm",
-  fields: [
-    { key: "diameter", label: "Pin diameter", kind: "length", section: "Pin", default: "10", min: 4, max: 30 },
-    { key: "length", label: "Pin length", kind: "length", section: "Pin", default: "40", min: 10, max: 100 },
-    { key: "chamfer", label: "End chamfer", kind: "length", section: "Pin", default: "1", min: 0.5, max: 3 },
-  ],
-  parse: (raw) => ({
-    diameterMm: rawLength(raw, "diameter"),
-    lengthMm: rawLength(raw, "length"),
-    chamferMm: rawLength(raw, "chamfer"),
-  }),
-  derive: (p, units) => {
-    const errors: DesignIssue[] = [];
-    const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "diameter", "Pin diameter", p.diameterMm, 4, 30);
-    pushRange(errors, units, "length", "Pin length", p.lengthMm, 10, 100);
-    pushRange(errors, units, "chamfer", "End chamfer", p.chamferMm, 0.5, 3);
-    if (errors.length > 0) return emptyResult(errors, warnings);
-    checkSize(errors, units, "diameter", p.diameterMm, p.lengthMm);
-
-    if (p.chamferMm * 2 >= p.lengthMm - 1) errors.push({ field: "chamfer", level: "error", message: "The two chamfers meet; shorten them or lengthen the pin." });
-    if (p.chamferMm > p.diameterMm * 0.4) warnings.push({ field: "chamfer", level: "warning", message: "A chamfer over 40 percent of the diameter leaves a short shank." });
-
-    return {
-      errors,
-      warnings,
-      readout: [
-        { label: "Diameter", value: U(p.diameterMm, units), source: "input" },
-        { label: "Length", value: U(p.lengthMm, units), source: "input" },
-        { label: "Chamfer", value: U(p.chamferMm, units), source: "input" },
-        { label: "Full shank", value: U(p.lengthMm - 2 * p.chamferMm, units), source: "calc" },
-        { label: "Lead-in", value: `${R((Math.atan2(p.chamferMm, p.chamferMm) * 180) / Math.PI, 0)}°`, source: "calc" },
-        { label: "Pin mass", value: `${R((Math.PI * (p.diameterMm / 2) ** 2 * p.lengthMm) / 1000, 2)} cm³`, source: "calc" },
-      ],
-      preview: previewOf(
-        `${U(p.diameterMm, units)} × ${U(p.lengthMm, units)} pin`,
-        `AP${R(p.diameterMm, 0)}-${R(p.lengthMm, 0)}`,
-        p.diameterMm,
-        p.lengthMm,
-        [
-          { label: "Diameter", value: U(p.diameterMm, units) },
-          { label: "Length", value: U(p.lengthMm, units) },
-          { label: "Chamfer", value: U(p.chamferMm, units) },
-        ],
-      ),
-    };
-  },
-  build: (p) => {
-    const radius = p.diameterMm / 2;
-    const c = p.chamferMm;
-    return spin(
-      [
-        { x: 0, y: 0 },
-        { x: radius - c, y: 0 },
-        { x: radius, y: c },
-        { x: radius, y: p.lengthMm - c },
-        { x: radius - c, y: p.lengthMm },
-        { x: 0, y: p.lengthMm },
-      ],
-      radius,
-    );
-  },
-  fileName: (p) => `alignment-pin-${R(p.diameterMm, 0)}-${R(p.lengthMm, 0)}.stl`,
-});
-
 /* --------------------------------------------------------------------- taper pin */
 
 export const taperPin: AnyDesign = defineDesign({
@@ -946,7 +861,6 @@ export const yoYo: AnyDesign = defineDesign({
 export const revolveWorkshop: AnyDesign[] = [
   portafilterFunnel,
   biscuitCutter,
-  alignmentPin,
   taperPin,
   eyelet,
   rivet,

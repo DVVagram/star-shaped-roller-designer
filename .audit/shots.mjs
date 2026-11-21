@@ -105,44 +105,28 @@ await send("Page.enable");
 await send("Runtime.enable");
 
 await shot({
-  route: "stamp-plate",
+  route: "lettered-plate",
   width: 1440,
   height: 1000,
   mobile: false,
   scrollToPreview: true,
-  out: ".audit/shots/cdp-stamp-desktop.png",
+  out: ".audit/shots/cdp-lettered-desktop.png",
 });
 await shot({
-  route: "name-keychain",
+  route: "lettered-plate",
   width: 390,
   height: 844,
   mobile: true,
   scrollToPreview: false,
-  out: ".audit/shots/cdp-keychain-mobile-top.png",
+  out: ".audit/shots/cdp-lettered-mobile-top.png",
 });
 await shot({
-  route: "name-keychain",
+  route: "lettered-plate",
   width: 390,
   height: 844,
   mobile: true,
   scrollToPreview: true,
-  out: ".audit/shots/cdp-keychain-mobile-preview.png",
-});
-await shot({
-  route: "stamp-plate",
-  width: 390,
-  height: 844,
-  mobile: true,
-  scrollToPreview: true,
-  out: ".audit/shots/cdp-stamp-mobile-preview.png",
-});
-await shot({
-  route: "house-number",
-  width: 390,
-  height: 844,
-  mobile: true,
-  scrollToPreview: true,
-  out: ".audit/shots/cdp-house-number-mobile-preview.png",
+  out: ".audit/shots/cdp-lettered-mobile-preview.png",
 });
 
 ws.close();

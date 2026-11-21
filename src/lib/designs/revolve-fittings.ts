@@ -385,97 +385,6 @@ export const guideRoller: AnyDesign = defineDesign({
   fileName: (p) => `guide-roller-${R(p.diameterMm, 0)}-${R(p.widthMm, 0)}.stl`,
 });
 
-/* -------------------------------------------------------------- plain bushing */
-
-export const plainBushing: AnyDesign = defineDesign({
-  id: "plain-bushing",
-  name: "Plain bushing",
-  family: "fixings",
-  eyebrow: "Sleeve bearing",
-  blurb: "A chamfered sleeve that takes a shaft in a plain bearing bore.",
-  lede: "A plain sleeve with a straight bore and chamfered ends, made to sit in a housing and carry a rotating or sliding shaft. The wall is reported so the bushing can be sized against the housing rather than guessed from the bore alone.",
-  use: "Repairing a worn bearing bore in a machine, a hinge or a wheel hub with a replaceable sleeve.",
-  notesTitle: "How the sleeve fits the housing",
-  chips: [
-    { label: "Outside Ø", value: "6 – 60 mm" },
-    { label: "Bore", value: "3 – 50 mm" },
-    { label: "Length", value: "4 – 60 mm" },
-  ],
-  notes: [
-    "The bore is a straight cylinder and both ends are chamfered, so the shaft starts without catching and the sleeve can be pressed into a housing without a burr rolling ahead of it. The wall is the difference between the outside and the bore, checked before the mesh is built.",
-    "Measure the housing and the shaft, then choose the wall; a sleeve pressed into a rough bore will close up and grip the shaft. Ream the bore after pressing if the fit matters, and lubricate the shaft before assembly.",
-  ],
-  header: "Plain Bushing Designer - units: mm",
-  fields: [
-    { key: "outside", label: "Outside diameter", kind: "length", section: "Bushing", default: "16", min: 6, max: 60 },
-    { key: "bore", label: "Bore", kind: "length", section: "Bushing", default: "8", min: 3, max: 50 },
-    { key: "length", label: "Length", kind: "length", section: "Bushing", default: "20", min: 4, max: 60 },
-    { key: "chamfer", label: "End chamfer", kind: "length", section: "Ends", default: "0.5", min: 0.3, max: 3 },
-  ],
-  parse: (raw) => ({
-    outsideMm: rawLength(raw, "outside"),
-    boreMm: rawLength(raw, "bore"),
-    lengthMm: rawLength(raw, "length"),
-    chamferMm: rawLength(raw, "chamfer"),
-  }),
-  derive: (p, units) => {
-    const errors: DesignIssue[] = [];
-    const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "outside", "Outside diameter", p.outsideMm, 6, 60);
-    pushRange(errors, units, "bore", "Bore", p.boreMm, 3, 50);
-    pushRange(errors, units, "length", "Length", p.lengthMm, 4, 60);
-    pushRange(errors, units, "chamfer", "End chamfer", p.chamferMm, 0.3, 3);
-    if (errors.length > 0) return emptyResult(errors, warnings);
-    checkSize(errors, units, "outside", p.outsideMm, p.lengthMm);
-
-    const wall = (p.outsideMm - p.boreMm) / 2;
-    checkWall(errors, units, "bore", "bushing wall", wall);
-    if (p.chamferMm >= p.lengthMm / 2) errors.push({ field: "chamfer", level: "error", message: "The chamfers meet." });
-    if (p.chamferMm >= wall - 0.3) errors.push({ field: "chamfer", level: "error", message: "The chamfer reaches the bore." });
-    if (p.lengthMm < p.boreMm * 1.5) warnings.push({ field: "length", level: "warning", message: "A bushing under 1.5 bore diameters long wears quickly." });
-
-    return {
-      errors,
-      warnings,
-      readout: [
-        { label: "Outside Ø", value: U(p.outsideMm, units), source: "input" },
-        { label: "Bore", value: U(p.boreMm, units), source: "input" },
-        { label: "Length", value: U(p.lengthMm, units), source: "input" },
-        { label: "Wall", value: U(wall, units), source: "calc" },
-        { label: "Chamfer", value: U(p.chamferMm, units), source: "input" },
-      ],
-      preview: previewOf(
-        `${U(p.outsideMm, units)} sleeve · ${U(p.boreMm, units)} bore`,
-        `PB${R(p.outsideMm, 0)}-${R(p.boreMm, 0)}`,
-        p.outsideMm,
-        p.lengthMm,
-        [
-          { label: "Outside", value: U(p.outsideMm, units) },
-          { label: "Bore", value: U(p.boreMm, units) },
-          { label: "Length", value: U(p.lengthMm, units) },
-        ],
-      ),
-    };
-  },
-  build: (p) => {
-    const outer = p.outsideMm / 2;
-    const bore = p.boreMm / 2;
-    const c = Math.min(p.chamferMm, p.lengthMm / 2 - 1e-4, outer - bore - 1e-4);
-    return spin(
-      [
-        { x: bore, y: 0 },
-        { x: outer - c, y: 0 },
-        { x: outer, y: c },
-        { x: outer, y: p.lengthMm - c },
-        { x: outer - c, y: p.lengthMm },
-        { x: bore, y: p.lengthMm },
-      ],
-      outer,
-    );
-  },
-  fileName: (p) => `plain-bushing-${R(p.outsideMm, 0)}-${R(p.boreMm, 0)}.stl`,
-});
-
 /* ------------------------------------------------------------- flanged sleeve */
 
 export const flangedSleeve: AnyDesign = defineDesign({
@@ -920,94 +829,6 @@ export const plunger: AnyDesign = defineDesign({
   fileName: (p) => `plunger-${R(p.diameterMm, 0)}-${R(p.lengthMm, 0)}.stl`,
 });
 
-/* ------------------------------------------------------------------ hinge pin */
-
-export const hingePin: AnyDesign = defineDesign({
-  id: "hinge-pin",
-  name: "Hinge pin",
-  family: "fixings",
-  eyebrow: "Headed pin",
-  blurb: "A headed pin with a plain shank that can be tapped out again.",
-  lede: "A hinge pin with a small head at one end and a straight shank: the head stops the pin falling through the knuckle and gives a drift somewhere to push from when the hinge has to come apart. The shank is undivided so it can be reversed.",
-  use: "Replacing a lost or bent pin in a cabinet hinge, a gate hinge or a removable pivot.",
-  notesTitle: "How the head retains the pin",
-  chips: [
-    { label: "Head Ø", value: "8 – 40 mm" },
-    { label: "Shank Ø", value: "4 – 30 mm" },
-    { label: "Length", value: "20 – 120 mm" },
-  ],
-  notes: [
-    "The head is a turned disc that overhangs the shank by a couple of millimetres, enough to catch on the knuckle without fouling the leaf. The shank runs straight to the far end so it can be drifted back out from the other side.",
-    "Check the shank against the knuckle bore and chamfer the far end so it starts into the second knuckle. A pin that is a tight fit all the way is hard to remove later, so leave the fit to a test piece.",
-  ],
-  header: "Hinge Pin Designer - units: mm",
-  fields: [
-    { key: "head", label: "Head diameter", kind: "length", section: "Pin", default: "14", min: 8, max: 40 },
-    { key: "headHeight", label: "Head height", kind: "length", section: "Pin", default: "4", min: 2, max: 10 },
-    { key: "shank", label: "Shank diameter", kind: "length", section: "Shank", default: "8", min: 4, max: 30 },
-    { key: "length", label: "Overall length", kind: "length", section: "Shank", default: "50", min: 20, max: 120 },
-  ],
-  parse: (raw) => ({
-    headMm: rawLength(raw, "head"),
-    headHeightMm: rawLength(raw, "headHeight"),
-    shankMm: rawLength(raw, "shank"),
-    lengthMm: rawLength(raw, "length"),
-  }),
-  derive: (p, units) => {
-    const errors: DesignIssue[] = [];
-    const warnings: DesignIssue[] = [];
-    pushRange(errors, units, "head", "Head diameter", p.headMm, 8, 40);
-    pushRange(errors, units, "headHeight", "Head height", p.headHeightMm, 2, 10);
-    pushRange(errors, units, "shank", "Shank diameter", p.shankMm, 4, 30);
-    pushRange(errors, units, "length", "Overall length", p.lengthMm, 20, 120);
-    if (errors.length > 0) return emptyResult(errors, warnings);
-    checkSize(errors, units, "head", p.headMm, p.lengthMm);
-
-    if (p.headMm <= p.shankMm + 2) errors.push({ field: "head", level: "error", message: "The head does not overhang the shank." });
-    if (p.headHeightMm >= p.lengthMm - 2) errors.push({ field: "headHeight", level: "error", message: "The head takes the whole pin." });
-    if (p.lengthMm < p.shankMm * 2) warnings.push({ field: "length", level: "warning", message: "A very short hinge pin falls out easily." });
-
-    return {
-      errors,
-      warnings,
-      readout: [
-        { label: "Head Ø", value: U(p.headMm, units), source: "input" },
-        { label: "Head height", value: U(p.headHeightMm, units), source: "input" },
-        { label: "Shank Ø", value: U(p.shankMm, units), source: "input" },
-        { label: "Overall length", value: U(p.lengthMm, units), source: "input" },
-        { label: "Shank length", value: U(p.lengthMm - p.headHeightMm, units), source: "calc" },
-      ],
-      preview: previewOf(
-        `${U(p.shankMm, units)} shank · ${U(p.lengthMm, units)} long`,
-        `HP${R(p.headMm, 0)}-${R(p.lengthMm, 0)}`,
-        p.headMm,
-        p.lengthMm,
-        [
-          { label: "Head", value: U(p.headMm, units) },
-          { label: "Shank", value: U(p.shankMm, units) },
-          { label: "Length", value: U(p.lengthMm, units) },
-        ],
-      ),
-    };
-  },
-  build: (p) => {
-    const head = p.headMm / 2;
-    const shank = p.shankMm / 2;
-    return spin(
-      [
-        { x: 0, y: 0 },
-        { x: head, y: 0 },
-        { x: head, y: p.headHeightMm },
-        { x: shank, y: p.headHeightMm },
-        { x: shank, y: p.lengthMm },
-        { x: 0, y: p.lengthMm },
-      ],
-      head,
-    );
-  },
-  fileName: (p) => `hinge-pin-${R(p.shankMm, 0)}-${R(p.lengthMm, 0)}.stl`,
-});
-
 /* ------------------------------------------------------------- bushing driver */
 
 export const bushingDriver: AnyDesign = defineDesign({
@@ -1447,13 +1268,11 @@ export const revolveFittings: AnyDesign[] = [
   crownedRoller,
   idlerWheel,
   guideRoller,
-  plainBushing,
   flangedSleeve,
   spacerStack,
   springSeat,
   springCap,
   plunger,
-  hingePin,
   bushingDriver,
   sealDriver,
   pressDisc,

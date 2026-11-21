@@ -46,7 +46,6 @@ export const NOTES_TITLES: Record<string, string> = {
   "gusset-plate": "How the brace is fitted",
   "keyhole-plate": "How the keyhole is drawn",
   "switch-plate": "How the opening is rounded",
-  "tensioner-plate": "How the slot takes up slack",
   "cable-mount": "How the ties are guided",
   "brake-rotor": "How the drillings are placed",
   "index-plate": "How the detents divide",

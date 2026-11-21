@@ -591,7 +591,7 @@ export default function App() {
               className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight whitespace-nowrap"
             >
               <StarMark className="size-5 shrink-0 text-accent sm:size-6" />
-              <span className="truncate">Parametric Wheel Works</span>
+              <span className="truncate">Parametric Works</span>
             </a>
             <DesignerNav route={route} />
           </div>
@@ -608,16 +608,16 @@ export default function App() {
             <div className="flex items-center gap-2">
               <StarMark className="size-5 text-accent" />
               <span className="text-sm font-semibold tracking-tight">
-                Parametric Wheel Works
+                Parametric Works
               </span>
             </div>
             <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted">
-              {ALL_ENTRIES.length} parametric designers in one static site: gears, pulleys,
-              fixings, vessels, springs, labware, workshop fixtures, household parts and
-              custom lettering, including the original star rollers, sprockets, impellers
-              and propellers.
-              Everything is generated locally in the browser — no accounts, no uploads,
-              no CAD kernel. Capability labels state what has and has not been checked.
+              {ALL_ENTRIES.length} parametric designers for mechanical, workshop, household
+              and lettered parts — wheels and rotors, gears and drives, plates and fixings,
+              vessels and fluid, motion, and text and lettering — plus the original star
+              rollers, sprockets, impellers and propellers. Everything is generated locally
+              in the browser: no accounts, no uploads, no CAD kernel. Capability labels
+              state what has and has not been checked.
             </p>
           </div>
           <div className="text-xs leading-relaxed text-muted sm:text-right">
@@ -626,7 +626,7 @@ export default function App() {
               more closed shells before an STL is offered. That is a topology check, not a fit,
               strength or safety certification; read the capability label before making.
             </p>
-            <p className="mt-2">© {new Date().getFullYear()} Parametric Wheel Works</p>
+            <p className="mt-2">© {new Date().getFullYear()} Parametric Works</p>
           </div>
         </div>
       </footer>

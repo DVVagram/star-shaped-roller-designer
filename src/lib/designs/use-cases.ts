@@ -51,7 +51,6 @@ export const USE_CASES: Record<string, string> = {
   "gusset-plate": "Braces a right-angle joint flat, where a folded bracket will not fit.",
   "keyhole-plate": "Hangs on a screw head: a keyhole hanger, escutcheon or lock plate.",
   "switch-plate": "Panel plate with a rounded opening for a switch, socket or gauge.",
-  "tensioner-plate": "Takes up slack in a belt or chain with a pivot and a locking slot.",
   "cable-mount": "Screws down and holds a cable bundle with two ties, no drilling of the bundle.",
   "brake-rotor": "A drilled rotor for a kart or model brake — a display part, never a road brake.",
   "index-plate": "Dividing plate for a rotary fixture: equal steps to a fixed angle.",

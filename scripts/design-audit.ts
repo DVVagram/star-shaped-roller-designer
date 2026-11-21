@@ -20,7 +20,7 @@ const lines = [
   "labels describe verified scope, not fitness. See `docs/CAPABILITY.md` for the",
   "checks actually performed and the evidence matrix.",
   "",
-  `Designers: **${DESIGNS.length}**`,
+  `Schema-driven designers: **${DESIGNS.length}**. With the four original builders the catalogue has ${DESIGNS.length + 4} pages.`,
   "",
   ...Object.entries(CAPABILITIES).map(
     ([id, meta]) => `- **${meta.label}**: ${counts.get(id as keyof typeof CAPABILITIES) ?? 0}`,
