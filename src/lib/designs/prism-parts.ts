@@ -848,7 +848,7 @@ export const flange: AnyDesign = defineDesign({
   chips: [
     { label: "Bolts", value: "2 – 12" },
     { label: "Outer Ø", value: "30 – 180 mm" },
-    { label: "Bolt circle", value: "mm" },
+    { label: "Bolt circle", value: "10 – 170 mm" },
   ],
   notes: [
     "Bolt holes are on the entered pitch circle at 360°/n spacing, starting on +X. The wall checks are the radial distance from each hole to the outside and to the bore — the same two numbers that decide whether a gasket will crush the flange or crack it.",

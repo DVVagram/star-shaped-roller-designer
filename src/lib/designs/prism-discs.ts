@@ -70,7 +70,7 @@ export const brakeRotor: AnyDesign = defineDesign({
   chips: [
     { label: "Rotor Ø", value: "40 – 180 mm" },
     { label: "Holes", value: "0 – 36" },
-    { label: "Bolt circle", value: "mm" },
+    { label: "Bolt circle", value: "12 – 140 mm" },
   ],
   notes: [
     "The cooling holes are evenly spaced on their own pitch circle, so the pattern is symmetric and the disc stays balanced. The mounting bolt circle is a separate pattern inside it, and every hole is a through-hole in the same cap triangulation as the rim.",

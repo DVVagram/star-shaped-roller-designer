@@ -118,7 +118,7 @@ export const pipeElbow: AnyDesign = defineDesign({
   chips: [
     { label: "Pipe Ø", value: "8 – 160 mm" },
     { label: "Bend angle", value: "15 – 180°" },
-    { label: "Bend radius", value: "mm" },
+    { label: "Bend radius", value: "10 – 140 mm" },
   ],
   notes: [
     "The cross-section is an annulus perpendicular to the path at every station, so the bore stays round around the bend. The inside of the bend is a real torus surface, which is why the wall thickness stays constant even when the bend radius is tight.",

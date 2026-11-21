@@ -440,7 +440,7 @@ export const oringPlug: AnyDesign = defineDesign({
   chips: [
     { label: "Plug Ø", value: "10 – 100 mm" },
     { label: "Groove", value: "1 – 6 mm" },
-    { label: "Flange", value: "mm" },
+    { label: "Flange", value: "12 – 120 mm" },
   ],
   notes: [
     "The groove is a rectangle in the profile: its width, depth and distance from the flange are all entered, so an O-ring of known section can be given the right squeeze. The groove floor is flat, which is what an O-ring wants.",

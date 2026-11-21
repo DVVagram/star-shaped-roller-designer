@@ -204,8 +204,8 @@ src/
     kit/sweep.ts             helical-tube and swept-annulus kernels
     designs/types.ts         field schema, defineDesign(), validation helpers
     designs/geometry.ts      involute gears, ratchet, Geneva, cams, wrench profiles
-    designs/prism-*.ts       the prism designs (gears, parts)
-    designs/revolve-*.ts     the revolved designs (vessels, mechanical)
+    designs/prism-*.ts       the prism designs (gears, parts, hardware, plates, discs)
+    designs/revolve-*.ts     the revolved designs (vessels, mechanical, household, parts)
     designs/motion-designs.ts  spring and pipe elbow
     designs/index.ts         the registry and id lookup
     sprocket.ts              spec, roller-seat profile, mesh, validation, form helpers

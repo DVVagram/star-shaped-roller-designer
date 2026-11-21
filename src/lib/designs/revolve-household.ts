@@ -38,7 +38,7 @@ export const candlestick: AnyDesign = defineDesign({
   chips: [
     { label: "Height", value: "40 – 170 mm" },
     { label: "Socket", value: "10 – 60 mm" },
-    { label: "Base", value: "mm" },
+    { label: "Base", value: "20 – 140 mm" },
   ],
   notes: [
     "The foot, stem and socket are one closed profile, so the part is a single solid with a flat base and a socket at the top. The socket floor is left solid: a candle sits on it rather than dropping through.",

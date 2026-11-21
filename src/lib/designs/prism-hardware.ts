@@ -844,7 +844,7 @@ export const pivotBracket: AnyDesign = defineDesign({
   chips: [
     { label: "Plate", value: "30 – 170 mm" },
     { label: "Pivot", value: "3 – 40 mm" },
-    { label: "Pitch", value: "mm" },
+    { label: "Pitch", value: "10 – 150 mm" },
   ],
   notes: [
     "The three holes are cut from one plate, with the pivot on the centre line and the mounting holes symmetric about it. Rounded corners keep the plate from splitting at a screw corner.",

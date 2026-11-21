@@ -813,7 +813,7 @@ export const steppedPulley: AnyDesign = defineDesign({
   chips: [
     { label: "Steps", value: "2 – 4" },
     { label: "Largest Ø", value: "20 – 180 mm" },
-    { label: "Total width", value: "mm" },
+    { label: "Total width", value: "6 – 180 mm" },
   ],
   notes: [
     "The steps are stacked along the bore with flat shoulders between them. Diameters and widths are independent, so a cone pulley with equal width steps and a 1:2 speed range is a few fields away.",
