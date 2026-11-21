@@ -130,7 +130,7 @@ export const eggCup: AnyDesign = defineDesign({
   name: "Egg cup",
   family: "vessels",
   eyebrow: "Breakfast",
-  blurb: "A footed cup with a rounded egg seat.",
+  blurb: "A footed cup that holds a boiled egg upright at the table.",
   lede: "A flared foot and a cup sized to a hen's egg, with a floor thick enough that the egg does not touch the table.",
   chips: [
     { label: "Cup Ø", value: "30 – 70 mm" },
@@ -405,7 +405,7 @@ export const bottleStopper: AnyDesign = defineDesign({
   name: "Bottle stopper",
   family: "vessels",
   eyebrow: "Tapered plug",
-  blurb: "A tapered plug under a round knob.",
+  blurb: "A tapered plug with a shoulder and a knob that pulls out of a neck.",
   lede: "A tapered plug sized to a bottle neck, with a knob wide enough to pull and a shoulder that stops it dropping in.",
   chips: [
     { label: "Plug Ø", value: "8 – 40 mm" },
@@ -809,7 +809,7 @@ export const wineGlass: AnyDesign = defineDesign({
   lede: "A rounded bowl, a slim solid stem and a flat foot, generated as one profile with a wall that thins towards the rim.",
   chips: [
     { label: "Bowl Ø", value: "40 – 100 mm" },
-    { label: "Height", value: "90 – 170 mm" },
+    { label: "Bowl height", value: "20 – 80 mm" },
     { label: "Wall", value: "1 – 4 mm" },
   ],
   notes: [
@@ -920,7 +920,7 @@ export const goblet: AnyDesign = defineDesign({
   lede: "A cup with a straight taper, a thick lip and a stem that widens into a foot — the profile a lathe would cut from one block.",
   chips: [
     { label: "Cup Ø", value: "40 – 100 mm" },
-    { label: "Height", value: "80 – 170 mm" },
+    { label: "Cup height", value: "20 – 80 mm" },
     { label: "Wall", value: "2 – 6 mm" },
   ],
   notes: [

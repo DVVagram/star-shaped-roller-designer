@@ -439,7 +439,7 @@ export const oringPlug: AnyDesign = defineDesign({
   lede: "A spigot with a square-section groove around its outside and a flange to stop it, sized so a standard O-ring sits proud of the plug.",
   chips: [
     { label: "Plug Ø", value: "10 – 100 mm" },
-    { label: "Groove", value: "1 – 6 mm" },
+    { label: "Groove depth", value: "0.8 – 6 mm" },
     { label: "Flange", value: "12 – 120 mm" },
   ],
   notes: [

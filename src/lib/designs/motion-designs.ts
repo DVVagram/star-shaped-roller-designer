@@ -79,7 +79,11 @@ export const compressionSpring: AnyDesign = defineDesign({
         { label: "Pitch", value: measure(p.pitchMm, units), source: "input" },
         { label: "Free length", value: measure(freeLength, units), source: "calc" },
         { label: "Spring index", value: round(index, 2), source: "calc" },
-        { label: "Rate (PLA)", value: `${round(rate, 3)} N/mm`, source: "calc" },
+        {
+          label: "Rate (PLA)",
+          value: units === "in" ? `${round(rate * 5.7101, 2)} lb/in` : `${round(rate, 3)} N/mm`,
+          source: "calc",
+        },
       ],
       preview: previewOf(
         `${Math.round(p.coils)} coils · ${measure(freeLength, units)} free`,

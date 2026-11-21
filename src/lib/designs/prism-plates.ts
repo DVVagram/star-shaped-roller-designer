@@ -305,7 +305,7 @@ export const keytag: AnyDesign = defineDesign({
   name: "Key tag",
   family: "fixings",
   eyebrow: "Rounded tag",
-  blurb: "A rounded tag with a key-ring hole.",
+  blurb: "A stiff stadium tag with a ring hole for a key ring or a hook.",
   lede: "A stadium tag with one ring hole, thin enough to flex and thick enough to survive a pocket.",
   chips: [
     { label: "Length", value: "30 – 120 mm" },
@@ -384,7 +384,7 @@ export const plantLabel: AnyDesign = defineDesign({
   name: "Plant label",
   family: "fixings",
   eyebrow: "Stake",
-  blurb: "A writing plate on a pointed stake.",
+  blurb: "A writing plate on a pointed stake that pushes into soil beside a row.",
   lede: "A flat label with a tapering point, pushed into soil beside a row. The plate stays above the surface and the point starts without crushing the stem.",
   chips: [
     { label: "Height", value: "40 – 170 mm" },
@@ -571,7 +571,7 @@ export const keyholePlate: AnyDesign = defineDesign({
   name: "Keyhole plate",
   family: "fixings",
   eyebrow: "Escutcheon",
-  blurb: "A plate with a keyhole-shaped opening.",
+  blurb: "A flat plate with a keyhole opening that hangs on a screw head.",
   lede: "A flat escutcheon with one keyhole opening — a round clearance at the bottom and a narrower slot above — for a lock, a hanging slot or a keyed hanger.",
   chips: [
     { label: "Plate", value: "20 – 120 mm" },

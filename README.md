@@ -153,7 +153,7 @@ The volume is the divergence-theorem volume of that closed mesh.
 | 3D       | three.js + OrbitControls                                 |
 | Geometry | In-repo profiles + one deterministic indexed-mesh extruder |
 | Export   | Binary STL writer (no dependency)                        |
-| Tests    | Vitest — 495 geometry, designer and STL tests            |
+| Tests    | Vitest — 496 geometry, designer and STL tests            |
 
 No database, no API keys and no environment variables.
 

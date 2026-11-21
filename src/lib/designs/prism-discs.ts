@@ -254,7 +254,7 @@ export const ventGrille: AnyDesign = defineDesign({
   name: "Vent grille",
   family: "fixings",
   eyebrow: "Slot array",
-  blurb: "A plate of parallel obround slots.",
+  blurb: "A vent plate cut with rows of obround slots and bars you set.",
   lede: "A vent or speaker grille made from rows of true stadium slots, with the bar between slots set independently of the slot width.",
   chips: [
     { label: "Rows", value: "1 – 12" },
@@ -322,7 +322,7 @@ export const ventGrille: AnyDesign = defineDesign({
       ],
       preview: previewOf(
         `${rows} × ${columns} slots`,
-        `VG${rows}x${columns}-${R(p.slotLengthMm, 0)}`,
+        `VG${rows}X${columns}-${R(p.slotLengthMm, 0)}`,
         p.widthMm,
         p.thicknessMm,
         [

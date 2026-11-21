@@ -214,7 +214,7 @@ export const internalGear: AnyDesign = defineDesign({
   chips: [
     { label: "Teeth", value: "16 – 120" },
     { label: "Module", value: "0.5 – 5 mm" },
-    { label: "Rim", value: "3 – 20 mm" },
+    { label: "Rim", value: "2 – 30 mm" },
   ],
   notes: [
     "The empty space is what meshes, so its half-width at radius r is ψp + inv(α) − inv(αr). That narrows as the radius grows, which is why an internal tooth is wide at its inward tip and narrow at the rim-side root. The rim is a plain circle outside the cavity floor, so the ring has one continuous outer wall.",
@@ -459,7 +459,7 @@ export const rack: AnyDesign = defineDesign({
   chips: [
     { label: "Teeth", value: "4 – 40" },
     { label: "Module", value: "0.5 – 5 mm" },
-    { label: "Bar", value: "4 – 30 mm" },
+    { label: "Bar", value: "3 – 40 mm" },
   ],
   notes: [
     "The rack pitch is πm and each tooth is centred on a half-pitch, with straight flanks at the pressure angle. At the pitch line the tooth is πm/2 wide minus backlash; it narrows by tan α per millimetre of addendum and widens by the same per millimetre of dedendum.",
@@ -1024,7 +1024,7 @@ export const eccentricWheel: AnyDesign = defineDesign({
   chips: [
     { label: "Throw", value: "2 × offset" },
     { label: "Outer Ø", value: "16 – 180 mm" },
-    { label: "Offset", value: "0.5 – 60 mm" },
+    { label: "Offset", value: "0 – 60 mm" },
   ],
   notes: [
     "The bore is translated by the eccentricity; both circles keep their own radius, so the narrowest wall is outerRadius − offset − boreRadius and that is the number the validator checks. The stroke is exactly twice the offset.",
@@ -1109,7 +1109,7 @@ export const splinedHub: AnyDesign = defineDesign({
   chips: [
     { label: "Splines", value: "4 – 20" },
     { label: "Major Ø", value: "8 – 170 mm" },
-    { label: "Bore", value: "2 – 80 mm" },
+    { label: "Bore", value: "1 – 100 mm" },
   ],
   notes: [
     "Each spline is a radial tooth with straight flanks: it runs from the minor diameter out to the major diameter, and its tip land is the spline width. The tooth space at the root is the root circumference divided by the spline count, minus that width.",

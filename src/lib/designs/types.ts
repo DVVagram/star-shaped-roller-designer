@@ -9,6 +9,8 @@
 
 import type { Mesh } from "@/lib/kit/solid";
 
+import { MAKING_NOTES } from "./making-notes";
+import { NOTES_TITLES } from "./notes-titles";
 import { USE_CASES } from "./use-cases";
 import {
   formatMeasure,
@@ -132,8 +134,8 @@ export function defineDesign<P>(module: DesignModule<P>): AnyDesign {
     blurb: module.blurb,
     lede: module.lede,
     chips: module.chips,
-    notes: module.notes,
-    notesTitle: module.notesTitle ?? "How the geometry is built",
+    notes: MAKING_NOTES[module.id] ? [...module.notes, MAKING_NOTES[module.id]] : module.notes,
+    notesTitle: module.notesTitle ?? NOTES_TITLES[module.id] ?? "How the geometry is built",
     use: module.use ?? USE_CASES[module.id] ?? "",
     header: module.header,
     fields: module.fields,

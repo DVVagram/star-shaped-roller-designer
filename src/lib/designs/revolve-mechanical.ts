@@ -324,7 +324,7 @@ export const deLavalNozzle: AnyDesign = defineDesign({
   chips: [
     { label: "Throat Ø", value: "3 – 60 mm" },
     { label: "Expansion", value: "1 – 12 ×" },
-    { label: "Length", value: "20 – 180 mm" },
+    { label: "Diverging", value: "8 – 140 mm" },
   ],
   notes: [
     "Both halves are cosine blends: the converging side runs from the inlet to the throat and the diverging side from the throat to the exit, with zero slope at each junction. That keeps the throat a clean minimum instead of a crease.",
@@ -432,7 +432,7 @@ export const noseCone: AnyDesign = defineDesign({
   lede: "A tangent ogive is the classic model-rocket nose: a circular arc swept around the axis, tangent to the body at the base. Enter the base, length and shoulder and the profile is generated from the ogive radius, with a socket bored into the shoulder.",
   chips: [
     { label: "Base Ø", value: "20 – 120 mm" },
-    { label: "Length", value: "20 – 180 mm" },
+    { label: "Length", value: "20 – 160 mm" },
     { label: "Fineness", value: "2 – 8 : 1" },
   ],
   notes: [
@@ -818,9 +818,9 @@ export const steppedPulley: AnyDesign = defineDesign({
   blurb: "A cone pulley with two to four diameters on one bore.",
   lede: "Stepped pulleys change speed by moving the belt from one sheave to the next. Each step has its own diameter and width, all on one through bore, so the part is a single turned solid rather than a stack of separate wheels.",
   chips: [
-    { label: "Steps", value: "2 – 4" },
-    { label: "Largest Ø", value: "20 – 180 mm" },
-    { label: "Total width", value: "6 – 180 mm" },
+    { label: "Steps", value: "2 / 3 / 4" },
+    { label: "Largest Ø", value: "10 – 180 mm" },
+    { label: "Step width", value: "3 – 60 mm" },
   ],
   notes: [
     "The steps are stacked along the bore with flat shoulders between them. Diameters and widths are independent, so a cone pulley with equal width steps and a 1:2 speed range is a few fields away.",

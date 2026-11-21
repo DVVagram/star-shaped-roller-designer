@@ -57,7 +57,7 @@ export const wingNut: AnyDesign = defineDesign({
   chips: [
     { label: "Wings", value: "2 – 4" },
     { label: "Span", value: "16 – 120 mm" },
-    { label: "Bore", value: "3 – 40 mm" },
+    { label: "Bore", value: "1 – 40 mm" },
   ],
   notes: [
     "The outline radius follows `waist/2 + (span/2 − waist/2)(1 − cos(wings·θ))/2`, which puts a wing at every half period and a smooth waist between them. The bore is a plain through-hole, sized for the stud rather than the thread.",
@@ -1070,7 +1070,7 @@ export const mountingPlate: AnyDesign = defineDesign({
       ],
       preview: previewOf(
         `${measure(p.lengthMm, units)} × ${measure(p.widthMm, units)} plate`,
-        `MP${round(p.lengthMm, 0)}x${round(p.widthMm, 0)}`,
+        `MP${round(p.lengthMm, 0)}X${round(p.widthMm, 0)}`,
         Math.max(p.lengthMm, p.widthMm),
         p.thicknessMm,
         [
