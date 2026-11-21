@@ -1,7 +1,8 @@
 # Parametric Wheel Works
 
-Four parametric designers for **3D-printable wheels and rotors**, in one static
-site:
+Fifty parametric designers for **3D-printable parts**, in one static site: the
+original four wheels and rotors plus forty-six gears, pulleys, fixings, vessels,
+ducts and mechanisms.
 
 | Designer     | What it makes                                                        |
 | ------------ | -------------------------------------------------------------------- |
@@ -19,7 +20,7 @@ Everything runs in the browser: no CAD kernel, no server, no account, no uploads
 
 ---
 
-## The designers
+## The original four
 
 ### Star roller
 
@@ -61,11 +62,35 @@ drop, sweep and the shaft bore.
 
 ---
 
+## The forty-six
+
+| Family | Designers |
+| --- | --- |
+| **Gears and drives** | Spur gear, internal ring gear, helical gear, rack, timing pulley, V-belt pulley, round-belt pulley, stepped pulley, flywheel |
+| **Wheels and rotors** | Ratchet wheel, Geneva wheel, disc cam, eccentric wheel, saw blade, handwheel, torus, chain link |
+| **Plates and fixings** | Wing nut, hex nut, washer, star knob, knurled knob, flange, mounting plate, splined hub, flanged bushing |
+| **Vessels and fluid** | Funnel, vase, cup, bowl, bottle, bell, lamp shade, spool, gasket, hemisphere shell, parabolic dish, de Laval nozzle, nose cone, pipe reducer, pipe cap, hose adapter, pipe elbow |
+| **Motion** | Compression spring |
+
+`docs/DESIGNERS.md` lists the 344 candidates these were chosen from, with the
+forty-six marked.
+
+Every new designer is a `defineDesign()` module. One field list drives the form,
+the unit conversion, the millimetre parameters, the validation copy, the readout,
+the preview and the STL file name, so the drawn part, the printed numbers and the
+exported file cannot disagree about what was asked for.
+
+---
+
 ## Shared geometry
 
-All internal lengths are millimetres. Every solid is built by one extruder:
-a stack of corresponding outlines from the bottom face to the top, a through-hole,
-and an optional hub boss.
+All internal lengths are millimetres. Three kernels cover the new library: a
+multi-hole prism extruder (stacked outlines with optional twisted rings), a solid
+of revolution from a closed `(r, z)` profile, and a swept tube that carries a
+circular or annular section along a helix or a bend. The original four still use
+the plain stack-of-outlines extruder.
+
+For the prism extruder:
 
 - Both faces are triangulated with the same earcut implementation three.js uses
   (`ShapeUtils.triangulateShape`), so cap boundaries are exactly the profile
@@ -80,11 +105,18 @@ and an optional hub boss.
 - `emitCap` fixes each cap triangle's winding from its 2D orientation, so caps and
   walls always agree.
 
+- The revolution builder welds every profile point on the axis into a single pole,
+  so a dome or a cone closes without a ring of degenerate triangles, and it flips
+  the profile winding if the points were listed clockwise.
+- The sweep builder caps both ends of the tube with the section it swept, so a
+  spring or an elbow is closed by construction rather than by stitching.
+
 `inspectMesh()` then verifies the result: every directed edge must cancel against
-its reverse, there must be a single connected shell, no repeated or zero-area
-faces, and the Euler characteristic must be 0 (one solid, one through-hole). Only
-then is a volume reported or an STL offered. The volume is the
-divergence-theorem volume of that closed mesh.
+its reverse, there must be a single connected shell, and no repeated or zero-area
+faces. It accepts any closed orientable surface — `χ = 2` for a plain solid, `0`
+for a tube, `−2` for a plate with two holes — and reports the genus instead of
+assuming every part has a bore. Only then is a volume reported or an STL offered.
+The volume is the divergence-theorem volume of that closed mesh.
 
 ### Why the shapes fit
 
@@ -105,7 +137,7 @@ divergence-theorem volume of that closed mesh.
 | 3D       | three.js + OrbitControls                                 |
 | Geometry | In-repo profiles + one deterministic indexed-mesh extruder |
 | Export   | Binary STL writer (no dependency)                        |
-| Tests    | Vitest — 84 geometry, solid and STL tests                |
+| Tests    | Vitest — 149 geometry, designer and STL tests            |
 
 No database, no API keys and no environment variables.
 
@@ -125,9 +157,9 @@ npm run typecheck  # tsc --noEmit
 npm test           # Vitest
 ```
 
-`npm run build` emits a static site in `dist/`. Routes are hash-based
-(`#/`, `#/sprocket`, `#/impeller`, `#/propeller`), so any static host works with no
-rewrite rules.
+`npm run build` emits a static site in `dist/`. Routes are hash-based: `#/` is the
+catalogue, `#/<designer-id>` opens any of the fifty (for example `#/spur-gear` or
+`#/sprocket`), so any static host works with no rewrite rules.
 
 ---
 
@@ -135,10 +167,13 @@ rewrite rules.
 
 ```
 src/
-  App.tsx                    suite shell: header, hash router, page copy, footer
+  App.tsx                    suite shell: header, hash router, catalog, footer
   components/
+    Catalog.tsx              the fifty cards, grouped by family
     DesignerPage.tsx         hero + builder slot + explainer shared by every page
     DesignScaffold.tsx       two-column builder: inputs, measurements, preview, export
+    GenericDesigner.tsx      schema-driven form used by all forty-six new designs
+    DesignMark.tsx           one family glyph per catalog card
     MeshPreview.tsx          three.js canvas (WebGL fallback, reset view)
     SprocketBuilder.tsx      sprocket form, validation, readout, STL
     FanBuilder.tsx           impeller form…
@@ -148,6 +183,15 @@ src/
   lib/
     kit/units.ts             units, formatting, outlines, validation helpers
     kit/solid.ts             extruder, mesh inspector, binary STL writer
+    kit/prism.ts             multi-hole prism kernel (twisted rings supported)
+    kit/revolve.ts           solid-of-revolution kernel and profile builder
+    kit/sweep.ts             helical-tube and swept-annulus kernels
+    designs/types.ts         field schema, defineDesign(), validation helpers
+    designs/geometry.ts      involute gears, ratchet, Geneva, cams, wrench profiles
+    designs/prism-*.ts       the prism designs (gears, parts)
+    designs/revolve-*.ts     the revolved designs (vessels, mechanical)
+    designs/motion-designs.ts  spring and pipe elbow
+    designs/index.ts         the registry and id lookup
     sprocket.ts              spec, roller-seat profile, mesh, validation, form helpers
     rotor.ts                 shared blade-rotor core (impeller and propeller)
     fan.ts / propeller.ts    form field sets and spec builders
@@ -170,5 +214,20 @@ src/
   plane on the top and bottom of the tip, capped at half the blade height. The two
   are separate features, and neither is a ball-end on the corner.
 - Hubs are plain bosses; there are no spoke cut-outs, bolt circles or keyways.
+- **Gears** use true involute flanks at the entered pressure angle, with a
+  straight radial root and no fillet. **Splines** are straight-sided rather than
+  involute. **Knurls** are modelled as a lobed outline, not a cut diamond.
+- **Threads are not modelled.** Nuts, knobs and adapters are bored to the
+  entered diameter, so a printed M8 nut needs the bore sized for the material and
+  the printer, not a real thread form.
+- **Ratchet wheels** have asymmetric teeth with a root fillet but no separate
+  pawl. **Geneva wheels** have the slots and the concave locking arc, but not the
+  driver pin. **Cams** are radial-lift discs with no roller follower.
+- **Flywheels** are rim, web and hub only: no lightening holes, keyway or
+  balancing marks. The mass estimate assumes PLA at 1.24 g/cm³.
+- **Springs** are a circular wire swept on a true helix with square-cut ends; the
+  rate uses G = 3.5 GPa for PLA and assumes the coils do not touch.
+- **Vessels** are solids of revolution, so handles, spouts that leave the axis
+  and non-circular rims are out of scope. A funnel's spout is concentric.
 - Printability checks describe geometry only. Layer adhesion, wall count and
   material still decide whether a print survives.

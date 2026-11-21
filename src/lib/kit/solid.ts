@@ -520,6 +520,8 @@ export interface SolidReport {
    * χ = 0, which is what every designer here produces.
    */
   eulerCharacteristic: number;
+  /** Number of through-holes; 0 for a plain closed solid, 1 for a tube. */
+  genus: number;
   validFaces: boolean;
   volumeMm3: number;
   triangleCount: number;
@@ -622,8 +624,22 @@ export function inspectMesh(mesh: Mesh): SolidReport {
   const eulerCharacteristic =
     usedVertices.size - edgeOwners.size + triangleCount;
 
+  // Every closed orientable surface has an even Euler characteristic of 2 − 2g.
+  // A plain solid is χ = 2, a tube or washer χ = 0, and a plate with six holes
+  // is χ = −12. Rejecting anything but 0 would block every part without a bore,
+  // so the closedness test is evenness instead of one fixed value.
+  const closedSurface =
+    eulerCharacteristic <= 2 && eulerCharacteristic % 2 === 0;
+  const genus = Math.max(0, (2 - eulerCharacteristic) / 2);
+
   return {
-    ok: watertight && manifold && connected && validFaces && eulerCharacteristic === 0,
+    ok:
+      watertight &&
+      manifold &&
+      connected &&
+      validFaces &&
+      closedSurface,
+    genus,
     watertight,
     manifold,
     connected,

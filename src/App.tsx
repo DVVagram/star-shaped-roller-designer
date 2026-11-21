@@ -1,10 +1,15 @@
 import { useEffect, useState, type ReactNode } from "react";
 
+import Catalog, { type CatalogEntry } from "@/components/Catalog";
+import DesignMark from "@/components/DesignMark";
 import DesignerPage, { type DesignerPageProps } from "@/components/DesignerPage";
 import FanBuilder from "@/components/FanBuilder";
+import GenericDesigner from "@/components/GenericDesigner";
 import PropellerBuilder from "@/components/PropellerBuilder";
 import SprocketBuilder from "@/components/SprocketBuilder";
 import StarBuilder from "@/components/StarBuilder";
+import { DESIGNS, designById } from "@/lib/designs";
+import { FAMILIES, type AnyDesign, type DesignFamily } from "@/lib/designs/types";
 
 /* ------------------------------------------------------------------- marks */
 
@@ -88,29 +93,66 @@ function PropellerMark({ className = "" }: { className?: string }) {
 const ROUTE_IDS = ["star", "sprocket", "impeller", "propeller"] as const;
 type RouteId = (typeof ROUTE_IDS)[number];
 
-const NAV: { id: RouteId; label: string; href: string }[] = [
-  { id: "star", label: "Star roller", href: "#/" },
-  { id: "sprocket", label: "Sprocket", href: "#/sprocket" },
-  { id: "impeller", label: "Impeller", href: "#/impeller" },
-  { id: "propeller", label: "Propeller", href: "#/propeller" },
+const LEGACY_CATALOG: CatalogEntry[] = [
+  {
+    id: "star",
+    name: "Star roller",
+    family: "wheels",
+    eyebrow: "Fully parametric",
+    blurb: "A star-spiked wheel by diameter, spike shape and centre hole.",
+    isNew: false,
+  },
+  {
+    id: "sprocket",
+    name: "Chain sprocket",
+    family: "drives",
+    eyebrow: "Chain driven",
+    blurb: "Roller-chain seats cut to a real pitch and roller.",
+    isNew: false,
+  },
+  {
+    id: "impeller",
+    name: "Axial impeller",
+    family: "wheels",
+    eyebrow: "Air moving",
+    blurb: "Swept, leaned blades on a solid hub.",
+    isNew: false,
+  },
+  {
+    id: "propeller",
+    name: "Propeller",
+    family: "wheels",
+    eyebrow: "Pitch and thrust",
+    blurb: "Pitch-driven blades with a tapered chord.",
+    isNew: false,
+  },
 ];
 
-function routeFromHash(): RouteId | null {
-  if (typeof window === "undefined") return "star";
+const ALL_ENTRIES: CatalogEntry[] = [
+  ...LEGACY_CATALOG,
+  ...DESIGNS.map((design) => ({
+    id: design.id,
+    name: design.name,
+    family: design.family,
+    eyebrow: design.eyebrow,
+    blurb: design.blurb,
+    isNew: true,
+  })),
+];
+
+function routeFromHash(): string {
+  if (typeof window === "undefined") return "home";
   const raw = window.location.hash.replace(/^#\/?/, "").toLowerCase();
-  if (raw === "") return "star";
-  return (ROUTE_IDS as readonly string[]).includes(raw) ? (raw as RouteId) : null;
+  return raw === "" ? "home" : raw;
 }
 
 /** Hash routing, so the whole suite stays a static site. */
-function useRoute(): RouteId {
-  const [route, setRoute] = useState<RouteId>(() => routeFromHash() ?? "star");
+function useRoute(): string {
+  const [route, setRoute] = useState<string>(() => routeFromHash());
 
   useEffect(() => {
     const onHashChange = () => {
-      const next = routeFromHash();
-      if (!next) return;
-      setRoute(next);
+      setRoute(routeFromHash());
       window.scrollTo({ top: 0, behavior: "auto" });
     };
     window.addEventListener("hashchange", onHashChange);
@@ -120,28 +162,89 @@ function useRoute(): RouteId {
   return route;
 }
 
-function NavLinks({ route }: { route: RouteId }) {
+function DesignerNav({ route }: { route: string }) {
+  const current = ALL_ENTRIES.some((entry) => entry.id === route) ? route : "";
+  const families = Object.keys(FAMILIES) as DesignFamily[];
+
   return (
-    <>
-      {NAV.map((item) => {
-        const active = item.id === route;
-        return (
-          <a
-            key={item.id}
-            href={item.href}
-            aria-current={active ? "page" : undefined}
-            className={
-              active
-                ? "shrink-0 rounded-md bg-card px-2.5 py-1 text-[11px] font-semibold text-ink ring-1 ring-line"
-                : "shrink-0 rounded-md px-2.5 py-1 text-[11px] font-medium text-muted transition hover:bg-card hover:text-ink"
-            }
-          >
-            {item.label}
-          </a>
-        );
-      })}
-    </>
+    <nav aria-label="Designers" className="flex min-w-0 items-center gap-2">
+      <a
+        href="#/"
+        aria-current={route === "home" ? "page" : undefined}
+        className={
+          route === "home"
+            ? "shrink-0 rounded-md bg-card px-2.5 py-1 text-[11px] font-semibold text-ink ring-1 ring-line"
+            : "shrink-0 rounded-md px-2.5 py-1 text-[11px] font-medium text-muted transition hover:bg-card hover:text-ink"
+        }
+      >
+        <span className="hidden sm:inline">All designers</span>
+        <span className="sm:hidden">All</span>
+      </a>
+      <label htmlFor="designer-jump" className="sr-only">
+        Jump to a designer
+      </label>
+      <select
+        id="designer-jump"
+        value={current}
+        onChange={(event) => {
+          const next = event.target.value;
+          if (next) window.location.hash = `#/${next}`;
+        }}
+        className="max-w-[9.5rem] rounded-md border border-line bg-card px-2 py-1 text-[11px] font-medium text-ink transition hover:bg-paper-deep sm:max-w-[14rem]"
+      >
+        <option value="">Jump to…</option>
+        {families.map((family) => (
+          <optgroup key={family} label={FAMILIES[family].label}>
+            {ALL_ENTRIES.filter((entry) => entry.family === family).map((entry) => (
+              <option key={entry.id} value={entry.id}>
+                {entry.name}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </nav>
   );
+}
+
+function genericPage(design: AnyDesign): PageConfig {
+  return {
+    mark: <DesignMark family={design.family} className="size-3.5" />,
+    eyebrow: design.eyebrow,
+    title: design.name,
+    lede: design.lede,
+    chips: design.chips,
+    builderTitle: `Build your ${design.name.toLowerCase()}`,
+    builderLede: "Millimetres or inches — every field is live and the solid follows.",
+    builderNote:
+      "Every dimension is checked against a 180 × 180 × 180 mm build volume, and the STL unlocks only for a verified closed shell.",
+    steps: [
+      {
+        number: "01",
+        title: "Set the dimensions",
+        body: "Every field is live. Lengths convert between millimetres and inches without changing the underlying part, and the readout updates as you type.",
+      },
+      {
+        number: "02",
+        title: "Read the numbers",
+        body: "The derived pitch, volume, angle or capacity is calculated from the same parameters that build the mesh — not typed in a second time.",
+      },
+      {
+        number: "03",
+        title: "Export the STL",
+        body: "The preview draws the indexed mesh the exporter writes, so the file is the part you have been looking at, in millimetres, centred on the origin.",
+      },
+    ],
+    checklist: [
+      `A closed indexed mesh measured before export: one shell, every edge shared by two consistently wound triangles.`,
+      `A binary STL built from the same vertices the preview renders — no bounding box, no repair pass.`,
+      `Derived measurements from the entered dimensions, so the drawing, the volume and the file agree.`,
+    ],
+    notesTitle: design.notesTitle,
+    notes: design.notes,
+    // Remount per designer so the form state cannot leak across routes.
+    builder: <GenericDesigner key={design.id} design={design} />,
+  };
 }
 
 /* ------------------------------------------------------------------ pages */
@@ -354,8 +457,17 @@ const PAGES: Record<RouteId, PageConfig> = {
 
 export default function App() {
   const route = useRoute();
-  const page = PAGES[route];
-  const { builder, ...content } = page;
+  const legacy = (ROUTE_IDS as readonly string[]).includes(route)
+    ? PAGES[route as RouteId]
+    : null;
+  const design = legacy ? null : designById(route);
+  const page = legacy ?? (design ? genericPage(design) : null);
+
+  const renderPage = () => {
+    if (!page) return <Catalog entries={ALL_ENTRIES} />;
+    const { builder, ...content } = page;
+    return <DesignerPage {...content}>{builder}</DesignerPage>;
+  };
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -369,22 +481,12 @@ export default function App() {
               <StarMark className="size-5 shrink-0 text-accent sm:size-6" />
               <span className="truncate">Parametric Wheel Works</span>
             </a>
-            <nav aria-label="Designers" className="hidden items-center gap-1 sm:flex">
-              <NavLinks route={route} />
-            </nav>
+            <DesignerNav route={route} />
           </div>
-          <nav
-            aria-label="Designers"
-            className="-mx-1 flex items-center gap-1 overflow-x-auto px-1 pb-2 sm:hidden"
-          >
-            <NavLinks route={route} />
-          </nav>
         </div>
       </header>
 
-      <main className="flex-1">
-        <DesignerPage {...content}>{builder}</DesignerPage>
-      </main>
+      <main className="flex-1">{renderPage()}</main>
 
       <footer className="bg-paper">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 sm:px-6">
@@ -396,9 +498,10 @@ export default function App() {
               </span>
             </div>
             <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted">
-              Four parametric designers in one static site: star rollers, roller-chain
-              sprockets, axial impellers and propellers. Everything is generated locally
-              in the browser — no accounts, no uploads, no CAD kernel.
+              Fifty parametric designers in one static site: gears, pulleys, fixings,
+              vessels, springs and the original star rollers, sprockets, impellers and
+              propellers. Everything is generated locally in the browser — no accounts,
+              no uploads, no CAD kernel.
             </p>
           </div>
           <div className="text-xs leading-relaxed text-muted sm:text-right">
