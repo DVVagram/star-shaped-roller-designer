@@ -1,8 +1,9 @@
 # Parametric Wheel Works
 
-Fifty parametric designers for **3D-printable parts**, in one static site: the
-original four wheels and rotors plus forty-six gears, pulleys, fixings, vessels,
-ducts and mechanisms.
+Ninety-six parametric designers for **3D-printable parts**, in one static site:
+the original four wheels and rotors, forty-six gears, pulleys, fixings, vessels,
+ducts and mechanisms, and fifty more plates, grilles, labware and household
+parts.
 
 | Designer     | What it makes                                                        |
 | ------------ | -------------------------------------------------------------------- |
@@ -75,6 +76,21 @@ drop, sweep and the shaft bore.
 `docs/DESIGNERS.md` lists the 344 candidates these were chosen from, with the
 forty-six marked.
 
+## The fifty
+
+| Family | Designers |
+| --- | --- |
+| **Plates and brackets** | Square flange, oval flange, bearing plate, NEMA 17 plate, pivot bracket, slot bracket, link plate, gusset plate, switch plate, tensioner plate, keyhole plate, drill guide |
+| **Fasteners and knobs** | T-slot nut, square nut, coupling nut, cross knob, pointer knob |
+| **Discs and grilles** | Brake rotor, index plate, vent grille, perforated plate, precision spacer, fan grille, baffle plate, sink strainer, mounting ring |
+| **Vessels and household** | Candlestick, egg cup, honey dipper, spinning top, bottle stopper, tapered plug, pet bowl, planter pot, wine glass, goblet |
+| **Labware and fluid** | Test tube, centrifuge tube, Erlenmeyer flask, O-ring plug, caulking nozzle |
+| **Motion and small parts** | Piston, golf tee, dowel pin, furniture foot, caster wheel |
+| **Workshop** | Dovetail rail |
+| **Garden and cable** | Key tag, plant label, cable tie mount |
+
+`docs/DESIGNERS-2.md` lists the 320 candidates these fifty were chosen from.
+
 Every new designer is a `defineDesign()` module. One field list drives the form,
 the unit conversion, the millimetre parameters, the validation copy, the readout,
 the preview and the STL file name, so the drawn part, the printed numbers and the
@@ -137,7 +153,7 @@ The volume is the divergence-theorem volume of that closed mesh.
 | 3D       | three.js + OrbitControls                                 |
 | Geometry | In-repo profiles + one deterministic indexed-mesh extruder |
 | Export   | Binary STL writer (no dependency)                        |
-| Tests    | Vitest — 149 geometry, designer and STL tests            |
+| Tests    | Vitest — 494 geometry, designer and STL tests            |
 
 No database, no API keys and no environment variables.
 
@@ -158,7 +174,7 @@ npm test           # Vitest
 ```
 
 `npm run build` emits a static site in `dist/`. Routes are hash-based: `#/` is the
-catalogue, `#/<designer-id>` opens any of the fifty (for example `#/spur-gear` or
+catalogue, `#/<designer-id>` opens any of the ninety-six (for example `#/spur-gear` or
 `#/sprocket`), so any static host works with no rewrite rules.
 
 ---
@@ -169,10 +185,10 @@ catalogue, `#/<designer-id>` opens any of the fifty (for example `#/spur-gear` o
 src/
   App.tsx                    suite shell: header, hash router, catalog, footer
   components/
-    Catalog.tsx              the fifty cards, grouped by family
+    Catalog.tsx              the ninety-six cards, grouped by family
     DesignerPage.tsx         hero + builder slot + explainer shared by every page
     DesignScaffold.tsx       two-column builder: inputs, measurements, preview, export
-    GenericDesigner.tsx      schema-driven form used by all forty-six new designs
+    GenericDesigner.tsx      schema-driven form used by all ninety-six new designs
     DesignMark.tsx           one family glyph per catalog card
     MeshPreview.tsx          three.js canvas (WebGL fallback, reset view)
     SprocketBuilder.tsx      sprocket form, validation, readout, STL

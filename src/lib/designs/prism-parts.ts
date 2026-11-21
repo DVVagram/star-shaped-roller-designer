@@ -19,6 +19,7 @@ import {
 } from "./geometry";
 import {
   boreHoles,
+  chamferRings,
   checkSize,
   checkWall,
   circle,
@@ -271,6 +272,12 @@ export const knurledKnob: AnyDesign = defineDesign({
     checkWall(errors, units, "bore", "wall inside the knurl roots", rootRadius - p.boreMm / 2);
     if (rootLand <= 0.3) {
       errors.push({ field: "knurls", level: "error", message: "The ridges merge at the root — reduce the count or the ridge width." });
+    }
+    const halfPitch = Math.PI / Math.max(8, Math.round(p.knurls));
+    const tipHalf = p.ridgeWidthMm / (2 * radius);
+    const rootHalf = Math.max(0, rootLand) / (2 * rootRadius);
+    if (tipHalf + rootHalf >= halfPitch - 0.0008) {
+      errors.push({ field: "knurls", level: "error", message: "The ridge and root lands fill the pitch at this diameter; narrow the ridge or use fewer ridges." });
     }
     if (p.depthMm > radius * 0.25) pushWarning(warnings, "depth", "A deep knurl cuts most of the way through the wall.");
 
@@ -775,6 +782,7 @@ export const handwheel: AnyDesign = defineDesign({
       errors.push({ field: "spokes", level: "error", message: "The spokes fill the space between the hub and rim." });
     }
     if (p.spokeWidthMm > (radius - p.rimWidthMm) * 1.4) pushWarning(warnings, "spokeWidth", "The spokes are wide relative to the openings.");
+    if (errors.length > 0) return emptyResult(errors, warnings);
 
     const parts = handwheelParts({
       outerDiameterMm: p.outerDiameterMm,
@@ -1005,6 +1013,9 @@ export const mountingPlate: AnyDesign = defineDesign({
     }
     const spacingX = p.lengthMm - 2 * p.insetMm;
     const spacingY = p.widthMm - 2 * p.insetMm;
+    if (spacingX <= p.holeMm + 1 || spacingY <= p.holeMm + 1) {
+      errors.push({ field: "inset", level: "error", message: "The corner holes run into each other; reduce the inset or the hole." });
+    }
     if (p.insetMm > Math.min(p.lengthMm, p.widthMm) * 0.35) pushWarning(warnings, "inset", "The holes are far inboard; the plate may rock on its bolts.");
 
     return {
@@ -1077,11 +1088,13 @@ export const hexNut: AnyDesign = defineDesign({
     { key: "acrossFlats", label: "Across flats", kind: "length", section: "Nut", default: "17", min: 4, max: 80 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Nut", default: "8", min: 2, max: 60 },
     { key: "bore", label: "Bore", kind: "length", section: "Nut", default: "10.2", min: 2, max: 60 },
+    { key: "chamfer", label: "Face chamfer", kind: "length", section: "Nut", default: "0.8", min: 0, max: 4 },
   ],
   parse: (raw) => ({
     acrossFlatsMm: rawLength(raw, "acrossFlats"),
     thicknessMm: rawLength(raw, "thickness"),
     boreMm: rawLength(raw, "bore"),
+    chamferMm: rawLength(raw, "chamfer"),
   }),
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
@@ -1089,11 +1102,14 @@ export const hexNut: AnyDesign = defineDesign({
     pushRange(errors, units, "acrossFlats", "Across flats", p.acrossFlatsMm, 4, 80);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 2, 60);
     pushRange(errors, units, "bore", "Bore", p.boreMm, 2, 60);
+    pushRange(errors, units, "chamfer", "Face chamfer", p.chamferMm, 0, 4);
     if (errors.length > 0) return emptyResult(errors, warnings);
 
     const circumRadius = p.acrossFlatsMm / Math.sqrt(3);
     checkSize(errors, units, "acrossFlats", p.acrossFlatsMm, p.thicknessMm);
     checkWall(errors, units, "bore", "wall at the flats", p.acrossFlatsMm / 2 - p.boreMm / 2);
+    if (p.chamferMm * 2 >= p.thicknessMm) errors.push({ field: "chamfer", level: "error", message: "The two face chamfers meet in the middle." });
+    if (p.chamferMm >= p.acrossFlatsMm / 2) errors.push({ field: "chamfer", level: "error", message: "The chamfer reaches the bore." });
     if (p.thicknessMm < p.acrossFlatsMm * 0.4) pushWarning(warnings, "thickness", "A nut much thinner than its width strips easily.");
 
     return {
@@ -1105,6 +1121,7 @@ export const hexNut: AnyDesign = defineDesign({
         { label: "Bore", value: measure(p.boreMm, units), source: "input" },
         { label: "Wall at flat", value: measure(Math.max(0, p.acrossFlatsMm / 2 - p.boreMm / 2), units), source: "calc" },
         { label: "Thickness", value: measure(p.thicknessMm, units), source: "input" },
+        { label: "Face chamfer", value: measure(p.chamferMm, units), source: "input" },
       ],
       preview: previewOf(
         `${measure(p.acrossFlatsMm, units)} AF hex`,
@@ -1121,8 +1138,10 @@ export const hexNut: AnyDesign = defineDesign({
   },
   build: (p) => {
     const outline = regularPolygon(6, p.acrossFlatsMm / Math.sqrt(3), 0);
+    const { rings, fractions } = chamferRings(outline, p.thicknessMm, p.chamferMm);
     return buildPrism({
-      rings: [outline, outline],
+      rings,
+      ringFractions: fractions,
       holes: boreHoles(p.boreMm),
       thicknessMm: p.thicknessMm,
     });
@@ -1153,11 +1172,13 @@ export const washer: AnyDesign = defineDesign({
     { key: "outerDiameter", label: "Outer diameter", kind: "length", section: "Washer", default: "20", min: 5, max: 180 },
     { key: "innerDiameter", label: "Inner diameter", kind: "length", section: "Washer", default: "8.4", min: 2, max: 120 },
     { key: "thickness", label: "Thickness", kind: "length", section: "Washer", default: "1.6", min: 0.5, max: 20 },
+    { key: "chamfer", label: "Edge break", kind: "length", section: "Washer", default: "0.2", min: 0, max: 2 },
   ],
   parse: (raw) => ({
     outerMm: rawLength(raw, "outerDiameter"),
     innerMm: rawLength(raw, "innerDiameter"),
     thicknessMm: rawLength(raw, "thickness"),
+    chamferMm: rawLength(raw, "chamfer"),
   }),
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
@@ -1165,10 +1186,12 @@ export const washer: AnyDesign = defineDesign({
     pushRange(errors, units, "outerDiameter", "Outer diameter", p.outerMm, 5, 180);
     pushRange(errors, units, "innerDiameter", "Inner diameter", p.innerMm, 2, 120);
     pushRange(errors, units, "thickness", "Thickness", p.thicknessMm, 0.5, 20);
+    pushRange(errors, units, "chamfer", "Edge break", p.chamferMm, 0, 2);
     if (errors.length > 0) return emptyResult(errors, warnings);
 
     checkSize(errors, units, "outerDiameter", p.outerMm, p.thicknessMm);
     checkWall(errors, units, "innerDiameter", "washer face", (p.outerMm - p.innerMm) / 2);
+    if (p.chamferMm * 2 >= p.thicknessMm) errors.push({ field: "chamfer", level: "error", message: "The two edge breaks meet in the middle." });
     if (p.thicknessMm < 0.8) pushWarning(warnings, "thickness", "Under 0.8 mm the washer curls as it cools.");
 
     return {
@@ -1180,6 +1203,7 @@ export const washer: AnyDesign = defineDesign({
         { label: "Face width", value: measure((p.outerMm - p.innerMm) / 2, units), source: "calc" },
         { label: "Thickness", value: measure(p.thicknessMm, units), source: "input" },
         { label: "Bearing area", value: `${round((Math.PI / 4) * (p.outerMm ** 2 - p.innerMm ** 2) / 100, 2)} cm²`, source: "calc" },
+        { label: "Edge break", value: measure(p.chamferMm, units), source: "input" },
       ],
       preview: previewOf(
         `${measure(p.outerMm, units)} × ${measure(p.innerMm, units)}`,
@@ -1196,8 +1220,10 @@ export const washer: AnyDesign = defineDesign({
   },
   build: (p) => {
     const outline = circle(p.outerMm / 2);
+    const { rings, fractions } = chamferRings(outline, p.thicknessMm, p.chamferMm);
     return buildPrism({
-      rings: [outline, outline],
+      rings,
+      ringFractions: fractions,
       holes: boreHoles(p.innerMm),
       thicknessMm: p.thicknessMm,
     });

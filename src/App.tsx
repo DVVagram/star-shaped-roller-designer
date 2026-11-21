@@ -498,10 +498,10 @@ export default function App() {
               </span>
             </div>
             <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted">
-              Fifty parametric designers in one static site: gears, pulleys, fixings,
-              vessels, springs and the original star rollers, sprockets, impellers and
-              propellers. Everything is generated locally in the browser — no accounts,
-              no uploads, no CAD kernel.
+              Ninety-six parametric designers in one static site: gears, pulleys,
+              fixings, vessels, springs, labware and household parts, plus the original
+              star rollers, sprockets, impellers and propellers. Everything is generated
+              locally in the browser — no accounts, no uploads, no CAD kernel.
             </p>
           </div>
           <div className="text-xs leading-relaxed text-muted sm:text-right">

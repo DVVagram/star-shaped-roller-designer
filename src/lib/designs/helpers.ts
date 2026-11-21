@@ -81,6 +81,94 @@ export function circle(radius: number): Point2D[] {
   return points;
 }
 
+/** A round hole anywhere on the plate. */
+export function circleAt(
+  cx: number,
+  cy: number,
+  radius: number,
+  segments = 40,
+): Point2D[] {
+  const points: Point2D[] = [];
+  for (let i = 0; i < segments; i += 1) {
+    const angle = (Math.PI * 2 * i) / segments;
+    points.push({ x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) });
+  }
+  return points;
+}
+
+/** Evenly spaced holes on a pitch-circle diameter. */
+export function boltCircle(
+  count: number,
+  pcdMm: number,
+  holeMm: number,
+  phaseRad = 0,
+): Point2D[][] {
+  const holes: Point2D[][] = [];
+  const n = Math.max(1, Math.round(count));
+  for (let i = 0; i < n; i += 1) {
+    const angle = phaseRad + (Math.PI * 2 * i) / n;
+    holes.push(
+      circleAt(
+        (pcdMm / 2) * Math.cos(angle),
+        (pcdMm / 2) * Math.sin(angle),
+        holeMm / 2,
+      ),
+    );
+  }
+  return holes;
+}
+
+/** A rectangular grid of holes, centred on the origin. */
+export function holeGrid(
+  rows: number,
+  cols: number,
+  pitchXMm: number,
+  pitchYMm: number,
+  holeMm: number,
+): Point2D[][] {
+  const holes: Point2D[][] = [];
+  const r = Math.max(1, Math.round(rows));
+  const c = Math.max(1, Math.round(cols));
+  for (let i = 0; i < r; i += 1) {
+    for (let j = 0; j < c; j += 1) {
+      holes.push(
+        circleAt(
+          (j - (c - 1) / 2) * pitchXMm,
+          (i - (r - 1) / 2) * pitchYMm,
+          holeMm / 2,
+        ),
+      );
+    }
+  }
+  return holes;
+}
+
+/**
+ * Four stacked outlines that break both outer edges with a 45° chamfer.
+ * Scaling a regular outline towards its centre is an exact chamfer on the flats
+ * and a close one at the corners.
+ */
+export function chamferRings(outline: Point2D[], thicknessMm: number, chamferMm: number): {
+  rings: Point2D[][];
+  fractions: number[];
+} {
+  const c = Math.max(0, Math.min(chamferMm, thicknessMm * 0.45));
+  if (c < 1e-6) {
+    return { rings: [outline, outline], fractions: [0, 1] };
+  }
+  let maxRadius = 0;
+  for (const point of outline) maxRadius = Math.max(maxRadius, Math.hypot(point.x, point.y));
+  const faceScale = Math.max(0.2, (maxRadius - c) / maxRadius);
+  const shrink = (point: Point2D): Point2D => ({
+    x: point.x * faceScale,
+    y: point.y * faceScale,
+  });
+  return {
+    rings: [outline.map(shrink), outline, outline, outline.map(shrink)],
+    fractions: [0, c / thicknessMm, 1 - c / thicknessMm, 1],
+  };
+}
+
 export function emptyResult(
   errors: DesignIssue[],
   warnings: DesignIssue[],

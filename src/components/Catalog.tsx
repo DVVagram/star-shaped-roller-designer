@@ -23,14 +23,14 @@ export default function Catalog({ entries }: { entries: CatalogEntry[] }) {
               Parametric Wheel Works · the full library
             </p>
             <h1 className="mt-4 max-w-2xl text-[2.6rem] font-semibold leading-[1.03] tracking-tight sm:text-6xl">
-              Fifty parts,
+              Ninety-six parts,
               <br />
               built to measure.
             </h1>
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted">
-              Gears, pulleys, plates, vessels, springs and knobs — every one generated
-              from the numbers you type, verified as a closed shell, and exported as a
-              binary STL in millimetres. Pick a designer to start.
+              Gears, pulleys, plates, vessels, springs, labware and grilles — every one
+              generated from the numbers you type, verified as a closed shell, and
+              exported as a binary STL in millimetres. Pick a designer to start.
             </p>
           </div>
 

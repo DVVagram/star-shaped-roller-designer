@@ -264,6 +264,26 @@ export const internalGear: AnyDesign = defineDesign({
     if (p.addendumMm >= g.pitchRadiusMm * 0.6) {
       errors.push({ field: "addendum", level: "error", message: "The inward addendum reaches the axis." });
     }
+    // The cavity is an involute, so it only exists outside the base circle and
+    // its tooth thins as the radius grows. Beyond either limit the outline
+    // crosses itself and the ring will not close.
+    const alpha = (p.pressureAngleDeg * Math.PI) / 180;
+    const baseRadius = g.pitchRadiusMm * Math.cos(alpha);
+    const inv = (a: number) => Math.tan(a) - a;
+    const halfAngleAt = (radius: number) =>
+      Math.PI / (2 * g.teeth) +
+      inv(alpha) -
+      inv(Math.acos(Math.min(1, baseRadius / Math.max(radius, baseRadius + 1e-6)))) -
+      p.backlashMm / (2 * Math.max(radius, 1e-6));
+    const cavityTip = g.pitchRadiusMm - p.addendumMm;
+    if (cavityTip <= baseRadius + 0.02) {
+      errors.push({ field: "addendum", level: "error", message: "This addendum cuts inside the involute base circle; shorten it or use a larger module." });
+    } else if (halfAngleAt(cavityTip) < 0.004) {
+      errors.push({ field: "addendum", level: "error", message: "The backlash or addendum leaves no tooth at the cavity tip." });
+    }
+    if (halfAngleAt(cavityFloor) < 0.004) {
+      errors.push({ field: "dedendum", level: "error", message: "The cavity floor closes the teeth; reduce the dedendum, backlash or module." });
+    }
     if (p.rimWidthMm < 3) pushWarning(warnings, "rimWidth", "A thin ring distorts when it comes off the bed.");
 
     return {

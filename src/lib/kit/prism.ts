@@ -191,20 +191,31 @@ export function buildPrism(input: PrismInput): Mesh {
   const indices: number[] = [];
   const triangle = (a: number, b: number, c: number) => indices.push(a, b, c);
 
+  // The cap's winding is decided once, from the total signed area, rather than
+  // per triangle. Bridging two holes can leave a zero-area sliver whose own
+  // cross product is numerical noise, and letting that noise pick a winding
+  // leaves the shell open along the sliver's edges.
+  const capOrientation = (faces: Face[], combined: Point2D[]): boolean => {
+    let area = 0;
+    for (const [a, b, c] of faces) {
+      const pa = combined[a];
+      const pb = combined[b];
+      const pc = combined[c];
+      area += (pb.x - pa.x) * (pc.y - pa.y) - (pb.y - pa.y) * (pc.x - pa.x);
+    }
+    return area >= 0;
+  };
+
   const emitCap = (
     faces: Face[],
     combined: Point2D[],
     mapIndex: (index: number) => number,
     upward: boolean,
   ) => {
+    const ccw = capOrientation(faces, combined);
     for (const face of faces) {
       const [a, b, c] = face;
-      const pa = combined[a];
-      const pb = combined[b];
-      const pc = combined[c];
-      const cross =
-        (pb.x - pa.x) * (pc.y - pa.y) - (pb.y - pa.y) * (pc.x - pa.x);
-      const order: Face = cross >= 0 ? [a, b, c] : [c, b, a];
+      const order: Face = ccw ? [a, b, c] : [c, b, a];
       if (upward) {
         triangle(mapIndex(order[0]), mapIndex(order[1]), mapIndex(order[2]));
       } else {
