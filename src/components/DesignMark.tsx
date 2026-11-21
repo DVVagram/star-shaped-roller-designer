@@ -66,6 +66,22 @@ export default function DesignMark({
     );
   }
 
+  if (family === "text") {
+    return (
+      <svg viewBox="0 0 32 32" aria-hidden="true" className={className}>
+        <path
+          d="M7 27 15.5 5h2L26 27"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path d="M10.6 19.5h11" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
   if (family === "vessels") {
     return (
       <svg viewBox="0 0 32 32" aria-hidden="true" className={className}>

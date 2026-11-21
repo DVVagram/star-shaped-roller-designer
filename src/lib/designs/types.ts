@@ -9,7 +9,7 @@
 
 import type { Mesh } from "@/lib/kit/solid";
 
-import { contractFor, type DesignContract } from "./contracts";
+import { contractFor, type CapabilityId, type DesignContract } from "./contracts";
 import { MAKING_NOTES } from "./making-notes";
 import { NOTES_TITLES } from "./notes-titles";
 import { USE_CASES } from "./use-cases";
@@ -20,7 +20,7 @@ import {
   type LengthUnit,
 } from "@/lib/kit/units";
 
-export type DesignFamily = "wheels" | "drives" | "fixings" | "vessels" | "motion";
+export type DesignFamily = "wheels" | "drives" | "fixings" | "vessels" | "motion" | "text";
 
 export const FAMILIES: Record<DesignFamily, { label: string; blurb: string }> = {
   wheels: { label: "Wheels & rotors", blurb: "Grip, move air, throw spray." },
@@ -28,9 +28,10 @@ export const FAMILIES: Record<DesignFamily, { label: string; blurb: string }> = 
   fixings: { label: "Plates & fixings", blurb: "Hold, clamp and fasten." },
   vessels: { label: "Vessels & fluid", blurb: "Cups, funnels, ducts and shells." },
   motion: { label: "Motion", blurb: "Springs, bends and rolling elements." },
+  text: { label: "Text & lettering", blurb: "Names, signs and labels with editable lettering." },
 };
 
-export type FieldKind = "length" | "number" | "count" | "angle" | "select" | "toggle";
+export type FieldKind = "length" | "number" | "count" | "angle" | "select" | "toggle" | "text";
 
 export interface FieldOption {
   value: string;
@@ -101,6 +102,10 @@ export interface DesignModule<P> {
   use?: string;
   /** ASCII text written into the binary STL header. */
   header: string;
+  /** True when the part is a plate plus separate raised lettering bodies. */
+  multiBody?: boolean;
+  /** Capability the contract table would otherwise overstate. */
+  capability?: CapabilityId;
   fields: FieldDef[];
   parse: (raw: RawValues) => P;
   derive: (params: P, units: LengthUnit) => DesignResult;
@@ -122,6 +127,8 @@ export interface AnyDesign {
   /** Capability, standard, mating dimensions and unverified properties. */
   contract: DesignContract;
   header: string;
+  /** Text parts export a plate and one or more separate closed letter bodies. */
+  multiBody: boolean;
   fields: FieldDef[];
   defaults: Record<string, string>;
   lengthFields: string[];
@@ -131,6 +138,16 @@ export interface AnyDesign {
 }
 
 export function defineDesign<P>(module: DesignModule<P>): AnyDesign {
+  const contract = contractFor(
+    module.id,
+    module.use ?? USE_CASES[module.id] ?? "",
+  );
+  if (module.capability && module.capability !== contract.capability) {
+    contract.capability = module.capability;
+    contract.limitations.push(
+      "Intended as a shape or display model; no structural, outdoor or safety duty is verified.",
+    );
+  }
   return {
     id: module.id,
     name: module.name,
@@ -142,8 +159,9 @@ export function defineDesign<P>(module: DesignModule<P>): AnyDesign {
     notes: MAKING_NOTES[module.id] ? [...module.notes, MAKING_NOTES[module.id]] : module.notes,
     notesTitle: module.notesTitle ?? NOTES_TITLES[module.id] ?? "How the geometry is built",
     use: module.use ?? USE_CASES[module.id] ?? "",
-    contract: contractFor(module.id, module.use ?? USE_CASES[module.id] ?? ""),
+    contract,
     header: module.header,
+    multiBody: module.multiBody ?? false,
     fields: module.fields,
     defaults: Object.fromEntries(module.fields.map((field) => [field.key, field.default])),
     lengthFields: module.fields

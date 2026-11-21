@@ -26,21 +26,19 @@ const inch = (design: AnyDesign, overrides: Record<string, string> = {}): RawVal
   units: "in" as const,
 });
 
-function assertSolid(mesh: Mesh, label: string): void {
-  const report = inspectMesh(mesh);
+function assertSolid(design: AnyDesign, mesh: Mesh, label: string): void {
+  const report = inspectMesh(mesh, { allowMultipleComponents: design.multiBody });
   expect({
     label,
     ok: report.ok,
     watertight: report.watertight,
     manifold: report.manifold,
-    components: report.components,
-  }).toEqual({
-    label,
-    ok: true,
-    watertight: true,
-    manifold: true,
-    components: 1,
-  });
+  }).toEqual({ label, ok: true, watertight: true, manifold: true });
+  if (design.multiBody) {
+    expect({ label, components: report.components > 1 }).toEqual({ label, components: true });
+  } else {
+    expect({ label, components: report.components }).toEqual({ label, components: 1 });
+  }
   expect(mesh.triangleCount).toBeGreaterThanOrEqual(12);
   expect(mesh.volumeMm3).toBeGreaterThan(0.5);
   for (const value of mesh.positions) expect(Number.isFinite(value)).toBe(true);
@@ -71,9 +69,9 @@ function stlVolume(buffer: ArrayBuffer): number {
 }
 
 describe("designer library", () => {
-  it("ships exactly ninety-six designers", () => {
-    expect(ALL.length).toBe(146);
-    expect(DESIGN_GROUPS.reduce((sum, group) => sum + group.length, 0)).toBe(146);
+  it("ships exactly two hundred and forty-six designers", () => {
+    expect(ALL.length).toBe(246);
+    expect(DESIGN_GROUPS.reduce((sum, group) => sum + group.length, 0)).toBe(246);
   });
 
   it("has unique ids and unique file names for the defaults", () => {
@@ -126,7 +124,7 @@ describe("designer library: defaults", () => {
       expect(result.errors).toEqual([]);
       expect(result.readout.length).toBeGreaterThanOrEqual(4);
       expect(result.preview.label.length).toBeGreaterThan(0);
-      assertSolid(design.build(raw), design.id);
+      assertSolid(design, design.build(raw), design.id);
       expect(design.fileName(raw)).toMatch(/\.stl$/);
     });
   }
@@ -153,7 +151,7 @@ describe("designer library: parameter sweeps", () => {
             }
             continue;
           }
-          assertSolid(design.build(raw), `${design.id}/${field.key}=${value}`);
+          assertSolid(design, design.build(raw), `${design.id}/${field.key}=${value}`);
         }
       }
     });
@@ -220,7 +218,7 @@ describe("designer library: families", () => {
     }
     for (const count of counts.values()) expect(count).toBeGreaterThan(0);
     expect([...counts.values()].filter((count) => count > 4).length).toBeGreaterThanOrEqual(4);
-    expect([...counts.values()].reduce((sum, count) => sum + count, 0)).toBe(146);
+    expect([...counts.values()].reduce((sum, count) => sum + count, 0)).toBe(246);
   });
 
   it("is the same set the catalogue renders", () => {
@@ -228,7 +226,7 @@ describe("designer library: families", () => {
     for (const group of DESIGN_GROUPS) {
       for (const design of group) expect(ids.has(design.id)).toBe(true);
     }
-    expect(ids.size).toBe(146);
+    expect(ids.size).toBe(246);
   });
 });
 

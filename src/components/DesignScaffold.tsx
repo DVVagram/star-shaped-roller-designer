@@ -25,6 +25,8 @@ export interface ScaffoldPreview {
   ariaLabel: string;
   cells: { label: string; value: string }[];
   stale: boolean;
+  /** Steeper camera opening for flat lettered plates. */
+  elevated?: boolean;
 }
 
 export interface ScaffoldExport {
@@ -102,8 +104,8 @@ export default function DesignScaffold({
           ))}
           {validationOk && !solidOk && (
             <p className="rounded-lg border border-red-300/70 bg-red-50 px-3 py-2 text-xs text-red-800">
-              The generated solid is not a single watertight, manifold shell, so this
-              configuration cannot be exported.
+              The generated mesh did not pass the watertight, manifold shell checks, so
+              this configuration cannot be exported.
             </p>
           )}
         </div>
@@ -156,6 +158,7 @@ export default function DesignScaffold({
               sizeMm={preview.sizeMm}
               heightMm={preview.heightMm}
               label={preview.ariaLabel}
+              elevated={preview.elevated}
             />
             {preview.stale && (
               <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-lg bg-panel-soft/90 px-3 py-2 text-[11px] leading-snug text-amber-200/90 ring-1 ring-amber-300/20">

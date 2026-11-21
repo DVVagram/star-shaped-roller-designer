@@ -297,7 +297,9 @@ const presetApplied = await evaluate(`(() => {
   compact?.click();
   return { before };
 })()`);
-await sleep(600);
+// The form writes the config into the URL after a 250 ms debounce; poll for it
+// rather than racing a fixed delay.
+await waitFor("new URL(location.href).searchParams.has('config')", 4000);
 const presetAfter = await evaluate(`(() => ({
   large: document.querySelector('#centering-cone-large')?.value,
   active: [...document.querySelectorAll('[aria-label="Starting point"] button')]
@@ -389,6 +391,10 @@ check("mobile-catalog-overflow", mobileHome <= 1, `overflow ${mobileHome}px`);
 
 await navigate(`${BASE}/#/centrifuge-tube`);
 await waitFor("Boolean(document.querySelector('#capability'))");
+// A restored scroll position can leave the export panel in view, which hides
+// the sticky bar by design. Start at the top, then wait for the observer.
+await evaluate("window.scrollTo(0, 0)");
+await waitFor("Boolean(document.querySelector('[aria-label=\"Export actions\"]'))", 5000);
 await sleep(500);
 const mobileDesigner = await evaluate(`(() => {
   const capability = document.querySelector('#capability');

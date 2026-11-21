@@ -529,8 +529,18 @@ export interface SolidReport {
   triangleCount: number;
 }
 
-/** Measures the closed shell the preview renders. */
-export function inspectMesh(mesh: Mesh): SolidReport {
+/**
+ * Measures the closed shell the preview renders.
+ *
+ * Text parts are deliberately several closed bodies (a plate plus each raised
+ * glyph). `allowMultipleComponents` accepts that shape while still requiring
+ * every body to be watertight and closed on its own: N separate shells have an
+ * Euler characteristic of 2N, so the closedness test scales with the count.
+ */
+export function inspectMesh(
+  mesh: Mesh,
+  options: { allowMultipleComponents?: boolean } = {},
+): SolidReport {
   const { indices } = mesh;
   const triangleCount = indices.length / 3;
 
@@ -644,15 +654,19 @@ export function inspectMesh(mesh: Mesh): SolidReport {
   // A plain solid is χ = 2, a tube or washer χ = 0, and a plate with six holes
   // is χ = −12. Rejecting anything but 0 would block every part without a bore,
   // so the closedness test is evenness instead of one fixed value.
+  // A closed body with g through-holes has χ = 2 − 2g, so N bodies give an even
+  // χ of at most 2N; lettering with counters (A, O, B, 8) is genus 1 per glyph.
   const closedSurface =
-    eulerCharacteristic <= 2 && eulerCharacteristic % 2 === 0;
+    options.allowMultipleComponents && components > 1
+      ? eulerCharacteristic <= 2 * components && eulerCharacteristic % 2 === 0
+      : eulerCharacteristic <= 2 && eulerCharacteristic % 2 === 0;
   const genus = Math.max(0, (2 - eulerCharacteristic) / 2);
 
   return {
     ok:
       watertight &&
       manifold &&
-      connected &&
+      (connected || (Boolean(options.allowMultipleComponents) && components > 1)) &&
       validFaces &&
       closedSurface,
     genus,

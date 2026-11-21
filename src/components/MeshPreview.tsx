@@ -14,13 +14,21 @@ interface MeshPreviewProps {
   sizeMm: number;
   heightMm: number;
   label: string;
+  /** A steeper three-quarter view for flat plates with raised lettering. */
+  elevated?: boolean;
 }
 
 /**
  * Renders the exact mesh the volume readout and the STL export use, so the
  * picture, the measurements and the file cannot drift apart.
  */
-export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPreviewProps) {
+export default function MeshPreview({
+  mesh,
+  sizeMm,
+  heightMm,
+  label,
+  elevated = false,
+}: MeshPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const meshRef = useRef<THREE.Mesh | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -28,6 +36,7 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
   const gridRef = useRef<THREE.PolarGridHelper | null>(null);
   const resetViewRef = useRef<() => void>(() => {});
   const fitDistanceRef = useRef(120);
+  const keyRef = useRef<THREE.DirectionalLight | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -51,6 +60,10 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setClearColor(0x000000, 0);
+    // Flat lettered plates need a contact shadow: without one the raised glyph
+    // tops share the plate's colour and read as engraved lines.
+    renderer.shadowMap.enabled = elevated;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const canvas = renderer.domElement;
     Object.assign(canvas.style, {
@@ -64,8 +77,13 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
 
     const scene = new THREE.Scene();
 
+    // Flat lettered plates read badly from the default low angle, so they open
+    // at a steeper three-quarter view; chunky parts keep the familiar framing.
+    const viewDirection = elevated
+      ? new THREE.Vector3(0.85, 1.65, 1.05).normalize()
+      : new THREE.Vector3(0.9, 0.8, 1.15).normalize();
     const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 5000);
-    camera.position.set(0.9, 0.8, 1.15).normalize().multiplyScalar(160);
+    camera.position.copy(viewDirection).multiplyScalar(160);
     cameraRef.current = camera;
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -80,7 +98,16 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
     scene.add(new THREE.HemisphereLight(0xffffff, 0x1b2430, 1.7));
 
     const key = new THREE.DirectionalLight(0xfff2e2, 2.6);
-    key.position.set(70, 110, 60);
+    // Offset the key from the elevated camera so letter flanks shade and the
+    // raised glyphs cast a readable contact shadow onto the plate.
+    key.position.set(elevated ? -70 : 70, 110, elevated ? 95 : 60);
+    if (elevated) {
+      key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      key.shadow.bias = -0.0006;
+      key.shadow.normalBias = 0.4;
+    }
+    keyRef.current = key;
     scene.add(key);
 
     const rim = new THREE.DirectionalLight(0x8fbaff, 1.15);
@@ -95,6 +122,8 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
     });
 
     const part = new THREE.Mesh(new THREE.BufferGeometry(), material);
+    part.castShadow = elevated;
+    part.receiveShadow = elevated;
     part.rotation.x = -Math.PI / 2;
     meshRef.current = part;
     scene.add(part);
@@ -126,8 +155,7 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
 
     const resetView = () => {
       const distance = fitDistanceRef.current;
-      const direction = new THREE.Vector3(0.9, 0.8, 1.15).normalize();
-      camera.position.copy(direction.multiplyScalar(distance));
+      camera.position.copy(viewDirection.clone().multiplyScalar(distance));
       controls.target.set(0, 0, 0);
       camera.near = Math.max(0.1, distance / 100);
       camera.far = distance * 20;
@@ -151,8 +179,9 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
       controlsRef.current = null;
       cameraRef.current = null;
       gridRef.current = null;
+      keyRef.current = null;
     };
-  }, []);
+  }, [elevated]);
 
   useEffect(() => {
     const part = meshRef.current;
@@ -194,7 +223,19 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
 
     grid.scale.setScalar(Math.max(0.15, (sizeMm * 0.8) / 90));
     grid.position.y = -heightMm / 2 - Math.max(0.6, sizeMm * 0.015);
-  }, [mesh, sizeMm, heightMm]);
+
+    if (elevated && keyRef.current) {
+      const extent = Math.max(sizeMm * 1.4, 80);
+      const shadow = keyRef.current.shadow.camera;
+      shadow.left = -extent;
+      shadow.right = extent;
+      shadow.top = extent;
+      shadow.bottom = -extent;
+      shadow.near = 1;
+      shadow.far = extent * 4;
+      shadow.updateProjectionMatrix();
+    }
+  }, [elevated, mesh, sizeMm, heightMm]);
 
   return (
     <>

@@ -1,6 +1,10 @@
 /** Every designer added in this branch, in catalog order. */
 
 import { motionDesigns } from "./motion-designs";
+import { prismBatch3 } from "./prism-batch3";
+import { textProducts } from "./text-products";
+import { revolveFittings } from "./revolve-fittings";
+import { revolveUtility } from "./revolve-utility";
 import { revolveFasteners } from "./revolve-fasteners";
 import { revolveHome } from "./revolve-home";
 import { revolveWorkshop } from "./revolve-workshop";
@@ -35,6 +39,10 @@ export const DESIGN_GROUPS: AnyDesign[][] = [
   revolveFasteners,
   revolveWorkshop,
   revolveHome,
+  revolveUtility,
+  revolveFittings,
+  prismBatch3,
+  textProducts,
 ];
 
 export const DESIGNS: AnyDesign[] = DESIGN_GROUPS.flat();
@@ -53,6 +61,10 @@ export function designsInFamily(family: DesignFamily): AnyDesign[] {
 
 export {
   motionDesigns,
+  prismBatch3,
+  textProducts,
+  revolveFittings,
+  revolveUtility,
   revolveFasteners,
   revolveHome,
   revolveWorkshop,

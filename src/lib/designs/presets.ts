@@ -21,6 +21,7 @@ const FAMILY_LABELS: Record<DesignFamily, [string, string]> = {
   fixings: ["Compact", "Oversize"],
   vessels: ["Compact", "Oversize"],
   motion: ["Compact", "Oversize"],
+  text: ["Compact", "Oversize"],
 };
 
 /** Scales length fields while keeping counts, toggles and menu choices fixed. */

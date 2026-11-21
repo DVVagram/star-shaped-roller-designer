@@ -265,7 +265,9 @@ function genericPage(design: AnyDesign): PageConfig {
       },
     ],
     checklist: [
-      `A closed indexed mesh measured before export: one shell, every edge shared by two consistently wound triangles.`,
+      design.multiBody
+        ? `A plate plus separately closed letter bodies, measured before export: every body is watertight, with each edge shared by two consistently wound triangles.`
+        : `A closed indexed mesh measured before export: one shell, every edge shared by two consistently wound triangles.`,
       `A binary STL built from the same vertices the preview renders — no bounding box, no repair pass.`,
       `Derived measurements from the entered dimensions, so the drawing, the volume and the file agree.`,
       `A capabilities and limitations statement beside the export and in the downloadable specification.`,
@@ -611,16 +613,17 @@ export default function App() {
             </div>
             <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted">
               {ALL_ENTRIES.length} parametric designers in one static site: gears, pulleys,
-              fixings, vessels, springs, labware, workshop fixtures and household parts,
-              plus the original star rollers, sprockets, impellers and propellers.
+              fixings, vessels, springs, labware, workshop fixtures, household parts and
+              custom lettering, including the original star rollers, sprockets, impellers
+              and propellers.
               Everything is generated locally in the browser — no accounts, no uploads,
               no CAD kernel. Capability labels state what has and has not been checked.
             </p>
           </div>
           <div className="text-xs leading-relaxed text-muted sm:text-right">
             <p>
-              Every model is generated from the fields you enter and checked as a single
-              closed shell before an STL is offered. That is a topology check, not a fit,
+              Every model is generated from the fields you enter and checked as one or
+              more closed shells before an STL is offered. That is a topology check, not a fit,
               strength or safety certification; read the capability label before making.
             </p>
             <p className="mt-2">© {new Date().getFullYear()} Parametric Wheel Works</p>

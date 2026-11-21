@@ -602,5 +602,405 @@
  {
   "id": "sanding-drum",
   "name": "Sanding drum"
+ },
+ {
+  "id": "round-standoff",
+  "name": "Round standoff"
+ },
+ {
+  "id": "locating-pin",
+  "name": "Locating pin"
+ },
+ {
+  "id": "countersink-plug",
+  "name": "Countersink plug"
+ },
+ {
+  "id": "screw-cap",
+  "name": "Screw cap"
+ },
+ {
+  "id": "acorn-cap",
+  "name": "Acorn cap"
+ },
+ {
+  "id": "dowel",
+  "name": "Dowel"
+ },
+ {
+  "id": "towel-bar-end",
+  "name": "Towel bar end"
+ },
+ {
+  "id": "capstan-drum",
+  "name": "Capstan drum"
+ },
+ {
+  "id": "bobbin-flange",
+  "name": "Bobbin flange"
+ },
+ {
+  "id": "tap-handle",
+  "name": "Tap handle"
+ },
+ {
+  "id": "tumbler",
+  "name": "Tumbler"
+ },
+ {
+  "id": "shot-glass",
+  "name": "Shot glass"
+ },
+ {
+  "id": "measuring-cup",
+  "name": "Measuring cup"
+ },
+ {
+  "id": "votive-holder",
+  "name": "Votive holder"
+ },
+ {
+  "id": "bud-vase",
+  "name": "Bud vase"
+ },
+ {
+  "id": "decanter-stopper",
+  "name": "Decanter stopper"
+ },
+ {
+  "id": "coaster",
+  "name": "Coaster"
+ },
+ {
+  "id": "napkin-ring",
+  "name": "Napkin ring"
+ },
+ {
+  "id": "drawer-knob",
+  "name": "Drawer knob"
+ },
+ {
+  "id": "vial-cap",
+  "name": "Vial cap"
+ },
+ {
+  "id": "septum-cap",
+  "name": "Septum cap"
+ },
+ {
+  "id": "sample-cup",
+  "name": "Sample cup"
+ },
+ {
+  "id": "dowel-spacer",
+  "name": "Dowel spacer"
+ },
+ {
+  "id": "flask-weight",
+  "name": "Flask weight"
+ },
+ {
+  "id": "wrist-pin",
+  "name": "Wrist pin"
+ },
+ {
+  "id": "crowned-roller",
+  "name": "Crowned roller"
+ },
+ {
+  "id": "idler-wheel",
+  "name": "Idler wheel"
+ },
+ {
+  "id": "guide-roller",
+  "name": "Guide roller"
+ },
+ {
+  "id": "plain-bushing",
+  "name": "Plain bushing"
+ },
+ {
+  "id": "flanged-sleeve",
+  "name": "Flanged sleeve"
+ },
+ {
+  "id": "spacer-stack",
+  "name": "Spacer stack"
+ },
+ {
+  "id": "spring-seat",
+  "name": "Spring seat"
+ },
+ {
+  "id": "spring-cap",
+  "name": "Spring cap"
+ },
+ {
+  "id": "plunger",
+  "name": "Plunger"
+ },
+ {
+  "id": "hinge-pin",
+  "name": "Hinge pin"
+ },
+ {
+  "id": "bushing-driver",
+  "name": "Bushing driver"
+ },
+ {
+  "id": "seal-driver",
+  "name": "Seal driver"
+ },
+ {
+  "id": "press-disc",
+  "name": "Press disc"
+ },
+ {
+  "id": "bench-dog",
+  "name": "Bench dog"
+ },
+ {
+  "id": "hole-plug",
+  "name": "Hole plug"
+ },
+ {
+  "id": "dial-plate",
+  "name": "Dial plate"
+ },
+ {
+  "id": "blind-flange",
+  "name": "Blind flange"
+ },
+ {
+  "id": "orifice-plate",
+  "name": "Orifice plate"
+ },
+ {
+  "id": "encoder-disc",
+  "name": "Encoder disc"
+ },
+ {
+  "id": "soft-jaw-blank",
+  "name": "Soft jaw blank"
+ },
+ {
+  "id": "pot-grid",
+  "name": "Pot grid"
+ },
+ {
+  "id": "pet-tag",
+  "name": "Pet tag"
+ },
+ {
+  "id": "cable-marker",
+  "name": "Cable marker"
+ },
+ {
+  "id": "zip-anchor",
+  "name": "Zip anchor"
+ },
+ {
+  "id": "rail-end-plate",
+  "name": "Rail end plate"
+ },
+ {
+  "id": "name-keychain",
+  "name": "Name keychain"
+ },
+ {
+  "id": "door-sign",
+  "name": "Door sign"
+ },
+ {
+  "id": "desk-nameplate",
+  "name": "Desk nameplate"
+ },
+ {
+  "id": "house-number",
+  "name": "House number"
+ },
+ {
+  "id": "cake-topper",
+  "name": "Cake topper"
+ },
+ {
+  "id": "bookmark",
+  "name": "Bookmark"
+ },
+ {
+  "id": "luggage-tag",
+  "name": "Luggage tag"
+ },
+ {
+  "id": "pet-collar-tag",
+  "name": "Pet collar tag"
+ },
+ {
+  "id": "herb-label",
+  "name": "Herb label"
+ },
+ {
+  "id": "gift-tag",
+  "name": "Gift tag"
+ },
+ {
+  "id": "table-number",
+  "name": "Table number"
+ },
+ {
+  "id": "seat-card",
+  "name": "Seat card"
+ },
+ {
+  "id": "locker-plate",
+  "name": "Locker plate"
+ },
+ {
+  "id": "tool-label",
+  "name": "Tool label"
+ },
+ {
+  "id": "cable-label",
+  "name": "Cable label"
+ },
+ {
+  "id": "bin-label",
+  "name": "Bin label"
+ },
+ {
+  "id": "drawer-label",
+  "name": "Drawer label"
+ },
+ {
+  "id": "mailbox-plate",
+  "name": "Mailbox plate"
+ },
+ {
+  "id": "trophy-plate",
+  "name": "Trophy plate"
+ },
+ {
+  "id": "award-plaque",
+  "name": "Award plaque"
+ },
+ {
+  "id": "coaster-text",
+  "name": "Coaster text"
+ },
+ {
+  "id": "wine-tag",
+  "name": "Wine tag"
+ },
+ {
+  "id": "menu-board",
+  "name": "Menu board"
+ },
+ {
+  "id": "parking-sign",
+  "name": "Parking sign"
+ },
+ {
+  "id": "gate-sign",
+  "name": "Gate sign"
+ },
+ {
+  "id": "room-sign",
+  "name": "Room sign"
+ },
+ {
+  "id": "letter-tile",
+  "name": "Letter tile"
+ },
+ {
+  "id": "scrabble-tile",
+  "name": "Scrabble tile"
+ },
+ {
+  "id": "cookie-plate",
+  "name": "Cookie plate"
+ },
+ {
+  "id": "stamp-plate",
+  "name": "Stamp plate"
+ },
+ {
+  "id": "embosser-plate",
+  "name": "Embosser plate"
+ },
+ {
+  "id": "bookmark-clip",
+  "name": "Bookmark clip"
+ },
+ {
+  "id": "key-rack",
+  "name": "Key rack"
+ },
+ {
+  "id": "leash-tag",
+  "name": "Leash tag"
+ },
+ {
+  "id": "bike-tag",
+  "name": "Bike tag"
+ },
+ {
+  "id": "school-name-tag",
+  "name": "School name tag"
+ },
+ {
+  "id": "uniform-label",
+  "name": "Uniform label"
+ },
+ {
+  "id": "jar-label",
+  "name": "Jar label"
+ },
+ {
+  "id": "spice-label",
+  "name": "Spice label"
+ },
+ {
+  "id": "tap-badge",
+  "name": "Tap badge"
+ },
+ {
+  "id": "cafe-sign",
+  "name": "Cafe sign"
+ },
+ {
+  "id": "restroom-sign",
+  "name": "Restroom sign"
+ },
+ {
+  "id": "exit-sign",
+  "name": "Exit sign"
+ },
+ {
+  "id": "wedding-place-card",
+  "name": "Wedding place card"
+ },
+ {
+  "id": "birthday-topper",
+  "name": "Birthday topper"
+ },
+ {
+  "id": "anniversary-plate",
+  "name": "Anniversary plate"
+ },
+ {
+  "id": "keepsake-plate",
+  "name": "Keepsake plate"
+ },
+ {
+  "id": "bag-tag",
+  "name": "Bag tag"
+ },
+ {
+  "id": "garden-marker",
+  "name": "Garden marker"
+ },
+ {
+  "id": "wine-cellar-label",
+  "name": "Wine cellar label"
  }
 ]

@@ -106,7 +106,7 @@ describe("downloadable specification", () => {
     expect(text).toContain("Bounding box");
   });
 
-  it("covers every designer without throwing", () => {
+  it("covers every designer without throwing", { timeout: 30000 }, () => {
     for (const design of DESIGNS) {
       const text = buildSpecification(design, rawFor(design), {
         generatedAt: new Date("2026-11-21T00:00:00Z"),

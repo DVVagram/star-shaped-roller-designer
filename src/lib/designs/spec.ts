@@ -33,6 +33,8 @@ export interface ArtifactRecord {
   warnings: string[];
   errors: { field: string; message: string }[];
   mesh: Mesh | null;
+  /** True when the plate and its lettering are deliberately separate shells. */
+  multiBody?: boolean;
 }
 
 function entered(fieldKind: string, raw: RawValues, key: string): string {
@@ -90,10 +92,23 @@ export function renderRecordSpecification(
   for (const warning of record.warnings) lines.push(`- WARNING ${warning}`);
   if (record.errors.length === 0 && record.mesh) {
     const mesh = record.mesh;
-    const report = inspectMesh(mesh);
+    const report = inspectMesh(mesh, { allowMultipleComponents: record.multiBody });
+    const multi = Boolean(record.multiBody) && report.components > 1;
     lines.push("");
     lines.push("MESH CHECKS PERFORMED");
-    for (const check of VALIDATION_CHECKS) lines.push(`- ${check}: ${report.ok ? "pass" : "fail"}`);
+    for (const check of VALIDATION_CHECKS) {
+      const verdict = !report.ok
+        ? "fail"
+        : multi && check.startsWith("One connected shell")
+          ? `not applicable (${report.components} closed bodies)`
+          : "pass";
+      lines.push(`- ${check}: ${verdict}`);
+    }
+    if (multi) {
+      lines.push(
+        `- Multi-body part: one plate plus closed letter bodies (${report.components} components), each watertight.`,
+      );
+    }
     lines.push(`- Triangles: ${report.triangleCount}`);
     lines.push(`- Connected components: ${report.components}`);
     lines.push(`- Zero-area cap faces (reported, not blocking): ${report.zeroAreaFaces}`);
@@ -136,6 +151,7 @@ export function buildSpecification(
       warnings: result.warnings.map((issue) => `${label(issue.field)}: ${issue.message}`),
       errors: result.errors,
       mesh,
+      multiBody: design.multiBody,
     },
     options,
   );

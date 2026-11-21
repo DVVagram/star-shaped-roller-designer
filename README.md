@@ -1,6 +1,6 @@
 # Parametric Wheel Works
 
-One hundred and forty-six parametric designers for **editable mechanical and
+One hundred and ninety-six parametric designers for **editable mechanical and
 household parts**, in one static site: the original four wheels and rotors,
 ninety-six gears, pulleys, fixings, vessels, ducts and mechanisms, and fifty more
 workshop fixtures, turned fittings and household forms.
@@ -48,7 +48,7 @@ the last local edit on that browser, and offers Standard, Compact and Oversize
 starting points where the design validates them. **Copy link** carries the same
 setup to another tab. The export panel downloads the STL, specification and
 dimension sheet separately or together as one ZIP. The header switcher searches
-all one hundred and forty-six designers, and every designer links to its paired
+all two hundred and forty-six designers, and every designer links to its paired
 and related pages.
 
 Everything runs in the browser: no CAD kernel, no server, no account, no uploads.
@@ -224,7 +224,7 @@ npm test           # Vitest
 ```
 
 `npm run build` emits a static site in `dist/`. Routes are hash-based: `#/` is the
-catalogue, `#/<designer-id>` opens any of the one hundred and forty-six (for example `#/spur-gear` or
+catalogue, `#/<designer-id>` opens any of the two hundred and forty-six (for example `#/spur-gear` or
 `#/sprocket`), so any static host works with no rewrite rules.
 
 ---
@@ -235,12 +235,12 @@ catalogue, `#/<designer-id>` opens any of the one hundred and forty-six (for exa
 src/
   App.tsx                    suite shell: header, hash router, catalog, footer
   components/
-    Catalog.tsx              the one hundred and forty-six cards, grouped by family
+    Catalog.tsx              the two hundred and forty-six cards, grouped by family
     DesignerPage.tsx         compact title + builder first, explainer below, related cards
     DesignerSearch.tsx       searchable designer combobox in the header
     DesignerTools.tsx        presets, copy-link, issue summary and sticky export bar
     DesignScaffold.tsx       two-column builder: inputs, measurements, preview, export
-    GenericDesigner.tsx      schema-driven form used by all one hundred and forty-six new designs
+    GenericDesigner.tsx      schema-driven form used by all two hundred and forty-six new designs
     DesignMark.tsx           one family glyph per catalog card
     MeshPreview.tsx          three.js canvas (WebGL fallback, reset view)
     SprocketBuilder.tsx      sprocket form, validation, readout, STL

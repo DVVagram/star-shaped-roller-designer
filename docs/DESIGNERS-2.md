@@ -6,6 +6,7 @@ rest stay recorded so the choice is visible rather than implied.
 
 A **✓** marks a designer that shipped in this batch. Together with the
 forty-six from `docs/DESIGNERS.md` the catalogue now holds ninety-six designs.
+The third batch (`docs/DESIGNERS-3.md`) brings it to one hundred and ninety-six.
 
 Every candidate was judged on the same four rules as the first list:
 
@@ -61,7 +62,7 @@ Every candidate was judged on the same four rules as the first list:
 24. Cross plate — four-arm plate with a central bore.
 25. Corner gusset — folded corner brace with two bolt ears.
 26. T-nut plate — plate with four captured T-nut pockets.
-27. Rail end plate — cap that closes an extrusion end.
+27. **Rail end plate** ✓ — cap that closes an extrusion end.
 28. Cable tray plate — plate with three tie slots and a lip.
 29. Antenna mount — plate with a socket boss and a cable notch.
 30. Camera plate — plate with a 1/4-20 boss and two strap slots.
@@ -110,7 +111,7 @@ Every candidate was judged on the same four rules as the first list:
 30. Star washer — external-tooth lock washer.
 31. Domed cap — push-on cap with a lip.
 32. Square cap — push-on square cap.
-33. Hole plug — plug with a retaining flange.
+33. **Hole plug** ✓ — plug with a retaining flange.
 34. Grommet — ring with a groove for a panel edge.
 35. Cable gland body — hex body with a dome nut.
 36. Thumb nut — knurled nut with a wide face.
@@ -130,26 +131,26 @@ Every candidate was judged on the same four rules as the first list:
 7. **Baffle plate** ✓ — bored disc with a ring of transfer holes.
 8. **Sink strainer** ✓ — square grid inside a round plate with a centre outlet.
 9. **Mounting ring** ✓ — annulus with a bolt circle and a lip.
-10. Dial plate — disc with a ring of tick holes and a centre bore.
+10. **Dial plate** ✓ — disc with a ring of tick holes and a centre bore.
 11. Speaker baffle — disc with a large opening and screw holes.
 12. Filter disc — fine grid with a wide support rim.
-13. Orifice plate — disc with one exact central bore.
-14. Blind flange — disc with a bolt circle and no bore.
+13. **Orifice plate** ✓ — disc with one exact central bore.
+14. **Blind flange** ✓ — disc with a bolt circle and no bore.
 15. Gasket ring — thin ring with a bolt circle.
 16. Wear plate — thick ring with oil grooves.
 17. Thrust washer — ring with radial grooves.
 18. Clutch disc — ring with a splined centre.
 19. Friction plate — ring with a segmented face.
 20. Timing disc — disc with a single index slot.
-21. Encoder disc — disc with a fine radial slot pattern.
+21. **Encoder disc** ✓ — disc with a fine radial slot pattern.
 22. Chopper wheel — disc with evenly spaced windows.
 23. Strobe disc — disc with one wide and one narrow window.
 24. Balance disc — disc with lightening holes on two circles.
 25. Flywheel blank — thick disc with a starter ring groove.
 26. Pulley face — disc with a V groove.
 27. Sheave half — disc with a half groove.
-28. Capstan drum — cylinder with a flange.
-29. Bobbin flange — disc with a centre bore and drive slot.
+28. **Capstan drum** ✓ — cylinder with a flange.
+29. **Bobbin flange** ✓ — disc with a centre bore and drive slot.
 30. Spool end — disc with a locking notch.
 31. Reel side — disc with a handle hole and a bearing bore.
 32. Wheel hub — disc with a bolt circle and a centre pilot.
@@ -178,9 +179,9 @@ Every candidate was judged on the same four rules as the first list:
 12. Salt shaker — small vessel with a pierced cap.
 13. Pepper mill body — turned body with a waist.
 14. Mug — cylinder with a handle approximated as a solid loop.
-15. Tumbler — tapered cup with a heavy base.
-16. Shot glass — thick-walled small cup.
-17. Measuring cup — cup with an internal step.
+15. **Tumbler** ✓ — tapered cup with a heavy base.
+16. **Shot glass** ✓ — thick-walled small cup.
+17. **Measuring cup** ✓ — cup with an internal step.
 18. Funnel with a strainer — cone with a pierced disc.
 19. Oil can body — body with a spout.
 20. Squeeze bottle — body with a nozzle seat.
@@ -189,21 +190,21 @@ Every candidate was judged on the same four rules as the first list:
 23. Razor stand — post with a head cradle.
 24. Candle mould — tube with a wick hole.
 25. Tea light cup — thin cup with a rim.
-26. Votive holder — flared holder with a lip.
+26. **Votive holder** ✓ — flared holder with a lip.
 27. Lantern body — body with window openings.
 28. Lamp base — weighted base with a stem.
 29. Lampshade ring — ring with three spider arms.
 30. Vase insert — narrow insert for a wide vase.
-31. Bud vase — slim vessel with a narrow neck.
-32. Decanter stopper — ground-taper stopper with a knob.
+31. **Bud vase** ✓ — slim vessel with a narrow neck.
+32. **Decanter stopper** ✓ — ground-taper stopper with a knob.
 33. Pour spout — tapered spout with an air groove.
 34. Drip tray — shallow tray with a rim.
-35. Coaster — disc with a raised rim.
-36. Napkin ring — ring with a decorative band.
+35. **Coaster** ✓ — disc with a raised rim.
+36. **Napkin ring** ✓ — ring with a decorative band.
 37. Cutlery rest — rest with two saddles.
 38. Chopstick rest — small cradle.
 39. Door stop — wedge with a rubber seat.
-40. Drawer knob — knob with a threaded insert seat.
+40. **Drawer knob** ✓ — knob with a threaded insert seat.
 
 ## 5. Labware and fluid (40)
 
@@ -229,12 +230,12 @@ Every candidate was judged on the same four rules as the first list:
 20. Luer cap — small cap with a taper.
 21. Needle hub — hub with a luer taper.
 22. Vial crimp cap — cap with a skirt.
-23. Septum cap — cap with a centre hole.
-24. Sample cup — small cup for an autosampler.
+23. **Septum cap** ✓ — cap with a centre hole.
+24. **Sample cup** ✓ — small cup for an autosampler.
 25. Cuvette blank — rectangular cell with two clear faces.
 26. Dialysis clip — clip with a flat jaw.
 27. Tube rack — rack with a grid of holes.
-28. Flask weight — ring weight for a flask.
+28. **Flask weight** ✓ — ring weight for a flask.
 29. Stir bar blank — capsule with a centre pocket.
 30. Boiling chip cup — cup with a perforated base.
 31. Desiccator plate — plate with a grid of holes.
@@ -257,13 +258,13 @@ Every candidate was judged on the same four rules as the first list:
 5. **Caster wheel** ✓ — wheel with a bearing bore and a tread groove.
 6. Crank arm — arm with two bores and a web.
 7. Connecting rod — rod with a big and a small end.
-8. Wrist pin — hollow pin with two chamfers.
+8. **Wrist pin** ✓ — hollow pin with two chamfers.
 9. Rocker arm — arm with a pivot and a pad.
 10. Cam follower — roller with a pin bore.
 11. Roller — cylinder with a crowned face.
-12. Idler wheel — wheel with a bearing bore and a flange.
+12. **Idler wheel** ✓ — wheel with a bearing bore and a flange.
 13. Belt tensioner wheel — wheel with a groove and a hub.
-14. Guide roller — roller with a side flange.
+14. **Guide roller** ✓ — roller with a side flange.
 15. Track roller — roller with a deep groove.
 16. Pulley sheave — disc with a V groove and a bore.
 17. Rope sheave — disc with a round groove.
@@ -275,19 +276,19 @@ Every candidate was judged on the same four rules as the first list:
 23. Ball joint blank — ball on a threaded shank.
 24. Rod end blank — eye with a threaded shank.
 25. Bushing — plain sleeve with a flange.
-26. Flanged sleeve — sleeve with a wide flange.
+26. **Flanged sleeve** ✓ — sleeve with a wide flange.
 27. Thrust collar — collar with a set screw hole.
 28. Shaft collar — split collar with a clamp slot.
 29. Set collar — collar with one radial hole.
-30. Spacer stack — stepped spacer.
-31. Spring seat — cup with a spring pocket.
-32. Spring cap — cap with a spigot.
+30. **Spacer stack** ✓ — stepped spacer.
+31. **Spring seat** ✓ — cup with a spring pocket.
+32. **Spring cap** ✓ — cap with a spigot.
 33. Damper body — tube with a rod guide.
-34. Plunger — plunger with a seal groove.
+34. **Plunger** ✓ — plunger with a seal groove.
 35. Diaphragm clamp — ring pair on one part.
 36. Bellows blank — stacked discs approximated by rings.
 37. Flexure — thin plate with two mounting blocks.
-38. Hinge pin — pin with a head and a groove.
+38. **Hinge pin** ✓ — pin with a head and a groove.
 39. Cotter pin — folded pin approximated as a loop.
 40. Retaining ring — open ring with two lug holes.
 
@@ -301,7 +302,7 @@ Every candidate was judged on the same four rules as the first list:
 6. Boring bar holder — holder with a round bore and a clamp slot.
 7. Collet block — block with a taper bore.
 8. Chuck jaw — jaw with a stepped face.
-9. Soft jaw blank — jaw with a mounting bolt pattern.
+9. **Soft jaw blank** ✓ — jaw with a mounting bolt pattern.
 10. Lathe dog — ring with a bent tail.
 11. Faceplate — disc with a radial slot pattern.
 12. Driving plate — plate with a pin boss.
@@ -320,7 +321,7 @@ Every candidate was judged on the same four rules as the first list:
 25. Mortise gauge fence — fence with a locking screw hole.
 26. Dowel jig — block with three guide holes.
 27. Pocket hole plug — tapered plug with a flat head.
-28. Bench dog — post with a collar.
+28. **Bench dog** ✓ — post with a collar.
 29. Hold-down clamp — arm with a slot and a pad.
 30. Cam clamp — arm with an eccentric boss.
 31. Toggle clamp arm — arm with two pivot holes.
@@ -328,8 +329,8 @@ Every candidate was judged on the same four rules as the first list:
 33. Push stick — stick with a notched head.
 34. Router template ring — ring with a guide lip.
 35. Bearing press disc — disc with a stepped spigot.
-36. Seal driver — cup with a flat face.
-37. Bushing driver — tube with a shoulder.
+36. **Seal driver** ✓ — cup with a flat face.
+37. **Bushing driver** ✓ — tube with a shoulder.
 38. Wheel puller plate — plate with a slot pattern.
 39. Spanner nut socket — ring with two drive lugs.
 40. Torque adapter — square drive reduced to a hex socket.
@@ -355,7 +356,7 @@ Every candidate was judged on the same four rules as the first list:
 17. Bird feeder base — base with drain holes.
 18. Bee hotel tube — bundle of tubes in a shell.
 19. Insect house frame — frame with slot pockets.
-20. Pet tag — tag with a ring hole.
+20. **Pet tag** ✓ — tag with a ring hole.
 21. Litter scoop — scoop with a slotted base.
 22. Pet brush body — body with a bristle field approximated by holes.
 23. Aquarium clip — clip with a tube holder.
@@ -365,7 +366,7 @@ Every candidate was judged on the same four rules as the first list:
 27. Cable clip — clip with one screw hole.
 28. Cable channel — channel with a snap lip.
 29. Cable drum flange — flange with a drive hole.
-30. Cable marker — tag with two slots.
+30. **Cable marker** ✓ — tag with two slots.
 31. Cord lock — body with a spring seat.
 32. Cord wrap — wrap with two notches.
 33. Zip tie anchor — anchor with a through slot.

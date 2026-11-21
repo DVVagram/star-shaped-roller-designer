@@ -104,13 +104,15 @@ const THREADS = ids(`hex-nut square-nut coupling-nut wing-nut t-slot-nut thumb-n
   thumb-screw cross-knob pointer-knob star-knob knurled-knob hex-standoff`);
 const PRESSURE = ids(`pipe-reducer pipe-cap pipe-elbow hose-adapter hose-barb barbed-reducer
   bulkhead-fitting tube-adapter oring-plug gasket de-laval-nozzle caulking-nozzle`);
-const LAB = ids(`test-tube centrifuge-tube erlenmeyer-flask pipette-tip`);
+const LAB = ids(`test-tube centrifuge-tube erlenmeyer-flask pipette-tip vial-cap
+  septum-cap`);
 const FOOD = ids(`cup bowl bottle egg-cup honey-dipper pet-bowl wine-glass goblet
-  funnel portafilter-funnel biscuit-cutter plant-saucer jar-lid`);
-const HEAT = ids(`candlestick tea-light-cup lamp-shade incense-holder trivet`);
+  funnel portafilter-funnel biscuit-cutter plant-saucer jar-lid tumbler shot-glass
+  measuring-cup`);
+const HEAT = ids(`candlestick tea-light-cup lamp-shade incense-holder trivet votive-holder`);
 const TORQUE = ids(`open-end-wrench box-wrench`);
 const HIGH_RISK = ids(`brake-rotor saw-blade flywheel piston centrifuge-tube`);
-const DECORATIVE = ids(`vase bell parabolic-dish spinning-top yo-yo torus
+const DECORATIVE = ids(`vase bell parabolic-dish spinning-top yo-yo torus pet-tag
   hemisphere-shell nose-cone chain-link keytag plant-label index-plate vent-grille
   fan-grille perforated-plate baffle-plate`);
 const LOAD = ids(`wall-hook pegboard-hook door-strike hinge-leaf mounting-plate
@@ -120,7 +122,8 @@ const LOAD = ids(`wall-hook pegboard-hook door-strike hinge-leaf mounting-plate
   featherboard hold-down-clamp eccentric-clamp hinge-leaf zero-clearance-insert
   router-template fan-mount bell-crank bearing-cap`);
 const SHAFT = ids(`flanged-bushing bearing-cap bearing-plate caster-wheel handwheel
-  eccentric-wheel splined-hub flywheel sprocket chain-link`);
+  eccentric-wheel splined-hub flywheel sprocket chain-link plain-bushing flanged-sleeve
+  idler-wheel guide-roller crowned-roller bobbin-flange`);
 const CUTTING = ids(`biscuit-cutter router-template drill-guide zero-clearance-insert
   sanding-drum saw-blade`);
 

@@ -110,11 +110,11 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
   const report = useMemo(() => {
     if (!mesh) return null;
     try {
-      return inspectMesh(mesh);
+      return inspectMesh(mesh, { allowMultipleComponents: design.multiBody });
     } catch {
       return null;
     }
-  }, [mesh]);
+  }, [design.multiBody, mesh]);
 
   const errorsByField = new Map<string, string>();
   for (const issue of result.errors) {
@@ -152,7 +152,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
     }
     if (!report?.ok) {
       setExportError(
-        "The generated solid is not a single watertight shell, so it was not exported.",
+        "The generated mesh did not pass the closed-solid checks, so it was not exported.",
       );
       return;
     }
@@ -266,6 +266,32 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
       );
     }
 
+    if (field.kind === "text") {
+      return (
+        <div key={field.key} className="sm:col-span-2">
+          <label
+            htmlFor={id}
+            className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.15em] text-muted"
+          >
+            {field.label}
+          </label>
+          <input
+            id={id}
+            type="text"
+            value={values[field.key] ?? field.default}
+            onChange={(event) => setField(field.key, event.target.value.toUpperCase())}
+            maxLength={24}
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="YOUR TEXT"
+            className="w-full rounded-lg border border-line bg-white px-3 py-2.5 text-[15px] uppercase tracking-wide text-ink outline-none transition focus:border-accent/60"
+          />
+          {error && <p className="mt-1 text-[11px] leading-snug text-red-700">{error}</p>}
+          <p className="mt-1 text-[11px] leading-snug text-muted/80">{rangeHint(field)}</p>
+        </div>
+      );
+    }
+
     return (
       <NumberField
         key={field.key}
@@ -343,6 +369,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
         ariaLabel: `${design.name} 3D preview`,
         cells: display.preview.cells,
         stale: !valid,
+        elevated: design.multiBody,
       }}
       exportPanel={{
         onExport: handleExport,
@@ -354,7 +381,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
         limitation: design.contract.limitations[0],
         disabled: !watertight,
         note: valid
-          ? `${report && report.zeroAreaFaces > 0 ? `${report.zeroAreaFaces} zero-area cap face${report.zeroAreaFaces === 1 ? "" : "s"} from hole bridging are reported; most importers ignore them. ` : ""}Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your software.`
+          ? `${design.multiBody ? "This part is a plate with separately closed letter bodies; every body is watertight and the STL keeps every triangle. " : ""}${report && report.zeroAreaFaces > 0 ? `${report.zeroAreaFaces} zero-area cap face${report.zeroAreaFaces === 1 ? "" : "s"} from hole bridging are reported; most importers ignore them. ` : ""}Binary STL, coordinates in millimetres. STL has no units or metadata: verify scale and orientation in your software.`
           : "Export is disabled while the configuration has errors.",
         volume: Number.isFinite(volumeCm3) ? `${formatNumber(volumeCm3, 2)} cm³` : "—",
         triangles: report ? formatNumber(report.triangleCount, 0) : "—",

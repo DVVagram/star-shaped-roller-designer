@@ -17,15 +17,15 @@ backlog, not shipped designs.
 0009 U shim — a horseshoe shim for a bolt that is already in place.
 0010 Taper shim — a wedge shim for levelling a frame in small steps.
 0011 **★ Hex standoff** — a hex-spanner spacer that sets a board off a panel.
-0012 Round standoff — a smooth spacer for a decorative panel gap.
+0012 **★ Round standoff** — a smooth spacer for a decorative panel gap.
 0013 Square standoff — a non-rotating spacer for a square-hole panel.
 0014 Threaded insert press — a guide that sets a heat-set insert square to a boss.
 0015 Dowel centring pin — a pair of pointed pins that mark a matching hole.
-0016 Dowel spacer — a ring that sets a dowel depth in a blind hole.
-0017 Countersink plug — a flush cap for a countersunk screw head.
-0018 Screw cap — a cover that hides a screw head in a visible panel.
+0016 **★ Dowel spacer** — a ring that sets a dowel depth in a blind hole.
+0017 **★ Countersink plug** — a flush cap for a countersunk screw head.
+0018 **★ Screw cap** — a cover that hides a screw head in a visible panel.
 0019 Bolt cap — a snap cover for an exposed bolt head.
-0020 Acorn cap — a domed cover that protects a thread end.
+0020 **★ Acorn cap** — a domed cover that protects a thread end.
 0021 **★ Dome nut** — a blind cap nut that hides a stud end.
 0022 **★ Thumb nut** — a hand-tightened nut for a clamp you adjust often.
 0023 **★ Thumb screw** — a tool-free screw for a cover or a jig plate.
@@ -40,10 +40,10 @@ backlog, not shipped designs.
 0032 Clevis pin — a headed pin that joins two ears.
 0033 **★ Taper pin** — a self-locking pin for a reamed hole in a hub.
 0034 **★ Alignment pin** — a chamfered pin that lines up two fixture plates.
-0035 Locating pin — a shouldered pin that repeats a fixture position.
+0035 **★ Locating pin** — a shouldered pin that repeats a fixture position.
 0036 Roll pin — a slotted spring pin for a press fit.
 0037 Spring pin — a coiled pin that absorbs vibration.
-0038 Dowel — a plain pin that transfers shear between two parts.
+0038 **★ Dowel** — a plain pin that transfers shear between two parts.
 0039 Barrel nut — a cross nut for a flat-pack joint.
 0040 Cross dowel — a dowel with a cross hole for a connector bolt.
 0041 T nut — a pronged nut that bites into wood from the back.
@@ -165,7 +165,7 @@ backlog, not shipped designs.
 0154 Appliance handle — a handle that stands off a hot appliance door.
 0155 Handle bracket — a standoff bracket for a bar handle.
 0156 Grab bar flange — a flange that covers a grab bar fixing.
-0157 Towel bar end — an end post for a towel rail.
+0157 **★ Towel bar end** — an end post for a towel rail.
 0158 Curtain bracket — a bracket that carries a curtain rod.
 0159 Blind bracket — a bracket that holds a roller blind end.
 0160 Mirror clip — a clip that holds a mirror against a wall.
@@ -249,7 +249,7 @@ backlog, not shipped designs.
 0235 Centre finder — a V guide that marks the centre of a round bar.
 0236 Centre punch guide — a guide that starts a punch on a curved surface.
 0237 Transfer punch — a punch that copies a hole centre.
-0238 Bench dog — a low dog that holds work against a bench stop.
+0238 **★ Bench dog** — a low dog that holds work against a bench stop.
 0239 **★ Hold-down clamp** — a pivoting arm with a curved slot that holds work flat.
 0240 Cam clamp — an eccentric cam that clamps a jig in one turn.
 0241 **★ Eccentric clamp** — an offset-pivot disc that locks a fixture with a quarter turn.
@@ -438,7 +438,7 @@ backlog, not shipped designs.
 0418 Bearing spacer — a spacer between two bearing inner races.
 0419 Bearing sleeve — a sleeve that adapts a shaft to a bearing.
 0420 Bearing puller plate — a plate that pulls a bearing squarely.
-0421 Seal driver — a driver that seats a lip seal square.
+0421 **★ Seal driver** — a driver that seats a lip seal square.
 0422 Seal retainer — a plate that keeps a seal in place.
 0423 Oil seal housing — a housing that holds a lip seal.
 0424 Grease nipple cap — a cap that keeps dirt off a grease nipple.
@@ -507,7 +507,7 @@ backlog, not shipped designs.
 0487 Wave washer — a wavy washer that preloads a bearing.
 0488 Disc spring — a stack of disc springs for a high load.
 0489 Leaf spring — a curved leaf that carries a beam load.
-0490 Spring seat — a seat that locates a spring end.
+0490 **★ Spring seat** — a seat that locates a spring end.
 0491 Spring retainer — a retainer that keeps a spring compressed.
 0492 Spring guide — a rod that keeps a spring straight.
 0493 Damper body — a body that houses a damping piston.
@@ -533,7 +533,7 @@ backlog, not shipped designs.
 0511 Pipe clamp — a clamp that holds a pipe to a rail.
 0512 Pipe hanger — a hanger that carries a pipe from above.
 0513 Pipe flange — a flange that bolts a pipe to a port.
-0514 Blind flange — a blank flange that closes a flanged port.
+0514 **★ Blind flange** — a blank flange that closes a flanged port.
 0515 Flange gasket — a gasket that seals between two flanges.
 0516 Flange spacer — a spacer that sets a flange gap.
 0517 Flange cover — a cover that protects a flange face.
@@ -554,7 +554,7 @@ backlog, not shipped designs.
 0532 Channel drain end — an end cap for a channel drain.
 0533 Weir plate — a plate that sets a liquid level.
 0534 Baffle plate — a plate that directs flow inside a vessel.
-0535 Orifice plate — a plate with a calibrated bore for flow measurement.
+0535 **★ Orifice plate** — a plate with a calibrated bore for flow measurement.
 0536 Flow straightener — a vane pack that removes swirl from a duct.
 0537 Flow restrictor — an insert that limits a flow rate.
 0538 Flow nozzle — a nozzle that measures or shapes a flow.
@@ -656,7 +656,7 @@ backlog, not shipped designs.
 0631 Dialysis clip — a clip that closes a dialysis tube.
 0632 Dialysis cap — a cap for a dialysis tube.
 0633 Sample vial — a small vial for a sample.
-0634 Vial cap — a cap for a sample vial.
+0634 **★ Vial cap** — a cap for a sample vial.
 0635 Vial rack — a rack for sample vials.
 0636 Cryo tube — a tube for a freezer.
 0637 Cryo box — a box that holds cryo tubes.
@@ -668,7 +668,7 @@ backlog, not shipped designs.
 0643 Mug lid — a lid that keeps a mug warm.
 0644 Cup lid — a lid for a takeaway cup.
 0645 Cup coaster — a coaster that fits a cup base.
-0646 Coaster — a coaster that protects a table.
+0646 **★ Coaster** — a coaster that protects a table.
 0647 Saucer — a saucer under a cup.
 0648 **★ Tea light cup** — a cup with a recess that holds a tea light.
 0649 Candle cup — a cup that holds a pillar candle.

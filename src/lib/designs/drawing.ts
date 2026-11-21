@@ -129,12 +129,13 @@ export interface DrawingRecord {
   name: string;
   contract: DesignContract;
   mesh: Mesh;
+  multiBody?: boolean;
 }
 
 /** Renders a sheet for any mesh; no design schema required. */
 export function renderRecordDrawingSvg(record: DrawingRecord): string {
   const { mesh, contract } = record;
-  const report = inspectMesh(mesh);
+  const report = inspectMesh(mesh, { allowMultipleComponents: record.multiBody });
   const edges = uniqueEdges(mesh);
   const [[minX, minY, minZ], [maxX, maxY, maxZ]] = [
     mesh.boundingBox.min,
@@ -184,6 +185,7 @@ export function buildDrawingSvg(design: AnyDesign, raw: RawValues): string {
     name: design.name,
     contract: design.contract,
     mesh: design.build(raw),
+    multiBody: design.multiBody,
   });
 }
 
