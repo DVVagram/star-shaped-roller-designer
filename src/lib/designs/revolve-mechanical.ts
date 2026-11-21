@@ -139,11 +139,13 @@ export const pipeCap: AnyDesign = defineDesign({
     { key: "pipeDiameter", label: "Pipe diameter", kind: "length", section: "Cap", default: "60", min: 10, max: 160 },
     { key: "depth", label: "Overall depth", kind: "length", section: "Cap", default: "40", min: 8, max: 100 },
     { key: "wall", label: "Wall thickness", kind: "length", section: "Cap", default: "3", min: 1, max: 8 },
+    { key: "lead", label: "Mouth chamfer", kind: "length", section: "Cap", default: "1", min: 0, max: 5, hint: "Lead-in on the outside of the mouth." },
   ],
   parse: (raw) => ({
     pipeMm: rawLength(raw, "pipeDiameter"),
     depthMm: rawLength(raw, "depth"),
     wallMm: rawLength(raw, "wall"),
+    leadMm: rawLength(raw, "lead"),
   }),
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
@@ -151,11 +153,13 @@ export const pipeCap: AnyDesign = defineDesign({
     pushRange(errors, units, "pipeDiameter", "Pipe diameter", p.pipeMm, 10, 160);
     pushRange(errors, units, "depth", "Overall depth", p.depthMm, 8, 100);
     pushRange(errors, units, "wall", "Wall thickness", p.wallMm, 1, 8);
+    pushRange(errors, units, "lead", "Mouth chamfer", p.leadMm, 0, 5);
     if (errors.length > 0) return emptyResult(errors, warnings);
 
     const outerR = p.pipeMm / 2 + p.wallMm;
     checkSize(errors, units, "pipeDiameter", outerR * 2, p.depthMm);
     if (p.depthMm <= p.wallMm + 2) errors.push({ field: "depth", level: "error", message: "The cap is no deeper than its top." });
+    if (p.leadMm >= p.wallMm) errors.push({ field: "lead", level: "error", message: "The mouth chamfer eats the whole wall." });
     if (p.wallMm < p.pipeMm * 0.03) pushWarning(warnings, "wall", "A wall under 3 % of the pipe diameter distorts when pushed on.");
 
     return {
@@ -168,6 +172,7 @@ export const pipeCap: AnyDesign = defineDesign({
         { label: "Overall depth", value: measure(p.depthMm, units), source: "input" },
         { label: "Inside depth", value: measure(p.depthMm - p.wallMm, units), source: "calc" },
         { label: "Wall", value: measure(p.wallMm, units), source: "input" },
+        { label: "Mouth chamfer", value: measure(p.leadMm, units), source: "input" },
       ],
       preview: previewOf(
         `${measure(p.pipeMm, units)} pipe · ${measure(p.depthMm, units)} deep`,
@@ -185,8 +190,10 @@ export const pipeCap: AnyDesign = defineDesign({
   build: (p) => {
     const outerR = p.pipeMm / 2 + p.wallMm;
     const innerR = p.pipeMm / 2;
+    const lead = Math.min(p.leadMm, p.wallMm * 0.9, p.depthMm * 0.4);
     const profile: Point2D[] = [
-      { x: outerR, y: 0 },
+      { x: outerR - lead, y: 0 },
+      { x: outerR, y: lead },
       { x: outerR, y: p.depthMm },
       { x: 0, y: p.depthMm },
       { x: 0, y: p.depthMm - p.wallMm },

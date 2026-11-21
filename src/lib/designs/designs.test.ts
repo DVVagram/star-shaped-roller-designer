@@ -96,6 +96,22 @@ describe("designer library", () => {
   });
 });
 
+describe("designer library: use cases", () => {
+  it("states a concrete, distinct use case for every designer", () => {
+    const seen = new Map<string, string[]>();
+    for (const design of ALL) {
+      expect(design.use.length).toBeGreaterThanOrEqual(25);
+      expect(design.use.length).toBeLessThanOrEqual(200);
+      expect(design.use).not.toMatch(/TODO|lorem|placeholder/i);
+      expect(design.use.trim()).toBe(design.use);
+      seen.set(design.use, [...(seen.get(design.use) ?? []), design.id]);
+    }
+    for (const [use, ids] of seen) {
+      expect({ use, ids }).toEqual({ use, ids: [ids[0]] });
+    }
+  });
+});
+
 describe("designer library: defaults", () => {
   for (const design of ALL) {
     it(`${design.id} starts valid and builds a closed shell`, () => {

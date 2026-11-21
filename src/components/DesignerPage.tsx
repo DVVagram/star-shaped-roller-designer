@@ -11,6 +11,7 @@ export interface DesignerPageProps {
   eyebrow: string;
   title: ReactNode;
   lede: string;
+  useCase: string;
   chips: readonly { label: string; value: string }[];
   builderTitle: string;
   builderLede: string;
@@ -28,6 +29,7 @@ export default function DesignerPage({
   eyebrow,
   title,
   lede,
+  useCase,
   chips,
   builderTitle,
   builderLede,
@@ -53,6 +55,12 @@ export default function DesignerPage({
               {title}
             </h1>
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted">{lede}</p>
+            <p className="mt-4 flex max-w-xl gap-2 border-l-2 border-accent/60 pl-3 text-sm leading-relaxed text-ink">
+              <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+                Use case
+              </span>
+              <span className="-ml-1">{useCase}</span>
+            </p>
           </div>
 
           <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-line bg-line text-xs">

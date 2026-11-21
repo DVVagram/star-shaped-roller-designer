@@ -591,6 +591,7 @@ export const keyholePlate: AnyDesign = defineDesign({
     { key: "slotWidth", label: "Slot width", kind: "length", section: "Opening", default: "8", min: 2, max: 24 },
     { key: "slotLength", label: "Slot rise", kind: "length", section: "Opening", default: "22", min: 4, max: 60 },
     { key: "corner", label: "Corner radius", kind: "length", section: "Plate", default: "6", min: 0, max: 20 },
+    { key: "screw", label: "Fixing screw", kind: "length", section: "Mounting", default: "4", min: 0, max: 10, hint: "0 for a hanger with no screws." },
   ],
   parse: (raw) => ({
     widthMm: rawLength(raw, "width"),
@@ -600,6 +601,7 @@ export const keyholePlate: AnyDesign = defineDesign({
     slotWidthMm: rawLength(raw, "slotWidth"),
     slotLengthMm: rawLength(raw, "slotLength"),
     cornerMm: rawLength(raw, "corner"),
+    screwMm: rawLength(raw, "screw"),
   }),
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
@@ -611,9 +613,15 @@ export const keyholePlate: AnyDesign = defineDesign({
     pushRange(errors, units, "slotWidth", "Slot width", p.slotWidthMm, 2, 24);
     pushRange(errors, units, "slotLength", "Slot rise", p.slotLengthMm, 4, 60);
     pushRange(errors, units, "corner", "Corner radius", p.cornerMm, 0, 20);
+    pushRange(errors, units, "screw", "Fixing screw", p.screwMm, 0, 10);
     if (errors.length > 0) return emptyResult(errors, warnings);
 
     checkSize(errors, units, "height", p.widthMm, p.heightMm);
+    if (p.screwMm > 0) {
+      if (2 * (p.widthMm / 2 - 8) < p.screwMm + 2) errors.push({ field: "screw", level: "error", message: "The two fixing screws touch; widen the plate or use smaller screws." });
+      const top = -p.heightMm / 2 + p.holeMm / 2 + 6 + p.slotLengthMm;
+      if (p.heightMm / 2 - 8 - p.screwMm / 2 < top + 1.6) errors.push({ field: "screw", level: "error", message: "The fixing screws run into the keyhole." });
+    }
     if (p.holeMm <= p.slotWidthMm) errors.push({ field: "slotWidth", level: "error", message: "The slot must be narrower than the keyhole." });
     if (p.slotWidthMm + 2 > p.widthMm || p.holeMm + 2 > p.widthMm) errors.push({ field: "hole", level: "error", message: "The opening leaves no plate at the sides." });
     if (p.holeMm + p.slotLengthMm + 2 > p.heightMm) errors.push({ field: "slotLength", level: "error", message: "The opening breaks out of the plate." });
@@ -628,6 +636,7 @@ export const keyholePlate: AnyDesign = defineDesign({
         { label: "Slot", value: `${U(p.slotWidthMm, units)} × ${U(p.slotLengthMm, units)}`, source: "input" },
         { label: "Overall opening", value: U(p.holeMm + p.slotLengthMm, units), source: "calc" },
         { label: "Side land", value: U((p.widthMm - Math.max(p.holeMm, p.slotWidthMm)) / 2, units), source: "calc" },
+        { label: "Fixing screws", value: p.screwMm > 0 ? `2 × ${U(p.screwMm, units)}` : "none", source: "input" },
         { label: "Thickness", value: U(p.thicknessMm, units), source: "input" },
       ],
       preview: previewOf(
@@ -662,9 +671,18 @@ export const keyholePlate: AnyDesign = defineDesign({
       points.push({ x: r * Math.cos(angle), y: cy + r * Math.sin(angle) });
     }
     points.push({ x: -half, y: top });
+    const holes: Point2D[][] = [points];
+    if (p.screwMm > 0) {
+      const sx = p.widthMm / 2 - 8;
+      const sy = p.heightMm / 2 - 8;
+      holes.push(
+        circleAt(sx, sy, p.screwMm / 2),
+        circleAt(-sx, sy, p.screwMm / 2),
+      );
+    }
     return buildPrism({
       rings: [roundedRect(p.widthMm, p.heightMm, p.cornerMm), roundedRect(p.widthMm, p.heightMm, p.cornerMm)],
-      holes: [points],
+      holes,
       thicknessMm: p.thicknessMm,
     });
   },
@@ -698,6 +716,7 @@ export const switchPlate: AnyDesign = defineDesign({
     { key: "openingHeight", label: "Opening height", kind: "length", section: "Opening", default: "45", min: 8, max: 120 },
     { key: "openingCorner", label: "Opening radius", kind: "length", section: "Opening", default: "3", min: 0, max: 20 },
     { key: "corner", label: "Plate radius", kind: "length", section: "Plate", default: "6", min: 0, max: 20 },
+    { key: "screw", label: "Fixing screw", kind: "length", section: "Mounting", default: "4", min: 0, max: 10 },
   ],
   parse: (raw) => ({
     widthMm: rawLength(raw, "width"),
@@ -707,6 +726,7 @@ export const switchPlate: AnyDesign = defineDesign({
     openingHeightMm: rawLength(raw, "openingHeight"),
     openingCornerMm: rawLength(raw, "openingCorner"),
     cornerMm: rawLength(raw, "corner"),
+    screwMm: rawLength(raw, "screw"),
   }),
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
@@ -718,11 +738,15 @@ export const switchPlate: AnyDesign = defineDesign({
     pushRange(errors, units, "openingHeight", "Opening height", p.openingHeightMm, 8, 120);
     pushRange(errors, units, "openingCorner", "Opening radius", p.openingCornerMm, 0, 20);
     pushRange(errors, units, "corner", "Plate radius", p.cornerMm, 0, 20);
+    pushRange(errors, units, "screw", "Fixing screw", p.screwMm, 0, 10);
     if (errors.length > 0) return emptyResult(errors, warnings);
 
     checkSize(errors, units, "width", p.widthMm, Math.max(p.heightMm, p.thicknessMm));
     checkWall(errors, units, "openingWidth", "plate at the sides", (p.widthMm - p.openingWidthMm) / 2);
     if (p.openingHeightMm >= p.heightMm - 2) errors.push({ field: "openingHeight", level: "error", message: "The opening reaches the top or bottom edge." });
+    if (p.screwMm > 0 && (p.heightMm - p.openingHeightMm) / 4 < p.screwMm / 2 + 1.6) {
+      errors.push({ field: "screw", level: "error", message: "No room for a fixing screw beside the opening." });
+    }
 
     return {
       errors,
@@ -733,6 +757,7 @@ export const switchPlate: AnyDesign = defineDesign({
         { label: "Side land", value: U((p.widthMm - p.openingWidthMm) / 2, units), source: "calc" },
         { label: "Top land", value: U((p.heightMm - p.openingHeightMm) / 2, units), source: "calc" },
         { label: "Opening radius", value: U(p.openingCornerMm, units), source: "input" },
+        { label: "Fixing screws", value: p.screwMm > 0 ? `2 × ${U(p.screwMm, units)}` : "none", source: "input" },
         { label: "Thickness", value: U(p.thicknessMm, units), source: "input" },
       ],
       preview: previewOf(
@@ -748,12 +773,18 @@ export const switchPlate: AnyDesign = defineDesign({
       ),
     };
   },
-  build: (p) =>
-    buildPrism({
+  build: (p) => {
+    const holes: Point2D[][] = [roundedRect(p.openingWidthMm, p.openingHeightMm, p.openingCornerMm)];
+    if (p.screwMm > 0) {
+      const y = (p.openingHeightMm + p.heightMm) / 4;
+      holes.push(circleAt(0, y, p.screwMm / 2), circleAt(0, -y, p.screwMm / 2));
+    }
+    return buildPrism({
       rings: [roundedRect(p.widthMm, p.heightMm, p.cornerMm), roundedRect(p.widthMm, p.heightMm, p.cornerMm)],
-      holes: [roundedRect(p.openingWidthMm, p.openingHeightMm, p.openingCornerMm)],
+      holes,
       thicknessMm: p.thicknessMm,
-    }),
+    });
+  },
   fileName: (p) => `switch-plate-${R(p.widthMm, 0)}x${R(p.heightMm, 0)}.stl`,
 });
 

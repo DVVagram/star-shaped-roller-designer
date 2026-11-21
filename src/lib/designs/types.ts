@@ -8,6 +8,8 @@
  */
 
 import type { Mesh } from "@/lib/kit/solid";
+
+import { USE_CASES } from "./use-cases";
 import {
   formatMeasure,
   parseInput,
@@ -90,6 +92,8 @@ export interface DesignModule<P> {
   chips: { label: string; value: string }[];
   notes: string[];
   notesTitle?: string;
+  /** What the part is for. Falls back to the shared use-case table. */
+  use?: string;
   /** ASCII text written into the binary STL header. */
   header: string;
   fields: FieldDef[];
@@ -109,6 +113,7 @@ export interface AnyDesign {
   chips: { label: string; value: string }[];
   notes: string[];
   notesTitle: string;
+  use: string;
   header: string;
   fields: FieldDef[];
   defaults: Record<string, string>;
@@ -129,6 +134,7 @@ export function defineDesign<P>(module: DesignModule<P>): AnyDesign {
     chips: module.chips,
     notes: module.notes,
     notesTitle: module.notesTitle ?? "How the geometry is built",
+    use: module.use ?? USE_CASES[module.id] ?? "",
     header: module.header,
     fields: module.fields,
     defaults: Object.fromEntries(module.fields.map((field) => [field.key, field.default])),

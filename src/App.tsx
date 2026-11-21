@@ -10,6 +10,7 @@ import SprocketBuilder from "@/components/SprocketBuilder";
 import StarBuilder from "@/components/StarBuilder";
 import { DESIGNS, designById } from "@/lib/designs";
 import { FAMILIES, type AnyDesign, type DesignFamily } from "@/lib/designs/types";
+import { USE_CASES } from "@/lib/designs/use-cases";
 
 /* ------------------------------------------------------------------- marks */
 
@@ -100,6 +101,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     family: "wheels",
     eyebrow: "Fully parametric",
     blurb: "A star-spiked wheel by diameter, spike shape and centre hole.",
+    use: USE_CASES.star,
     isNew: false,
   },
   {
@@ -108,6 +110,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     family: "drives",
     eyebrow: "Chain driven",
     blurb: "Roller-chain seats cut to a real pitch and roller.",
+    use: USE_CASES.sprocket,
     isNew: false,
   },
   {
@@ -116,6 +119,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     family: "wheels",
     eyebrow: "Air moving",
     blurb: "Swept, leaned blades on a solid hub.",
+    use: USE_CASES.impeller,
     isNew: false,
   },
   {
@@ -124,6 +128,7 @@ const LEGACY_CATALOG: CatalogEntry[] = [
     family: "wheels",
     eyebrow: "Pitch and thrust",
     blurb: "Pitch-driven blades with a tapered chord.",
+    use: USE_CASES.propeller,
     isNew: false,
   },
 ];
@@ -136,6 +141,7 @@ const ALL_ENTRIES: CatalogEntry[] = [
     family: design.family,
     eyebrow: design.eyebrow,
     blurb: design.blurb,
+    use: design.use,
     isNew: true,
   })),
 ];
@@ -213,6 +219,7 @@ function genericPage(design: AnyDesign): PageConfig {
     eyebrow: design.eyebrow,
     title: design.name,
     lede: design.lede,
+    useCase: design.use,
     chips: design.chips,
     builderTitle: `Build your ${design.name.toLowerCase()}`,
     builderLede: "Millimetres or inches — every field is live and the solid follows.",
@@ -268,6 +275,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       { label: "Wheel Ø", value: "20 – 180 mm" },
       { label: "Spike depth", value: "0.5 – 80 mm" },
     ],
+    useCase: USE_CASES.star,
     builderTitle: "Build your roller",
     builderLede: "Millimetres or inches — every field is live.",
     builderNote:
@@ -318,6 +326,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       { label: "Chain", value: "#25 – #50" },
       { label: "Seat", value: "roller + gap" },
     ],
+    useCase: USE_CASES.sprocket,
     builderTitle: "Build your sprocket",
     builderLede: "The preset sets pitch and roller; every field stays live.",
     builderNote:
@@ -368,6 +377,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       { label: "Tip Ø", value: "20 – 180 mm" },
       { label: "Blade angle", value: "0 – 70°" },
     ],
+    useCase: USE_CASES.impeller,
     builderTitle: "Build your impeller",
     builderLede: "Chords, sweep and lean are measured in millimetres and degrees.",
     builderNote:
@@ -418,6 +428,7 @@ const PAGES: Record<RouteId, PageConfig> = {
       { label: "Pitch", value: "mm / rev" },
       { label: "Tip Ø", value: "20 – 180 mm" },
     ],
+    useCase: USE_CASES.propeller,
     builderTitle: "Build your propeller",
     builderLede: "Pitch is the input; the blade angle is derived from it.",
     builderNote:

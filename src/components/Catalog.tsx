@@ -7,6 +7,7 @@ export interface CatalogEntry {
   family: DesignFamily;
   eyebrow: string;
   blurb: string;
+  use: string;
   isNew: boolean;
 }
 
@@ -88,8 +89,14 @@ export default function Catalog({ entries }: { entries: CatalogEntry[] }) {
                       <span className="mt-2 text-[15px] font-semibold tracking-tight">
                         {entry.name}
                       </span>
-                      <span className="mt-1 flex-1 text-xs leading-relaxed text-muted">
+                      <span className="mt-1 text-xs leading-relaxed text-muted">
                         {entry.blurb}
+                      </span>
+                      <span className="mt-2 flex-1 text-[11px] leading-relaxed text-muted/90">
+                        <span className="font-semibold uppercase tracking-[0.1em] text-accent/80">
+                          Use:{" "}
+                        </span>
+                        {entry.use}
                       </span>
                       <span className="mt-3 text-[11px] font-medium text-muted transition group-hover:text-accent">
                         Open designer →

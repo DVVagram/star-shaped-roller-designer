@@ -17,6 +17,8 @@ import {
   sawBladeOutline,
   toothedRing,
 } from "./geometry";
+import { obround } from "@/lib/kit/outlines";
+
 import {
   boreHoles,
   chamferRings,
@@ -648,6 +650,9 @@ export const sawBlade: AnyDesign = defineDesign({
     { key: "tipLand", label: "Tip land", kind: "length", section: "Tooth", default: "1.2", min: 0.2, max: 5 },
     { key: "arbor", label: "Arbor hole", kind: "length", section: "Blade", default: "10", min: 2, max: 40 },
     { key: "thickness", label: "Plate thickness", kind: "length", section: "Blade", default: "1.6", min: 0.8, max: 6 },
+    { key: "slots", label: "Expansion slots", kind: "count", section: "Slots", default: "3", min: 0, max: 8 },
+    { key: "slotLength", label: "Slot length", kind: "length", section: "Slots", default: "14", min: 4, max: 40 },
+    { key: "slotWidth", label: "Slot width", kind: "length", section: "Slots", default: "3", min: 1.5, max: 8 },
   ],
   parse: (raw) => ({
     diameterMm: rawLength(raw, "diameter"),
@@ -657,6 +662,9 @@ export const sawBlade: AnyDesign = defineDesign({
     tipLandMm: rawLength(raw, "tipLand"),
     arborMm: rawLength(raw, "arbor"),
     thicknessMm: rawLength(raw, "thickness"),
+    slots: rawCount(raw, "slots"),
+    slotLengthMm: rawLength(raw, "slotLength"),
+    slotWidthMm: rawLength(raw, "slotWidth"),
   }),
   derive: (p, units) => {
     const errors: DesignIssue[] = [];
@@ -668,12 +676,24 @@ export const sawBlade: AnyDesign = defineDesign({
     pushRange(errors, units, "tipLand", "Tip land", p.tipLandMm, 0.2, 5);
     pushRange(errors, units, "arbor", "Arbor hole", p.arborMm, 2, 40);
     pushRange(errors, units, "thickness", "Plate thickness", p.thicknessMm, 0.8, 6);
+    pushInteger(errors, "slots", "Expansion slots", p.slots, 0, 8);
+    pushRange(errors, units, "slotLength", "Slot length", p.slotLengthMm, 4, 40);
+    pushRange(errors, units, "slotWidth", "Slot width", p.slotWidthMm, 1.5, 8);
     if (errors.length > 0) return emptyResult(errors, warnings);
 
     const radius = p.diameterMm / 2;
     const root = radius - p.toothDepthMm;
+    const slots = Math.max(0, Math.round(p.slots));
+    const slotRadius = (p.arborMm / 2 + root) / 2;
+    const slotHalf = (p.slotLengthMm + p.slotWidthMm) / 2;
     checkSize(errors, units, "diameter", p.diameterMm, p.thicknessMm);
     checkWall(errors, units, "arbor", "plate around the arbor", root - p.arborMm / 2);
+    if (slots > 0) {
+      if (slotRadius - slotHalf < p.arborMm / 2 + 2) errors.push({ field: "slotLength", level: "error", message: "The expansion slots run into the arbor hole." });
+      if (slotRadius + slotHalf > root - 2) errors.push({ field: "slotLength", level: "error", message: "The expansion slots reach the gullets." });
+      const chord = 2 * slotRadius * Math.sin(Math.PI / slots);
+      if (slots > 1 && chord < p.slotWidthMm + 2) errors.push({ field: "slots", level: "error", message: "The expansion slots run into each other." });
+    }
     if (p.toothDepthMm >= radius - p.arborMm / 2 - 2) {
       errors.push({ field: "toothDepth", level: "error", message: "The gullets reach the arbor hole." });
     }
@@ -689,6 +709,7 @@ export const sawBlade: AnyDesign = defineDesign({
         { label: "Root Ø", value: measure(Math.max(0, root * 2), units), source: "calc" },
         { label: "Hook", value: deg(p.hookAngleDeg), source: "input" },
         { label: "Arbor", value: measure(p.arborMm, units), source: "input" },
+        { label: "Slots", value: slots > 0 ? `${slots} × ${measure(p.slotLengthMm, units)}` : "none", source: "input" },
         { label: "Plate", value: measure(p.thicknessMm, units), source: "input" },
       ],
       preview: previewOf(
@@ -712,9 +733,25 @@ export const sawBlade: AnyDesign = defineDesign({
       hookAngleDeg: p.hookAngleDeg,
       tipLandMm: p.tipLandMm,
     });
+    const holes = boreHoles(p.arborMm);
+    const slots = Math.max(0, Math.round(p.slots));
+    const root = p.diameterMm / 2 - p.toothDepthMm;
+    const slotRadius = (p.arborMm / 2 + root) / 2;
+    for (let i = 0; i < slots; i += 1) {
+      const angle = (Math.PI * 2 * i) / slots;
+      holes.push(
+        obround(
+          slotRadius * Math.cos(angle),
+          slotRadius * Math.sin(angle),
+          p.slotLengthMm,
+          p.slotWidthMm,
+          angle,
+        ),
+      );
+    }
     return buildPrism({
       rings: [outline, outline],
-      holes: boreHoles(p.arborMm),
+      holes,
       thicknessMm: p.thicknessMm,
     });
   },
