@@ -3,10 +3,14 @@ import { useMemo, useRef, useState } from "react";
 import { renderRecordDrawingSvg } from "@/lib/designs/drawing";
 import { legacyRecord, sprocketEnteredValues } from "@/lib/designs/legacy";
 import { renderRecordSpecification } from "@/lib/designs/spec";
-import { downloadText } from "@/lib/kit/download";
+import { downloadBytes, downloadText } from "@/lib/kit/download";
+import { isConfigRecord, loadDesignConfig } from "@/lib/kit/design-link";
+import { createZip } from "@/lib/kit/zip";
 
-import { NumberField, OptionCards, PresetButtons, Segmented, Toggle } from "./fields";
+import { DesignerToolbar, type FieldIssue } from "./DesignerTools";
+import { NumberField, OptionCards, Segmented, Toggle } from "./fields";
 import DesignScaffold, { type ReadoutItem } from "./DesignScaffold";
+import { useDesignConfig } from "./useDesignConfig";
 import { useUnitValues } from "./useUnitValues";
 
 import {
@@ -41,17 +45,78 @@ import {
   stlByteLength,
 } from "@/lib/kit/solid";
 
+interface SprocketConfig {
+  units: "mm" | "in";
+  values: Record<SprocketField, string>;
+  toothProfile: ToothProfile;
+  boreShape: BoreShape;
+  hubEnabled: boolean;
+  presetId: string | null;
+}
+
+function decodeSprocketConfig(raw: unknown): SprocketConfig | null {
+  if (!isConfigRecord(raw) || !isConfigRecord(raw.values)) return null;
+  const values = { ...sprocketDefaultValues() };
+  for (const key of Object.keys(values) as SprocketField[]) {
+    const value = raw.values[key];
+    if (typeof value === "string") values[key] = value;
+  }
+  return {
+    units: raw.units === "in" ? "in" : "mm",
+    values,
+    toothProfile:
+      typeof raw.toothProfile === "string" && raw.toothProfile in TOOTH_PROFILES
+        ? (raw.toothProfile as ToothProfile)
+        : "standard",
+    boreShape:
+      raw.boreShape === "hex" || raw.boreShape === "doubleFlat"
+        ? raw.boreShape
+        : "round",
+    hubEnabled: raw.hubEnabled === true,
+    presetId: typeof raw.presetId === "string" ? raw.presetId : null,
+  };
+}
+
+const SPROCKET_FIELD_LABELS: Record<string, string> = {
+  pitch: "Chain pitch",
+  roller: "Roller diameter",
+  teeth: "Teeth",
+  toothHeight: "Tooth height",
+  clearance: "Seat clearance",
+  tipWidth: "Tip land",
+  thickness: "Thickness",
+  bore: "Centre hole",
+  hubDiameter: "Hub diameter",
+  hubHeight: "Hub height",
+};
+
 export default function SprocketBuilder() {
+  const [initial] = useState(() => loadDesignConfig("sprocket", decodeSprocketConfig));
   const { units, values, setField, setUnits, reset } = useUnitValues(
     sprocketDefaultValues(),
     SPROCKET_LENGTH_FIELDS,
+    initial?.data ?? null,
   );
-  const [toothProfile, setToothProfile] = useState<ToothProfile>("standard");
-  const [boreShape, setBoreShape] = useState<BoreShape>("round");
-  const [hubEnabled, setHubEnabled] = useState(false);
-  const [presetId, setPresetId] = useState<string | null>("#40");
+  const [toothProfile, setToothProfile] = useState<ToothProfile>(
+    initial?.data.toothProfile ?? "standard",
+  );
+  const [boreShape, setBoreShape] = useState<BoreShape>(
+    initial?.data.boreShape ?? "round",
+  );
+  const [hubEnabled, setHubEnabled] = useState(initial?.data.hubEnabled ?? false);
+  const [presetId, setPresetId] = useState<string | null>(
+    initial?.data.presetId ?? "#40",
+  );
   const [notice, setNotice] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
+  const { copyStatus, copyLink } = useDesignConfig("sprocket", {
+    values,
+    units,
+    toothProfile,
+    boreShape,
+    hubEnabled,
+    presetId,
+  });
 
   const built = useMemo(
     () => buildSprocketSpec(values, units, { toothProfile, boreShape, hubEnabled }),
@@ -94,6 +159,11 @@ export default function SprocketBuilder() {
     .filter((issue) => issue.field === "general")
     .map((issue) => issue.message);
   const warnings = validation.warnings.map((warning) => warning.message);
+  const fieldIssues: FieldIssue[] = Array.from(errors, ([field, message]) => ({
+    fieldId: field,
+    label: SPROCKET_FIELD_LABELS[field] ?? field,
+    message,
+  })).filter((issue) => issue.fieldId !== "general");
   const watertight = Boolean(validation.ok && report?.ok);
   const volumeCm3 = report?.ok ? report.volumeMm3 / 1000 : Number.NaN;
   const fileBytes = mesh ? stlByteLength(mesh) : 0;
@@ -218,6 +288,41 @@ export default function SprocketBuilder() {
     );
   }
 
+  function handleBundle() {
+    const record = artifactRecord();
+    if (!current || !record) return;
+    try {
+      const stlName = `sprocket-${current.teeth}t-${formatNumber(current.pitchMm, 2)}p.stl`;
+      const base = stlName.replace(/\.stl$/i, "");
+      downloadBytes(
+        createZip([
+          {
+            name: stlName,
+            data: buildBinaryStl(
+              buildSprocketMesh(current),
+              "FIT PROTOTYPE - Sprocket Designer - units: mm",
+            ),
+          },
+          { name: `${base}-spec.txt`, data: renderRecordSpecification(record) },
+          {
+            name: `${base}-drawing.svg`,
+            data: renderRecordDrawingSvg({
+              id: record.id,
+              name: record.name,
+              contract: record.contract,
+              mesh: record.mesh!,
+            }),
+          },
+        ]),
+        `${base}.zip`,
+        "application/zip",
+      );
+    } catch (error) {
+      console.error(error);
+      setExportError("The export bundle could not be generated. Please try again.");
+    }
+  }
+
   const form = (
     <form
       onSubmit={(event) => event.preventDefault()}
@@ -249,18 +354,6 @@ export default function SprocketBuilder() {
               Reset
             </button>
           </div>
-        </div>
-
-        <div className="mt-4">
-          <PresetButtons
-            label="Chain preset"
-            value={presetId}
-            options={CHAIN_PRESETS.map((chain) => ({
-              value: chain.id,
-              label: chain.label,
-            }))}
-            onChange={applyPreset}
-          />
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -436,6 +529,20 @@ export default function SprocketBuilder() {
 
   return (
     <DesignScaffold
+      toolbar={
+        <DesignerToolbar
+          presets={CHAIN_PRESETS.map((chain) => ({
+            id: chain.id,
+            label: chain.label,
+            description: `Pitch ${chain.pitchMm} mm, roller ${chain.rollerMm} mm.`,
+          }))}
+          activePresetId={presetId}
+          onPreset={applyPreset}
+          copyStatus={copyStatus}
+          onCopy={copyLink}
+        />
+      }
+      fieldIssues={fieldIssues}
       form={form}
       general={general}
       warnings={warnings}
@@ -465,6 +572,7 @@ export default function SprocketBuilder() {
         limitation: "Chain engagement is not demonstrated; test-fit a short chain run.",
         onSpec: handleSpec,
         onDrawing: handleDrawing,
+        onBundle: handleBundle,
         artifactsDisabled: !watertight,
         onExport: handleExport,
         disabled: !validation.ok || !report?.ok,

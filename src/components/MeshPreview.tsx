@@ -175,7 +175,9 @@ export default function MeshPreview({ mesh, sizeMm, heightMm, label }: MeshPrevi
     part.geometry = geometry;
     previous.dispose();
 
-    const fitDistance = Math.max(sizeMm * 1.9, heightMm * 3.2, 60);
+    // Leave margin for the elevated three-quarter view; fitting the bare
+    // bounding box clips the near rim of wide, short parts.
+    const fitDistance = Math.max(sizeMm * 2.1, heightMm * 3.8, 60);
     fitDistanceRef.current = fitDistance;
 
     const direction = camera.position.clone().sub(controls.target);

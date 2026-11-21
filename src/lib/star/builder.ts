@@ -254,6 +254,18 @@ export function setUnits(state: BuilderState, units: LengthUnit): BuilderState {
   return commit({ ...state, units, values, notice: null });
 }
 
+export function applyPresetValues(
+  state: BuilderState,
+  values: Record<NumericField, string>,
+): BuilderState {
+  return commit({
+    ...state,
+    values: { ...defaultValues(), ...values },
+    autoSpikes: true,
+    notice: null,
+  });
+}
+
 export function resetBuilder(): BuilderState {
   return { ...DEFAULT_BUILDER_STATE, values: defaultValues() };
 }

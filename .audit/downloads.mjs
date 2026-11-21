@@ -193,6 +193,38 @@ function inspectSvg(file) {
   };
 }
 
+function inspectZip(file) {
+  const buffer = fs.readFileSync(file);
+  const end = buffer.length - 22;
+  const count = buffer.readUInt16LE(end + 10);
+  let cursor = buffer.readUInt32LE(end + 16);
+  const names = [];
+  let valid = true;
+  for (let i = 0; i < count; i += 1) {
+    if (buffer.readUInt32LE(cursor) !== 0x02014b50) {
+      valid = false;
+      break;
+    }
+    const nameLength = buffer.readUInt16LE(cursor + 28);
+    const extraLength = buffer.readUInt16LE(cursor + 30);
+    const commentLength = buffer.readUInt16LE(cursor + 32);
+    names.push(buffer.subarray(cursor + 46, cursor + 46 + nameLength).toString("utf8"));
+    cursor += 46 + nameLength + extraLength + commentLength;
+  }
+  return {
+    bytes: buffer.length,
+    local: buffer.readUInt32LE(0) === 0x04034b50,
+    end: buffer.readUInt32LE(end) === 0x06054b50,
+    valid,
+    count,
+    names,
+    stl: names.some((name) => name.endsWith(".stl")),
+    spec: names.some((name) => name.endsWith("-spec.txt")),
+    drawing: names.some((name) => name.endsWith("-drawing.svg")),
+    unique: new Set(names).size === names.length,
+  };
+}
+
 try {
   /* ------------------------------------------------------------ library page */
   const libraryDir = path.join(ROOT, "library");
@@ -232,6 +264,23 @@ try {
     "library-svg",
     Object.values(librarySvg).every(Boolean),
     { file: path.basename(librarySvgFile), ...librarySvg },
+  );
+
+  await clickText("Download all three (.zip)");
+  const libraryZipFile = await waitFile(libraryDir, ".zip");
+  const libraryZip = inspectZip(libraryZipFile);
+  check(
+    "library-bundle-zip",
+    libraryZip.local &&
+      libraryZip.end &&
+      libraryZip.valid &&
+      libraryZip.count === 3 &&
+      libraryZip.stl &&
+      libraryZip.spec &&
+      libraryZip.drawing &&
+      libraryZip.unique &&
+      libraryZip.bytes > 1000,
+    { file: path.basename(libraryZipFile), ...libraryZip },
   );
 
   const bannedCopy = /build volume|3D-printable|print bed|slicer|printer|filament|\bPLA\b|\bPETG\b/i;
@@ -290,10 +339,10 @@ try {
 
   const switched = await evaluate(`(() => {
     const inch = [...document.querySelectorAll('button')].find(
-      (b) => (b.textContent || '').trim() === 'in' && b.getAttribute('aria-pressed') !== 'true',
+      (b) => (b.textContent || '').trim() === 'in',
     );
     if (!inch) return false;
-    inch.click();
+    if (inch.getAttribute('aria-pressed') !== 'true') inch.click();
     return true;
   })()`);
   if (!switched) throw new Error("Could not switch the star designer to inches");
@@ -348,6 +397,23 @@ try {
     "legacy-svg",
     Object.values(legacySvg).every(Boolean),
     { file: path.basename(legacySvgFile), ...legacySvg },
+  );
+
+  await clickText("Download all three (.zip)");
+  const legacyZipFile = await waitFile(legacyDir, ".zip");
+  const legacyZip = inspectZip(legacyZipFile);
+  check(
+    "legacy-bundle-zip",
+    legacyZip.local &&
+      legacyZip.end &&
+      legacyZip.valid &&
+      legacyZip.count === 3 &&
+      legacyZip.stl &&
+      legacyZip.spec &&
+      legacyZip.drawing &&
+      legacyZip.unique &&
+      legacyZip.bytes > 1000,
+    { file: path.basename(legacyZipFile), ...legacyZip },
   );
 
   const legacyCopy = await evaluate("document.body.innerText");

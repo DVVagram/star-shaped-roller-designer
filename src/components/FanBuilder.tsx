@@ -2,11 +2,20 @@ import { useMemo, useRef, useState } from "react";
 
 import { renderRecordDrawingSvg } from "@/lib/designs/drawing";
 import { legacyRecord, fanEnteredValues } from "@/lib/designs/legacy";
+import {
+  presetMatches,
+  presetValuesForUnits,
+  scaleLengthValues,
+} from "@/lib/designs/presets";
 import { renderRecordSpecification } from "@/lib/designs/spec";
-import { downloadText } from "@/lib/kit/download";
+import { downloadBytes, downloadText } from "@/lib/kit/download";
+import { isConfigRecord, loadDesignConfig } from "@/lib/kit/design-link";
+import { createZip } from "@/lib/kit/zip";
 
+import { DesignerToolbar, type FieldIssue } from "./DesignerTools";
 import { NumberField, OptionCards, Segmented } from "./fields";
 import DesignScaffold, { type ReadoutItem } from "./DesignScaffold";
+import { useDesignConfig } from "./useDesignConfig";
 import { useUnitValues } from "./useUnitValues";
 
 import {
@@ -15,6 +24,7 @@ import {
   buildFanSpec,
   fanCode,
   fanDefaultValues,
+  type FanField,
 } from "@/lib/fan";
 import {
   buildRotorMesh,
@@ -31,13 +41,88 @@ import {
 } from "@/lib/kit/units";
 import { buildBinaryStl, downloadStl, inspectMesh, stlByteLength } from "@/lib/kit/solid";
 
+interface FanConfig {
+  units: "mm" | "in";
+  values: Record<FanField, string>;
+  boreShape: BoreShape;
+}
+
+function decodeFanConfig(raw: unknown): FanConfig | null {
+  if (!isConfigRecord(raw) || !isConfigRecord(raw.values)) return null;
+  const values = { ...fanDefaultValues() };
+  for (const key of Object.keys(values) as FanField[]) {
+    const value = raw.values[key];
+    if (typeof value === "string") values[key] = value;
+  }
+  return {
+    units: raw.units === "in" ? "in" : "mm",
+    values,
+    boreShape:
+      raw.boreShape === "hex" || raw.boreShape === "doubleFlat"
+        ? raw.boreShape
+        : "round",
+  };
+}
+
+const FAN_FIELD_LABELS: Record<string, string> = {
+  tipDiameter: "Tip diameter",
+  hubDiameter: "Hub diameter",
+  bladeCount: "Blade count",
+  rootWidth: "Root width",
+  tipWidth: "Tip width",
+  tipRounding: "Tip rounding",
+  tipEdgeRounding: "Edge rounding",
+  bladeHeight: "Blade height",
+  bladeAngle: "Blade angle",
+  bladeSweep: "Sweep",
+  bore: "Hole size",
+};
+
+function fanStartingPresets(boreShape: BoreShape) {
+  const defaults = fanDefaultValues();
+  const mk = (id: string, label: string, description: string, factor: number) => {
+    const scaled = scaleLengthValues(defaults, FAN_LENGTH_FIELDS, factor) as Record<
+      FanField,
+      string
+    >;
+    const built = buildFanSpec(scaled, "mm", boreShape);
+    if (!built.complete) return null;
+    if (!validateRotor(built.spec as RotorSpec, { unit: "mm" }).ok) return null;
+    return { id, label, description, values: scaled };
+  };
+  return [
+    {
+      id: "standard",
+      label: "Standard",
+      description: "The balanced 150 mm rotor.",
+      values: defaults,
+    },
+    mk("compact", "Compact", "A smaller rotor; all fields stay editable.", 0.76),
+    mk("oversize", "Oversize", "A larger rotor; all fields stay editable.", 1.35),
+  ].filter((preset): preset is NonNullable<typeof preset> => preset !== null);
+}
+
 export default function FanBuilder() {
-  const { units, values, setField, setUnits, reset } = useUnitValues(
+  const [initial] = useState(() => loadDesignConfig("impeller", decodeFanConfig));
+  const { units, values, setField, replaceValues, setUnits, reset } = useUnitValues(
     fanDefaultValues(),
     FAN_LENGTH_FIELDS,
+    initial?.data ?? null,
   );
-  const [boreShape, setBoreShape] = useState<BoreShape>("round");
+  const [boreShape, setBoreShape] = useState<BoreShape>(
+    initial?.data.boreShape ?? "round",
+  );
   const [exportError, setExportError] = useState<string | null>(null);
+  const presets = useMemo(() => fanStartingPresets(boreShape), [boreShape]);
+  const activePresetId = useMemo(
+    () => presets.find((preset) => presetMatches(values, preset, FAN_LENGTH_FIELDS, units))?.id ?? null,
+    [presets, units, values],
+  );
+  const { copyStatus, copyLink } = useDesignConfig("impeller", {
+    values,
+    units,
+    boreShape,
+  });
 
   const built = useMemo(
     () => buildFanSpec(values, units, boreShape),
@@ -77,6 +162,11 @@ export default function FanBuilder() {
     .filter((issue) => issue.field === "general")
     .map((issue) => issue.message);
   const warnings = validation.warnings.map((warning) => warning.message);
+  const fieldIssues: FieldIssue[] = Array.from(errors, ([field, message]) => ({
+    fieldId: field,
+    label: FAN_FIELD_LABELS[field] ?? field,
+    message,
+  })).filter((issue) => issue.fieldId !== "general");
   const watertight = Boolean(validation.ok && report?.ok);
   const volumeCm3 = report?.ok ? report.volumeMm3 / 1000 : Number.NaN;
   const fileBytes = mesh ? stlByteLength(mesh) : 0;
@@ -196,6 +286,49 @@ export default function FanBuilder() {
       "impeller-drawing.svg",
       "image/svg+xml",
     );
+  }
+
+  function handleBundle() {
+    const record = artifactRecord();
+    if (!current || !record) return;
+    try {
+      const stlName = `impeller-${formatNumber(current.tipDiameterMm, 0)}d-${Math.round(
+        current.bladeCount,
+      )}blade.stl`;
+      const base = stlName.replace(/\.stl$/i, "");
+      downloadBytes(
+        createZip([
+          {
+            name: stlName,
+            data: buildBinaryStl(
+              buildRotorMesh(current),
+              "FIT PROTOTYPE - Impeller Designer - units: mm",
+            ),
+          },
+          { name: `${base}-spec.txt`, data: renderRecordSpecification(record) },
+          {
+            name: `${base}-drawing.svg`,
+            data: renderRecordDrawingSvg({
+              id: record.id,
+              name: record.name,
+              contract: record.contract,
+              mesh: record.mesh!,
+            }),
+          },
+        ]),
+        `${base}.zip`,
+        "application/zip",
+      );
+    } catch (error) {
+      console.error(error);
+      setExportError("The export bundle could not be generated. Please try again.");
+    }
+  }
+
+  function applyPreset(id: string) {
+    const preset = presets.find((item) => item.id === id);
+    if (!preset) return;
+    replaceValues(presetValuesForUnits(preset.values, FAN_LENGTH_FIELDS, units));
   }
 
   const form = (
@@ -384,6 +517,16 @@ export default function FanBuilder() {
 
   return (
     <DesignScaffold
+      toolbar={
+        <DesignerToolbar
+          presets={presets}
+          activePresetId={activePresetId}
+          onPreset={applyPreset}
+          copyStatus={copyStatus}
+          onCopy={copyLink}
+        />
+      }
+      fieldIssues={fieldIssues}
       form={form}
       general={general}
       warnings={warnings}
@@ -413,6 +556,7 @@ export default function FanBuilder() {
         limitation: "No airflow, balance or safe-speed rating is provided; guard the rotor.",
         onSpec: handleSpec,
         onDrawing: handleDrawing,
+        onBundle: handleBundle,
         artifactsDisabled: !watertight,
         onExport: handleExport,
         disabled: !validation.ok || !report?.ok,

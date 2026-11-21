@@ -2,7 +2,11 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import Catalog, { type CatalogEntry } from "@/components/Catalog";
 import DesignMark from "@/components/DesignMark";
-import DesignerPage, { type DesignerPageProps } from "@/components/DesignerPage";
+import DesignerPage, {
+  type DesignerPageProps,
+  type RelatedDesign,
+} from "@/components/DesignerPage";
+import DesignerSearch from "@/components/DesignerSearch";
 import FanBuilder from "@/components/FanBuilder";
 import GenericDesigner from "@/components/GenericDesigner";
 import PropellerBuilder from "@/components/PropellerBuilder";
@@ -10,7 +14,7 @@ import SprocketBuilder from "@/components/SprocketBuilder";
 import StarBuilder from "@/components/StarBuilder";
 import { DESIGNS, designById } from "@/lib/designs";
 import { LEGACY_CONTRACTS } from "@/lib/designs/legacy";
-import { FAMILIES, type AnyDesign, type DesignFamily } from "@/lib/designs/types";
+import type { AnyDesign } from "@/lib/designs/types";
 import { USE_CASES } from "@/lib/designs/use-cases";
 
 /* ------------------------------------------------------------------- marks */
@@ -175,48 +179,61 @@ function useRoute(): string {
 }
 
 function DesignerNav({ route }: { route: string }) {
-  const current = ALL_ENTRIES.some((entry) => entry.id === route) ? route : "";
-  const families = Object.keys(FAMILIES) as DesignFamily[];
-
   return (
-    <nav aria-label="Designers" className="flex min-w-0 items-center gap-2">
+    <nav
+      aria-label="Designers"
+      className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:flex-none"
+    >
       <a
         href="#/"
         aria-current={route === "home" ? "page" : undefined}
         className={
           route === "home"
-            ? "shrink-0 rounded-md bg-card px-2.5 py-1 text-[11px] font-semibold text-ink ring-1 ring-line"
-            : "shrink-0 rounded-md px-2.5 py-1 text-[11px] font-medium text-muted transition hover:bg-card hover:text-ink"
+            ? "hidden shrink-0 rounded-md bg-card px-2.5 py-1 text-[11px] font-semibold text-ink ring-1 ring-line sm:block"
+            : "hidden shrink-0 rounded-md px-2.5 py-1 text-[11px] font-medium text-muted transition hover:bg-card hover:text-ink sm:block"
         }
       >
-        <span className="hidden sm:inline">All designers</span>
-        <span className="sm:hidden">All</span>
+        All designers
       </a>
-      <label htmlFor="designer-jump" className="sr-only">
-        Jump to a designer
-      </label>
-      <select
-        id="designer-jump"
-        value={current}
-        onChange={(event) => {
-          const next = event.target.value;
-          if (next) window.location.hash = `#/${next}`;
-        }}
-        className="w-28 min-w-0 rounded-md border border-line bg-card px-2 py-1 text-[11px] font-medium text-ink transition hover:bg-paper-deep sm:w-auto sm:max-w-[14rem]"
-      >
-        <option value="">Jump to…</option>
-        {families.map((family) => (
-          <optgroup key={family} label={FAMILIES[family].label}>
-            {ALL_ENTRIES.filter((entry) => entry.family === family).map((entry) => (
-              <option key={entry.id} value={entry.id}>
-                {entry.name}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
+      <DesignerSearch entries={ALL_ENTRIES} route={route} />
     </nav>
   );
+}
+
+const PAIRINGS: Record<string, string[]> = {
+  star: ["sprocket", "impeller", "propeller"],
+  sprocket: ["chain-link", "star"],
+  impeller: ["propeller", "fan-mount", "star"],
+  propeller: ["impeller", "fan-mount"],
+  "fan-mount": ["fan-grille", "impeller"],
+  "fan-grille": ["fan-mount", "impeller"],
+  "chain-link": ["sprocket"],
+  "timing-pulley": ["v-belt-pulley", "round-belt-pulley"],
+  "v-belt-pulley": ["timing-pulley", "round-belt-pulley"],
+  "round-belt-pulley": ["timing-pulley", "v-belt-pulley"],
+  "bearing-cap": ["bearing-plate", "flanged-bushing"],
+  "bearing-plate": ["bearing-cap", "flanged-bushing"],
+};
+
+function relatedFor(route: string): RelatedDesign[] {
+  const current = ALL_ENTRIES.find((entry) => entry.id === route);
+  if (!current) return [];
+  const paired = (PAIRINGS[route] ?? [])
+    .map((id) => ALL_ENTRIES.find((entry) => entry.id === id))
+    .filter((entry): entry is CatalogEntry => Boolean(entry));
+  const pairedIds = new Set(paired.map((entry) => entry.id));
+  const familyMatches = ALL_ENTRIES.filter(
+    (entry) =>
+      entry.family === current.family &&
+      entry.id !== current.id &&
+      !pairedIds.has(entry.id),
+  );
+  return [...paired, ...familyMatches].slice(0, 3).map((entry) => ({
+    id: entry.id,
+    name: entry.name,
+    family: entry.family,
+    blurb: entry.blurb,
+  }));
 }
 
 function genericPage(design: AnyDesign): PageConfig {
@@ -544,7 +561,11 @@ export default function App() {
       );
     }
     const { builder, ...content } = page;
-    return <DesignerPage {...content}>{builder}</DesignerPage>;
+    return (
+      <DesignerPage {...content} related={relatedFor(route)}>
+        {builder}
+      </DesignerPage>
+    );
   };
 
   return (

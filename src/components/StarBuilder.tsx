@@ -2,7 +2,10 @@ import { lazy, Suspense, useMemo, useReducer, useState } from "react";
 
 import {
   DEFAULT_BUILDER_STATE,
+  LENGTH_FIELDS,
+  applyPresetValues,
   buildSpec,
+  defaultValues,
   fitNote,
   resetBuilder,
   setAutoSpikes,
@@ -28,13 +31,22 @@ import {
 } from "@/lib/star/geometry";
 import { renderRecordDrawingSvg } from "@/lib/designs/drawing";
 import { legacyRecord, starEnteredValues } from "@/lib/designs/legacy";
+import {
+  presetMatches,
+  presetValuesForUnits,
+  scaleLengthValues,
+} from "@/lib/designs/presets";
 import { renderRecordSpecification } from "@/lib/designs/spec";
-import { downloadText } from "@/lib/kit/download";
+import { downloadBytes, downloadText } from "@/lib/kit/download";
+import { isConfigRecord, loadDesignConfig } from "@/lib/kit/design-link";
+import { createZip } from "@/lib/kit/zip";
 import { buildStarMesh, inspectStarSolid, type SolidReport } from "@/lib/star/mesh";
 import { buildBinaryStl, stlFileName } from "@/lib/star/stl";
 
 import { CapabilityBadge } from "./CapabilityNotice";
+import { DesignerToolbar, FieldIssueSummary, StickyExportBar, type FieldIssue } from "./DesignerTools";
 import SpecForm from "./SpecForm";
+import { useDesignConfig } from "./useDesignConfig";
 
 const StarPreview = lazy(() => import("./StarPreview"));
 
@@ -45,6 +57,7 @@ type Action =
   | { type: "units"; units: LengthUnit }
   | { type: "auto"; auto: boolean }
   | { type: "hub"; hub: boolean }
+  | { type: "preset"; values: Record<NumericField, string> }
   | { type: "reset" };
 
 function reducer(state: BuilderState, action: Action): BuilderState {
@@ -61,6 +74,8 @@ function reducer(state: BuilderState, action: Action): BuilderState {
       return setAutoSpikes(state, action.auto);
     case "hub":
       return setHubEnabled(state, action.hub);
+    case "preset":
+      return applyPresetValues(state, action.values);
     case "reset":
       return resetBuilder();
     default:
@@ -68,9 +83,112 @@ function reducer(state: BuilderState, action: Action): BuilderState {
   }
 }
 
+interface StarConfig {
+  units: LengthUnit;
+  values: Record<NumericField, string>;
+  autoSpikes: boolean;
+  spikeShape: SpikeShape;
+  boreShape: BoreShape;
+  hubEnabled: boolean;
+}
+
+function decodeStarConfig(raw: unknown): StarConfig | null {
+  if (!isConfigRecord(raw) || !isConfigRecord(raw.values)) return null;
+  const values = { ...defaultValues() };
+  for (const key of Object.keys(values) as NumericField[]) {
+    const value = raw.values[key];
+    if (typeof value === "string") values[key] = value;
+  }
+  const spikeShape = raw.spikeShape;
+  const boreShape = raw.boreShape;
+  return {
+    units: raw.units === "in" ? "in" : "mm",
+    values,
+    autoSpikes: raw.autoSpikes !== false,
+    spikeShape:
+      typeof spikeShape === "string" && spikeShape in SPIKE_SHAPES
+        ? (spikeShape as SpikeShape)
+        : "rounded",
+    boreShape:
+      boreShape === "hex" || boreShape === "doubleFlat" ? boreShape : "round",
+    hubEnabled: raw.hubEnabled === true,
+  };
+}
+
+function initialState(loaded: ReturnType<typeof loadDesignConfig<StarConfig>>): BuilderState {
+  if (!loaded) return DEFAULT_BUILDER_STATE;
+  return {
+    ...DEFAULT_BUILDER_STATE,
+    units: loaded.data.units,
+    values: { ...defaultValues(), ...loaded.data.values },
+    autoSpikes: loaded.data.autoSpikes,
+    spikeShape: loaded.data.spikeShape,
+    boreShape: loaded.data.boreShape,
+    hubEnabled: loaded.data.hubEnabled,
+    notice: null,
+  };
+}
+
+function starPresets(spikeShape: SpikeShape) {
+  const make = (id: string, label: string, description: string, factor: number) => {
+    const scaled = scaleLengthValues(
+      defaultValues(),
+      LENGTH_FIELDS,
+      factor,
+    ) as Record<NumericField, string>;
+    const candidate = applyPresetValues(
+      { ...DEFAULT_BUILDER_STATE, spikeShape },
+      scaled,
+    );
+    const built = buildSpec(candidate);
+    if (!built.complete) return null;
+    if (!validateStar(built.spec as StarSpec, { unit: "mm" }).ok) return null;
+    return { id, label, description, values: candidate.values };
+  };
+
+  const standard = applyPresetValues(DEFAULT_BUILDER_STATE, defaultValues());
+  return [
+    {
+      id: "standard",
+      label: "Standard",
+      description: "The balanced 80 mm starting wheel.",
+      values: standard.values,
+    },
+    make("compact", "Compact", "A smaller wheel; auto-fit recalculates the spikes.", 0.72),
+    make("oversize", "Oversize", "A larger wheel; auto-fit recalculates the spikes.", 1.35),
+  ].filter((preset): preset is NonNullable<typeof preset> => preset !== null);
+}
+
+const STAR_FIELD_LABELS: Record<string, string> = {
+  outerDiameter: "Wheel diameter",
+  thickness: "Thickness",
+  spikeCount: "Number of spikes",
+  spikeDepth: "Spike depth",
+  tipWidth: "Tip width",
+  valleyWidth: "Valley width",
+  taper: "Tip taper",
+  bore: "Hole size",
+  hubDiameter: "Hub diameter",
+  hubHeight: "Hub height",
+};
+
 export default function StarBuilder() {
-  const [state, dispatch] = useReducer(reducer, DEFAULT_BUILDER_STATE);
+  const [initial] = useState(() => loadDesignConfig("star", decodeStarConfig));
+  const [state, dispatch] = useReducer(reducer, initial, initialState);
   const [exportError, setExportError] = useState<string | null>(null);
+  const { copyStatus, copyLink } = useDesignConfig("star", {
+    values: state.values,
+    units: state.units,
+    autoSpikes: state.autoSpikes,
+    spikeShape: state.spikeShape,
+    boreShape: state.boreShape,
+    hubEnabled: state.hubEnabled,
+  });
+  const presets = useMemo(() => starPresets(state.spikeShape), [state.spikeShape]);
+  const activePresetId =
+    presets.find((preset) =>
+      presetMatches(state.values, preset, LENGTH_FIELDS, state.units),
+    )?.id ?? null;
 
   const { spec, complete } = buildSpec(state);
   const validation = validateStar(complete ? (spec as StarSpec) : spec, {
@@ -97,6 +215,11 @@ export default function StarBuilder() {
     validation.errors.map((issue) => [issue.field, issue.message] as const),
   );
   const generalErrors = validation.errors.filter((issue) => issue.field === "general");
+  const fieldIssues: FieldIssue[] = Array.from(errors, ([field, message]) => ({
+    fieldId: field,
+    label: STAR_FIELD_LABELS[field] ?? field,
+    message,
+  })).filter((issue) => issue.fieldId !== "general");
   const watertight = Boolean(validation.ok && solid?.ok);
   const volumeCm3 =
     solid && solid.ok ? solid.volumeMm3 / 1000 : Number.NaN;
@@ -143,6 +266,35 @@ export default function StarBuilder() {
       "star-roller-drawing.svg",
       "image/svg+xml",
     );
+  }
+
+  function handleBundle() {
+    const current = currentSpec;
+    const record = artifactRecord();
+    if (!current || !record) return;
+    try {
+      const base = stlFileName(current).replace(/\.stl$/i, "");
+      downloadBytes(
+        createZip([
+          { name: stlFileName(current), data: buildBinaryStl(buildStarMesh(current)) },
+          { name: `${base}-spec.txt`, data: renderRecordSpecification(record) },
+          {
+            name: `${base}-drawing.svg`,
+            data: renderRecordDrawingSvg({
+              id: record.id,
+              name: record.name,
+              contract: record.contract,
+              mesh: record.mesh!,
+            }),
+          },
+        ]),
+        `${base}.zip`,
+        "application/zip",
+      );
+    } catch (error) {
+      console.error(error);
+      setExportError("The export bundle could not be generated. Please try again.");
+    }
   }
 
   const readout = useMemo(
@@ -250,6 +402,31 @@ export default function StarBuilder() {
   }
 
   return (
+    <>
+      <DesignerToolbar
+        presets={presets}
+        activePresetId={activePresetId}
+        onPreset={(id) => {
+          const preset = presets.find((item) => item.id === id);
+          if (preset) {
+            dispatch({
+              type: "preset",
+              values: presetValuesForUnits(
+                preset.values,
+                LENGTH_FIELDS,
+                state.units,
+              ) as Record<NumericField, string>,
+            });
+          }
+        }}
+        copyStatus={copyStatus}
+        onCopy={copyLink}
+      />
+      <FieldIssueSummary
+        fieldIssues={fieldIssues}
+        general={generalErrors.map((issue) => issue.message)}
+        errorCount={validation.errors.length}
+      />
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
       {/* ------------------------------------------------------------- inputs */}
       <div className="space-y-5">
@@ -269,21 +446,6 @@ export default function StarBuilder() {
 
         {/* ------------------------------------------------------- messages */}
         <div aria-live="polite" className="space-y-2">
-          {generalErrors.map((issue) => (
-            <p
-              key={issue.message}
-              className="rounded-lg border border-red-300/70 bg-red-50 px-3 py-2 text-xs text-red-800"
-            >
-              {issue.message}
-            </p>
-          ))}
-          {validation.errors.length > 0 && (
-            <p className="rounded-lg border border-red-300/70 bg-red-50 px-3 py-2 text-xs text-red-800">
-              {validation.errors.length} field
-              {validation.errors.length === 1 ? " needs" : "s need"} attention before the
-              STL can be exported.
-            </p>
-          )}
           {validation.warnings.map((warning) => (
             <p
               key={warning.message}
@@ -439,6 +601,14 @@ export default function StarBuilder() {
               Dimension sheet (.svg)
             </button>
           </div>
+          <button
+            type="button"
+            onClick={handleBundle}
+            disabled={!validation.ok || !solid?.ok}
+            className="mt-2 w-full rounded-lg border border-line bg-paper-deep/40 px-2 py-2 text-[11px] font-semibold text-ink transition hover:bg-paper-deep disabled:cursor-not-allowed disabled:text-muted/50"
+          >
+            Download all three (.zip)
+          </button>
 
           <dl className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
             {[
@@ -483,5 +653,19 @@ export default function StarBuilder() {
         </div>
       </div>
     </div>
+      <StickyExportBar
+        errorCount={validation.errors.length}
+        validationOk={validation.ok}
+        solidOk={Boolean(solid?.ok)}
+        onExport={handleExport}
+        onReview={() => {
+          const target = document.getElementById(
+            validation.errors.length > 0 ? "builder-issues" : "capability",
+          );
+          target?.scrollIntoView({ block: "start" });
+          (target?.querySelector("h2") as HTMLElement | null)?.focus();
+        }}
+      />
+    </>
   );
 }

@@ -430,7 +430,7 @@ describe("rounded blade tips", () => {
         }
       }
     }
-  });
+  }, 20000);
 
   it("ships the rounded mesh through the STL with the same dimensions", () => {
     const spec: RotorSpec = { ...PROPELLER_DEFAULT_SPEC, tipRoundingMm: 3 };

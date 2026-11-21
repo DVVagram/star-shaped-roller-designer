@@ -3,6 +3,11 @@ import type { ReactNode } from "react";
 import { CAPABILITIES, type CapabilityId } from "@/lib/designs/contracts";
 
 import { CapabilityBadge } from "./CapabilityNotice";
+import {
+  FieldIssueSummary,
+  StickyExportBar,
+  type FieldIssue,
+} from "./DesignerTools";
 import MeshPreview, { type PreviewMesh } from "./MeshPreview";
 
 export interface ReadoutItem {
@@ -35,10 +40,13 @@ export interface ScaffoldExport {
   limitation?: string;
   onSpec?: () => void;
   onDrawing?: () => void;
+  onBundle?: () => void;
   artifactsDisabled?: boolean;
 }
 
 interface DesignScaffoldProps {
+  toolbar?: ReactNode;
+  fieldIssues?: readonly FieldIssue[];
   form: ReactNode;
   general: string[];
   warnings: string[];
@@ -52,6 +60,8 @@ interface DesignScaffoldProps {
 
 /** The two-column builder used by every designer: inputs left, solid right. */
 export default function DesignScaffold({
+  toolbar,
+  fieldIssues = [],
   form,
   general,
   warnings,
@@ -62,26 +72,23 @@ export default function DesignScaffold({
   preview,
   exportPanel,
 }: DesignScaffoldProps) {
+  const reviewIssues = () => {
+    const id = errorCount > 0 ? "builder-issues" : "capability";
+    const target = document.getElementById(id);
+    target?.scrollIntoView({ block: "start" });
+    const focusTarget = id === "builder-issues" ? target : target?.querySelector("h2");
+    (focusTarget as HTMLElement | null)?.focus();
+  };
+
   return (
+    <>
+    {toolbar}
+    <FieldIssueSummary fieldIssues={fieldIssues} general={general} errorCount={errorCount} />
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
       <div className="space-y-5">
         {form}
 
         <div aria-live="polite" className="space-y-2">
-          {general.map((message) => (
-            <p
-              key={message}
-              className="rounded-lg border border-red-300/70 bg-red-50 px-3 py-2 text-xs text-red-800"
-            >
-              {message}
-            </p>
-          ))}
-          {errorCount > 0 && (
-            <p className="rounded-lg border border-red-300/70 bg-red-50 px-3 py-2 text-xs text-red-800">
-              {errorCount} field{errorCount === 1 ? " needs" : "s need"} attention before
-              the STL can be exported.
-            </p>
-          )}
           {warnings.map((message) => (
             <p
               key={message}
@@ -171,7 +178,7 @@ export default function DesignScaffold({
           </dl>
         </div>
 
-        <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
+        <div id="export-panel" className="rounded-2xl border border-line bg-card p-4 sm:p-5">
           {exportPanel.capability && (
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <CapabilityBadge capability={exportPanel.capability} />
@@ -228,6 +235,17 @@ export default function DesignScaffold({
             </div>
           )}
 
+          {exportPanel.onBundle && (
+            <button
+              type="button"
+              onClick={exportPanel.onBundle}
+              disabled={exportPanel.artifactsDisabled}
+              className="mt-2 w-full rounded-lg border border-line bg-paper-deep/40 px-2 py-2 text-[11px] font-semibold text-ink transition hover:bg-paper-deep disabled:cursor-not-allowed disabled:text-muted/50"
+            >
+              Download all three (.zip)
+            </button>
+          )}
+
           <dl className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
             {[
               ["Volume", exportPanel.volume],
@@ -261,5 +279,13 @@ export default function DesignScaffold({
         </div>
       </div>
     </div>
+    <StickyExportBar
+      errorCount={errorCount}
+      validationOk={validationOk}
+      solidOk={solidOk}
+      onExport={exportPanel.onExport}
+      onReview={reviewIssues}
+    />
+    </>
   );
 }

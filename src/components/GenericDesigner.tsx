@@ -8,15 +8,35 @@ import {
   type Mesh,
 } from "@/lib/kit/solid";
 import { CAPABILITIES } from "@/lib/designs/contracts";
-import { downloadText } from "@/lib/kit/download";
-import { formatNumber } from "@/lib/kit/units";
+import { downloadBytes, downloadText } from "@/lib/kit/download";
+import { isConfigRecord, loadDesignConfig } from "@/lib/kit/design-link";
+import { formatNumber, type LengthUnit } from "@/lib/kit/units";
 import { buildDrawingSvg, drawingFileName } from "@/lib/designs/drawing";
+import { buildDesignPresets, presetMatches, presetValuesForUnits } from "@/lib/designs/presets";
 import { buildSpecification, specificationFileName } from "@/lib/designs/spec";
 import type { AnyDesign, FieldDef } from "@/lib/designs/types";
+import { createZip } from "@/lib/kit/zip";
 
 import DesignScaffold from "./DesignScaffold";
+import { DesignerToolbar, type FieldIssue } from "./DesignerTools";
 import { NumberField, Segmented, Toggle } from "./fields";
+import { useDesignConfig } from "./useDesignConfig";
 import { useUnitValues } from "./useUnitValues";
+
+interface GenericConfig {
+  values: Record<string, string>;
+  units: LengthUnit;
+}
+
+function decodeGenericConfig(design: AnyDesign, raw: unknown): GenericConfig | null {
+  if (!isConfigRecord(raw) || !isConfigRecord(raw.values)) return null;
+  const values = { ...design.defaults };
+  for (const field of design.fields) {
+    const value = raw.values[field.key];
+    if (typeof value === "string") values[field.key] = value;
+  }
+  return { values, units: raw.units === "in" ? "in" : "mm" };
+}
 
 function rangeHint(field: FieldDef): string | undefined {
   const limit =
@@ -47,11 +67,24 @@ function rangeHint(field: FieldDef): string | undefined {
  * parameters, the validation and the STL export all read the same declaration.
  */
 export default function GenericDesigner({ design }: { design: AnyDesign }) {
-  const { units, values, setField, setUnits, reset } = useUnitValues(
+  const [initial] = useState(() =>
+    loadDesignConfig(design.id, (raw) => decodeGenericConfig(design, raw)),
+  );
+  const { units, values, setField, replaceValues, setUnits, reset } = useUnitValues(
     design.defaults,
     design.lengthFields,
+    initial?.data ?? null,
   );
   const [exportError, setExportError] = useState<string | null>(null);
+  const presets = useMemo(() => buildDesignPresets(design), [design]);
+  const activePresetId = useMemo(
+    () =>
+      presets.find((preset) =>
+        presetMatches(values, preset, design.lengthFields, units),
+      )?.id ?? null,
+    [design.lengthFields, presets, units, values],
+  );
+  const { copyStatus, copyLink } = useDesignConfig(design.id, { values, units });
 
   const raw = useMemo(() => ({ values, units }), [values, units]);
   const result = useMemo(() => design.derive(raw), [design, raw]);
@@ -99,6 +132,17 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
   const fileBytes = mesh ? stlByteLength(mesh) : 0;
   const fieldLabel = (key: string) =>
     design.fields.find((field) => field.key === key)?.label ?? key;
+  const fieldIssues: FieldIssue[] = Array.from(errorsByField, ([field, message]) => ({
+    fieldId: `${design.id}-${field}`,
+    label: fieldLabel(field),
+    message,
+  }));
+
+  function applyPreset(id: string) {
+    const preset = presets.find((item) => item.id === id);
+    if (!preset) return;
+    replaceValues(presetValuesForUnits(preset.values, design.lengthFields, units));
+  }
 
   function handleExport() {
     setExportError(null);
@@ -148,6 +192,31 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
     } catch (error) {
       console.error(error);
       setExportError("The dimension sheet could not be generated. Please try again.");
+    }
+  }
+
+  function handleBundle() {
+    if (!valid || !report?.ok) return;
+    try {
+      const mesh = design.build(raw);
+      const stlName = design.fileName(raw);
+      const base = stlName.replace(/\.stl$/i, "");
+      const stl = buildBinaryStl(
+        mesh,
+        `${CAPABILITIES[design.contract.capability].short.toUpperCase()} - ${design.header}`,
+      );
+      downloadBytes(
+        createZip([
+          { name: stlName, data: stl },
+          { name: specificationFileName(design, raw), data: buildSpecification(design, raw) },
+          { name: drawingFileName(design, raw), data: buildDrawingSvg(design, raw) },
+        ]),
+        `${base}.zip`,
+        "application/zip",
+      );
+    } catch (error) {
+      console.error(error);
+      setExportError("The export bundle could not be generated. Please try again.");
     }
   }
 
@@ -213,6 +282,16 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
 
   return (
     <DesignScaffold
+      toolbar={
+        <DesignerToolbar
+          presets={presets}
+          activePresetId={activePresetId}
+          onPreset={applyPreset}
+          copyStatus={copyStatus}
+          onCopy={copyLink}
+        />
+      }
+      fieldIssues={fieldIssues}
       form={
         <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -269,6 +348,7 @@ export default function GenericDesigner({ design }: { design: AnyDesign }) {
         onExport: handleExport,
         onSpec: handleSpec,
         onDrawing: handleDrawing,
+        onBundle: handleBundle,
         artifactsDisabled: !watertight,
         capability: design.contract.capability,
         limitation: design.contract.limitations[0],

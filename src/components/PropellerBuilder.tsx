@@ -2,11 +2,20 @@ import { useMemo, useRef, useState } from "react";
 
 import { renderRecordDrawingSvg } from "@/lib/designs/drawing";
 import { legacyRecord, propellerEnteredValues } from "@/lib/designs/legacy";
+import {
+  presetMatches,
+  presetValuesForUnits,
+  scaleLengthValues,
+} from "@/lib/designs/presets";
 import { renderRecordSpecification } from "@/lib/designs/spec";
-import { downloadText } from "@/lib/kit/download";
+import { downloadBytes, downloadText } from "@/lib/kit/download";
+import { isConfigRecord, loadDesignConfig } from "@/lib/kit/design-link";
+import { createZip } from "@/lib/kit/zip";
 
+import { DesignerToolbar, type FieldIssue } from "./DesignerTools";
 import { NumberField, OptionCards, Segmented } from "./fields";
 import DesignScaffold, { type ReadoutItem } from "./DesignScaffold";
+import { useDesignConfig } from "./useDesignConfig";
 import { useUnitValues } from "./useUnitValues";
 
 import {
@@ -27,13 +36,91 @@ import {
 } from "@/lib/kit/units";
 import { buildBinaryStl, downloadStl, inspectMesh, stlByteLength } from "@/lib/kit/solid";
 
+interface PropellerConfig {
+  units: "mm" | "in";
+  values: Record<PropellerField, string>;
+  boreShape: BoreShape;
+}
+
+function decodePropellerConfig(raw: unknown): PropellerConfig | null {
+  if (!isConfigRecord(raw) || !isConfigRecord(raw.values)) return null;
+  const values = { ...propellerDefaultValues() };
+  for (const key of Object.keys(values) as PropellerField[]) {
+    const value = raw.values[key];
+    if (typeof value === "string") values[key] = value;
+  }
+  return {
+    units: raw.units === "in" ? "in" : "mm",
+    values,
+    boreShape:
+      raw.boreShape === "hex" || raw.boreShape === "doubleFlat"
+        ? raw.boreShape
+        : "round",
+  };
+}
+
+const PROPELLER_FIELD_LABELS: Record<string, string> = {
+  tipDiameter: "Tip diameter",
+  hubDiameter: "Hub diameter",
+  bladeCount: "Blade count",
+  rootWidth: "Root chord",
+  tipWidth: "Tip chord",
+  tipRounding: "Tip rounding",
+  tipEdgeRounding: "Edge rounding",
+  bladeHeight: "Blade drop",
+  pitch: "Pitch",
+  bladeSweep: "Sweep",
+  bore: "Hole size",
+};
+
+function propellerStartingPresets(boreShape: BoreShape) {
+  const defaults = propellerDefaultValues();
+  const mk = (id: string, label: string, description: string, factor: number) => {
+    const scaled = scaleLengthValues(defaults, PROPELLER_LENGTH_FIELDS, factor) as Record<
+      PropellerField,
+      string
+    >;
+    const built = buildPropellerSpec(scaled, "mm", boreShape);
+    if (!built.complete) return null;
+    if (!validateRotor(built.spec as RotorSpec, { unit: "mm" }).ok) return null;
+    return { id, label, description, values: scaled };
+  };
+  return [
+    {
+      id: "standard",
+      label: "Standard",
+      description: "The balanced 160 mm three-blade prop.",
+      values: defaults,
+    },
+    mk("compact", "Compact", "A smaller prop; pitch scales with the disc.", 0.75),
+    mk("oversize", "Oversize", "A larger prop; pitch scales with the disc.", 1.35),
+  ].filter((preset): preset is NonNullable<typeof preset> => preset !== null);
+}
+
 export default function PropellerBuilder() {
-  const { units, values, setField, setUnits, reset } = useUnitValues(
+  const [initial] = useState(() => loadDesignConfig("propeller", decodePropellerConfig));
+  const { units, values, setField, replaceValues, setUnits, reset } = useUnitValues(
     propellerDefaultValues(),
     PROPELLER_LENGTH_FIELDS,
+    initial?.data ?? null,
   );
-  const [boreShape, setBoreShape] = useState<BoreShape>("round");
+  const [boreShape, setBoreShape] = useState<BoreShape>(
+    initial?.data.boreShape ?? "round",
+  );
   const [exportError, setExportError] = useState<string | null>(null);
+  const presets = useMemo(() => propellerStartingPresets(boreShape), [boreShape]);
+  const activePresetId = useMemo(
+    () =>
+      presets.find((preset) =>
+        presetMatches(values, preset, PROPELLER_LENGTH_FIELDS, units),
+      )?.id ?? null,
+    [presets, units, values],
+  );
+  const { copyStatus, copyLink } = useDesignConfig("propeller", {
+    values,
+    units,
+    boreShape,
+  });
 
   const built = useMemo(
     () => buildPropellerSpec(values, units, boreShape),
@@ -77,6 +164,11 @@ export default function PropellerBuilder() {
     .filter((issue) => issue.field === "general")
     .map((issue) => issue.message);
   const warnings = validation.warnings.map((warning) => warning.message);
+  const fieldIssues: FieldIssue[] = Array.from(errors, ([field, message]) => ({
+    fieldId: field,
+    label: PROPELLER_FIELD_LABELS[field] ?? field,
+    message,
+  })).filter((issue) => issue.fieldId !== "general");
   const watertight = Boolean(validation.ok && report?.ok);
   const volumeCm3 = report?.ok ? report.volumeMm3 / 1000 : Number.NaN;
   const fileBytes = mesh ? stlByteLength(mesh) : 0;
@@ -188,6 +280,49 @@ export default function PropellerBuilder() {
       "propeller-drawing.svg",
       "image/svg+xml",
     );
+  }
+
+  function handleBundle() {
+    const record = artifactRecord();
+    if (!current || !record) return;
+    try {
+      const stlName = `propeller-${formatNumber(current.tipDiameterMm, 0)}d-${Math.round(
+        current.bladeCount,
+      )}blade.stl`;
+      const base = stlName.replace(/\.stl$/i, "");
+      downloadBytes(
+        createZip([
+          {
+            name: stlName,
+            data: buildBinaryStl(
+              buildRotorMesh(current),
+              "FIT PROTOTYPE - Propeller Designer - units: mm",
+            ),
+          },
+          { name: `${base}-spec.txt`, data: renderRecordSpecification(record) },
+          {
+            name: `${base}-drawing.svg`,
+            data: renderRecordDrawingSvg({
+              id: record.id,
+              name: record.name,
+              contract: record.contract,
+              mesh: record.mesh!,
+            }),
+          },
+        ]),
+        `${base}.zip`,
+        "application/zip",
+      );
+    } catch (error) {
+      console.error(error);
+      setExportError("The export bundle could not be generated. Please try again.");
+    }
+  }
+
+  function applyPreset(id: string) {
+    const preset = presets.find((item) => item.id === id);
+    if (!preset) return;
+    replaceValues(presetValuesForUnits(preset.values, PROPELLER_LENGTH_FIELDS, units));
   }
 
   const change = (field: PropellerField, value: string) => setField(field, value);
@@ -378,6 +513,16 @@ export default function PropellerBuilder() {
 
   return (
     <DesignScaffold
+      toolbar={
+        <DesignerToolbar
+          presets={presets}
+          activePresetId={activePresetId}
+          onPreset={applyPreset}
+          copyStatus={copyStatus}
+          onCopy={copyLink}
+        />
+      }
+      fieldIssues={fieldIssues}
       form={form}
       general={general}
       warnings={warnings}
@@ -407,6 +552,7 @@ export default function PropellerBuilder() {
         limitation: "No thrust, balance or safe-speed rating is provided; geometry prototype only.",
         onSpec: handleSpec,
         onDrawing: handleDrawing,
+        onBundle: handleBundle,
         artifactsDisabled: !watertight,
         onExport: handleExport,
         disabled: !validation.ok || !report?.ok,

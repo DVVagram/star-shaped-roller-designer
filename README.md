@@ -43,6 +43,14 @@ builders also download a specification and a dimension sheet. Exporting a fit
 prototype is allowed only after the mesh passes the topology checks; that is
 still not permission to treat it as a certified part.
 
+Each designer keeps its current setup in the address bar (`?config=…`), restores
+the last local edit on that browser, and offers Standard, Compact and Oversize
+starting points where the design validates them. **Copy link** carries the same
+setup to another tab. The export panel downloads the STL, specification and
+dimension sheet separately or together as one ZIP. The header switcher searches
+all one hundred and forty-six designers, and every designer links to its paired
+and related pages.
+
 Everything runs in the browser: no CAD kernel, no server, no account, no uploads.
 
 ---
@@ -228,7 +236,9 @@ src/
   App.tsx                    suite shell: header, hash router, catalog, footer
   components/
     Catalog.tsx              the one hundred and forty-six cards, grouped by family
-    DesignerPage.tsx         compact title + builder first, explainer below
+    DesignerPage.tsx         compact title + builder first, explainer below, related cards
+    DesignerSearch.tsx       searchable designer combobox in the header
+    DesignerTools.tsx        presets, copy-link, issue summary and sticky export bar
     DesignScaffold.tsx       two-column builder: inputs, measurements, preview, export
     GenericDesigner.tsx      schema-driven form used by all one hundred and forty-six new designs
     DesignMark.tsx           one family glyph per catalog card
@@ -245,6 +255,9 @@ src/
     kit/revolve.ts           solid-of-revolution kernel and profile builder
     kit/sweep.ts             helical-tube and swept-annulus kernels
     designs/types.ts         field schema, defineDesign(), validation helpers
+    designs/presets.ts       validated Compact/Standard/Oversize starting points
+    kit/design-link.ts       versioned URL/config, local restore and clipboard
+    kit/zip.ts               store-only ZIP writer for the three export files
     designs/geometry.ts      involute gears, ratchet, Geneva, cams, wrench profiles
     designs/prism-*.ts       the prism designs (gears, parts, hardware, plates, discs)
     designs/revolve-*.ts     the revolved designs (vessels, mechanical, household, parts)

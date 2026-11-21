@@ -133,6 +133,7 @@ await send("Log.enable");
 await send("Page.navigate", { url: `${BASE}/#/` });
 await waitFor("Boolean(document.querySelector('h1'))");
 await sleep(700);
+await evaluate("localStorage.clear()");
 
 const results = [];
 for (const route of routes) {
@@ -253,10 +254,16 @@ const invalidState = await evaluate(`(() => {
   const buttons = [...document.querySelectorAll('button')];
   const stl = buttons.find((b) => /Download STL/.test(b.textContent || ''));
   const spec = buttons.find((b) => /Specification/.test(b.textContent || ''));
+  const summary = document.querySelector('#builder-issues');
+  const jump = summary?.querySelector('button');
+  jump?.click();
   return {
     stlDisabled: Boolean(stl?.disabled),
     specDisabled: Boolean(spec?.disabled),
     error: /must be between|Enter a/.test(document.body.innerText),
+    summary: Boolean(summary && /needs attention/.test(summary.innerText)),
+    jumped: Boolean(jump && document.activeElement?.id === jump.dataset.fieldId),
+    focused: document.activeElement?.id || '',
   };
 })()`);
 check(
@@ -264,8 +271,105 @@ check(
   !validState.stlDisabled &&
     invalidState.stlDisabled &&
     invalidState.specDisabled &&
-    invalidState.error,
+    invalidState.error &&
+    invalidState.summary,
   JSON.stringify({ validState, invalidState }),
+);
+check(
+  "error-summary-jumps-to-field",
+  invalidState.jumped && invalidState.focused.length > 0,
+  JSON.stringify(invalidState),
+);
+await evaluate(`(() => {
+  [...document.querySelectorAll('#builder button')].find((b) => b.textContent?.trim() === 'Reset')?.click();
+  return true;
+})()`);
+await sleep(500);
+
+// Presets, search, related links and URL round-trip.
+await navigate(`${BASE}/#/centering-cone`);
+await waitFor("Boolean(document.querySelector('[aria-label=\"Starting point\"]'))");
+await sleep(400);
+const presetApplied = await evaluate(`(() => {
+  const compact = [...document.querySelectorAll('[aria-label="Starting point"] button')]
+    .find((b) => b.textContent.trim() === 'Compact');
+  const before = document.querySelector('#centering-cone-large')?.value;
+  compact?.click();
+  return { before };
+})()`);
+await sleep(600);
+const presetAfter = await evaluate(`(() => ({
+  large: document.querySelector('#centering-cone-large')?.value,
+  active: [...document.querySelectorAll('[aria-label="Starting point"] button')]
+    .find((b) => b.getAttribute('aria-pressed') === 'true')?.textContent.trim(),
+  config: new URL(location.href).searchParams.has('config'),
+  related: document.querySelectorAll('#about ~ section a[href^="#/"]').length,
+  relatedTitle: document.body.innerText.includes('Related designers'),
+  bundle: [...document.querySelectorAll('button')].some((b) => /Download all three/.test(b.textContent || '')),
+  url: location.href,
+}))()`);
+check(
+  "preset-and-shared-url",
+  presetApplied.before !== presetAfter.large &&
+    presetAfter.active === 'Compact' &&
+    presetAfter.config &&
+    presetAfter.bundle,
+  JSON.stringify({ presetApplied, ...presetAfter }),
+);
+check(
+  "related-designers",
+  presetAfter.related >= 3 && presetAfter.relatedTitle,
+  `${presetAfter.related} links, title ${presetAfter.relatedTitle}`,
+);
+await navigate(presetAfter.url);
+await waitFor("Boolean(document.querySelector('#centering-cone-large'))");
+await sleep(300);
+const restored = await evaluate(`({
+  large: document.querySelector('#centering-cone-large')?.value,
+  active: [...document.querySelectorAll('[aria-label="Starting point"] button')]
+    .find((b) => b.getAttribute('aria-pressed') === 'true')?.textContent.trim(),
+})`);
+check(
+  "shared-url-restores-state",
+  restored.large === presetAfter.large && restored.active === 'Compact',
+  JSON.stringify(restored),
+);
+
+const searchOpened = await evaluate(`(() => {
+  const trigger = document.querySelector('nav button[aria-haspopup="listbox"]');
+  trigger?.click();
+  return Boolean(trigger);
+})()`);
+await sleep(250);
+await evaluate(`(() => {
+  const input = document.querySelector('#designer-search');
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+  setter.call(input, 'sprocket');
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  return true;
+})()`);
+await sleep(300);
+const searchFiltered = await evaluate(`(() => {
+  const options = [...document.querySelectorAll('[role=option]')];
+  const names = options.map((option) => option.querySelector('span span')?.textContent || '');
+  options[0]?.click();
+  return { names };
+})()`);
+await sleep(800);
+const searchLanded = await evaluate(`({
+  hash: location.hash,
+  h1: document.querySelector('h1')?.innerText || '',
+  options: document.querySelectorAll('[role=option]').length,
+})`);
+check(
+  "searchable-designer-switcher",
+  searchOpened &&
+    searchFiltered.names.length === 1 &&
+    searchFiltered.names[0] === 'Chain sprocket' &&
+    searchLanded.hash === '#/sprocket' &&
+    searchLanded.h1.includes('Sprockets') &&
+    searchLanded.options === 0,
+  JSON.stringify({ searchOpened, searchFiltered, searchLanded }),
 );
 
 // Mobile layout and one high-risk designer page.
@@ -306,6 +410,7 @@ const mobileDesigner = await evaluate(`(() => {
     drawing: buttons.some((b) => /Dimension sheet/.test(b.textContent || '')),
     skip: buttons.some((b) => /Skip to content/.test(b.textContent || '')),
     focus: document.activeElement?.tagName === 'H1',
+    sticky: document.querySelector('[aria-label="Export actions"]')?.innerText || '',
   };
 })()`);
 check(
@@ -322,9 +427,18 @@ check(
     mobileDesigner.spec &&
     mobileDesigner.drawing &&
     mobileDesigner.skip &&
-    mobileDesigner.focus,
+    mobileDesigner.focus &&
+    /Ready to export/.test(mobileDesigner.sticky) &&
+    /Download STL/.test(mobileDesigner.sticky),
   JSON.stringify(mobileDesigner),
 );
+
+await evaluate(`document.querySelector('#export-panel')?.scrollIntoView({ block: 'center' })`);
+await sleep(500);
+const stickyNearPanel = await evaluate(
+  "Boolean(document.querySelector('[aria-label=\"Export actions\"]'))",
+);
+check("sticky-export-hides-at-panel", !stickyNearPanel, `visible ${stickyNearPanel}`);
 // In-page controls must not be mistaken for hash routes.
 const anchorBefore = await evaluate(`({ h1: document.querySelector('h1')?.innerText || '', hash: location.hash })`);
 await evaluate(`(() => {

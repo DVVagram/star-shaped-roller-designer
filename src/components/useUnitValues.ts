@@ -15,12 +15,20 @@ import {
 export function useUnitValues<F extends string>(
   defaults: Record<F, string>,
   lengthFields: readonly F[],
+  initial?: { units: LengthUnit; values: Partial<Record<F, string>> } | null,
 ) {
-  const [units, setUnitsState] = useState<LengthUnit>("mm");
-  const [values, setValues] = useState<Record<F, string>>(defaults);
+  const [units, setUnitsState] = useState<LengthUnit>(initial?.units ?? "mm");
+  const [values, setValues] = useState<Record<F, string>>(() => ({
+    ...defaults,
+    ...(initial?.values ?? {}),
+  }));
 
   const setField = useCallback((field: F, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
+  }, []);
+
+  const replaceValues = useCallback((next: Record<string, string>) => {
+    setValues((current) => ({ ...current, ...next }));
   }, []);
 
   const setUnits = useCallback(
@@ -47,5 +55,5 @@ export function useUnitValues<F extends string>(
     setValues(defaults);
   }, [defaults]);
 
-  return { units, values, setField, setUnits, reset };
+  return { units, values, setField, replaceValues, setUnits, reset };
 }

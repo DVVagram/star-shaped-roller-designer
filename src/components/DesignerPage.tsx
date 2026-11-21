@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { DesignContract } from "@/lib/designs/contracts";
+import { FAMILIES, type DesignFamily } from "@/lib/designs/types";
 
 import CapabilityNotice from "./CapabilityNotice";
 
@@ -8,6 +9,13 @@ export interface PageStep {
   number: string;
   title: string;
   body: string;
+}
+
+export interface RelatedDesign {
+  id: string;
+  name: string;
+  family: DesignFamily;
+  blurb: string;
 }
 
 export interface DesignerPageProps {
@@ -24,6 +32,7 @@ export interface DesignerPageProps {
   checklist: readonly string[];
   notesTitle: string;
   notes: readonly string[];
+  related?: readonly RelatedDesign[];
   children: ReactNode;
 }
 
@@ -41,6 +50,7 @@ export default function DesignerPage({
   checklist,
   notesTitle,
   notes,
+  related = [],
   children,
 }: DesignerPageProps) {
   return (
@@ -149,6 +159,52 @@ export default function DesignerPage({
         <div className="pt-10">
           <CapabilityNotice contract={contract} />
         </div>
+      )}
+
+      {related.length > 0 && (
+        <section className="border-t border-line bg-paper">
+          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
+                  Keep designing
+                </p>
+                <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+                  Related designers
+                </h2>
+              </div>
+              <a
+                href="#/"
+                className="text-xs font-medium text-muted underline decoration-line underline-offset-2 hover:text-ink"
+              >
+                All designers
+              </a>
+            </div>
+            <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+              {related.map((item) => (
+                <li key={item.id}>
+                  <a
+                    href={`#/${item.id}`}
+                    className="flex h-full flex-col rounded-2xl border border-line bg-card p-4 transition hover:border-accent/50 hover:bg-paper-deep/40"
+                  >
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                      {FAMILIES[item.family].label}
+                    </span>
+                    <span className="mt-1.5 text-sm font-semibold tracking-tight">
+                      {item.name}
+                    </span>
+                    <span className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted">
+                      {item.blurb}
+                    </span>
+                    <span className="mt-auto pt-3 text-[11px] font-semibold text-accent-strong">
+                      Open designer →
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       )}
     </>
   );
